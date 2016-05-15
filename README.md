@@ -1,2 +1,2 @@
 # py-ga-VRPSTW
-A Solution to Vehicle Routing Problem with Soft Time Windows using Genetic Algorithm based on a Python Implementation
+A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Soft Time Windows
