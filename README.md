@@ -17,20 +17,20 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 > 
 > The larger problems are 100 customer euclidean problems where travel times equal the corresponding distances. For each such problem, smaller problems have been created by considering only the first 25 or 50 customers.
 > 
-> (Source: [Solomon's Web Page](http://web.cba.neu.edu/~msolomon/problems.htm))
+> (Source: [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm))
 
 ### Instance definitions
-See [Solomon's Web Page](http://web.cba.neu.edu/~msolomon/problems.htm)  
+See [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm).  
 As a backup, you will find a zip-file with the 100 instance definitions [here](http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip).
 
 **Below is a description of the format of the text file that defines each problem instance (assuming 100 customers).**
 
 * All constants are integers.
-* Customer number 0 denotes the depot, where all vehicles must start and finish.
-* K is the maximum number of vehicles.  
-* Q the capacity of each vehicle.
-* 'Ready time' is the earliest time at which service may start at the given customer/depot.
-* 'Due date' is the latest time at which service may start at the given customer/depot.
+* `CUST NO.` 0 denotes the depot, where all vehicles must start and finish.
+* `K` is the maximum number of vehicles.  
+* `Q` the capacity of each vehicle.
+* `READY TIME` is the earliest time at which service may start at the given customer/depot.
+* `DUE DATE` is the latest time at which service may start at the given customer/depot.
 * The value of time is equal to the value of distance.
 
 ```
