@@ -59,6 +59,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 ```
 Sample code coming soon...
 ```
+
 [^solomon]: [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm)
 [^100customers]: [100 Customers Instance Definitions](http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/)
 [^deap]: [Distributed Evolutionary Algorithms in Python (DEAP)](https://pypi.python.org/pypi/deap/)
