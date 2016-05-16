@@ -25,14 +25,6 @@ As a backup, you will find a zip-file with the 100 instance definitions [here](h
 
 **Below is a description of the format of the text file that defines each problem instance (assuming 100 customers).**
 
-* All constants are integers.
-* `CUST NO.` 0 denotes the depot, where all vehicles must start and finish.
-* `K` is the maximum number of vehicles.  
-* `Q` the capacity of each vehicle.
-* `READY TIME` is the earliest time at which service may start at the given customer/depot.
-* `DUE DATE` is the latest time at which service may start at the given customer/depot.
-* The value of time is equal to the value of distance.
-
 ```
 <Instance name>
 <empty line>
@@ -48,6 +40,15 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
   ...     ...        ...        ...        ...         ...           ...  
   100     x100      y100       q100       e100        l100          s100
 ```
+**Remarks:**
+
+1. All constants are integers.
+2. `CUST NO.` 0 denotes the depot, where all vehicles must start and finish.
+3. `K` is the maximum number of vehicles.  
+4. `Q` the capacity of each vehicle.
+5. `READY TIME` is the earliest time at which service may start at the given customer/depot.
+6. `DUE DATE` is the latest time at which service may start at the given customer/depot.
+7. The value of time is equal to the value of distance.
 
 ## GA Implementation
 **Distributed Evolutionary Algorithms in Python (DEAP)**
