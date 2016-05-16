@@ -1,7 +1,7 @@
 # py-ga-VRPSTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Soft Time Windows (VRPSTW)
 
-## Solomon's VRPTW Benchmark Problems[^solomon]
+## Solomon's VRPTW Benchmark Problems
 > R1-type|C1-type|RC1-type|R2-type|C2-type|RC2-type
 > -------|-------|--------|-------|-------|--------
 > I generated six sets of problems. Their design highlights several factors that affect the behavior of routing and scheduling algorithms. They are:
@@ -19,7 +19,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 > 
 > (Source: [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm))
 
-### Instance Definitions[^100customers]
+### Instance Definitions
 See [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm).  
 As a backup, you will find a zip-file with the 100 instance definitions [here](http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip).
 
@@ -50,7 +50,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 ```
 
 ## GA Implementation
-**Distributed Evolutionary Algorithms in Python (DEAP)**[^deap]
+**Distributed Evolutionary Algorithms in Python (DEAP)**
 
 * Docs: [http://deap.readthedocs.org/](http://deap.readthedocs.org/)
 * GitHub: [https://github.com/deap/deap/](https://github.com/deap/deap/)
@@ -60,6 +60,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 Sample code coming soon...
 ```
 
-[^solomon]: [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm)
-[^100customers]: [100 Customers Instance Definitions](http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/)
-[^deap]: [Distributed Evolutionary Algorithms in Python (DEAP)](https://pypi.python.org/pypi/deap/)
+## References
+1. [Solomon's VRPTW Benchmark Problems](http://web.cba.neu.edu/~msolomon/problems.htm)
+2. [100 Customers Instance Definitions](http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/)
+3. [Distributed Evolutionary Algorithms in Python (DEAP)](https://pypi.python.org/pypi/deap/)
