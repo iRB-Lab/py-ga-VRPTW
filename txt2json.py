@@ -10,7 +10,59 @@ sys.setdefaultencoding('utf8');
 
 
 def main():
-    pass
+    rootpath = ROOT_PATH
+    txtDataDir = os.path.join(rootpath, 'data', 'txt')
+    jsonDataDir = os.path.join(rootpath,'data', 'json')
+
+    for txtFile in map(lambda txtFilename: os.path.join(txtDataDir, txtFilename), os.listdir(txtDataDir)):
+        jsonData = {
+        }
+        with open(txtFile) as f:
+            for lineCount, line in enumerate(f, start=1):
+                if lineCount in [2, 3, 4, 6, 7, 8, 9]:
+                    pass
+                elif lineCount == 1:
+                    # <Instance name>
+                    jsonData['instance_name'] = line.strip()
+                elif lineCount == 5:
+                    # <Maximum vehicle number>, <Vehicle capacity>
+                    values = line.strip().split()
+                    jsonData['max_vehicle_number'] = int(values[0])
+                    jsonData['vehicle_capacity'] = int(values[1])
+                elif lineCount == 10:
+                    # Custom number = 0, deport
+                    # <Custom number>, <X coordinate>, <Y coordinate>, <Demand>, <Ready time>, <Due date>, <Service time>
+                    values = line.strip().split()
+                    jsonData['deport'] = {
+                        'coordinates': {
+                            'x': int(values[1]),
+                            'y': int(values[2]),
+                        },
+                        'demand': int(values[3]),
+                        'ready_time': int(values[4]),
+                        'due_date': int(values[5]),
+                        'service_time': int(values[6]),
+                    }
+                else:
+                    # <Custom number>, <X coordinate>, <Y coordinate>, <Demand>, <Ready time>, <Due date>, <Service time>
+                    values = line.strip().split()
+                    jsonData['customer_%s' % values[0]] = {
+                        'coordinates': {
+                            'x': int(values[1]),
+                            'y': int(values[2]),
+                        },
+                        'demand': int(values[3]),
+                        'ready_time': int(values[4]),
+                        'due_date': int(values[5]),
+                        'service_time': int(values[6]),
+                    }
+
+        jsonFilename = '%s.js' % jsonData['instance_name']
+        jsonFile = os.path.join(jsonDataDir, jsonFilename)
+        print 'Write to file: %s' % jsonFile
+        makeDirsForFile(jsonFile)
+        with open(jsonFile, 'w') as f:
+            json.dump(jsonData, f)
 
 
 if __name__ == '__main__':
