@@ -20,10 +20,12 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 > (Source: [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm))
 
 ### Instance Definitions
-See [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm).  
-As a backup, you will find a zip-file with the 100 instance definitions [here](http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip).
+See [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm).
 
-**Below is a description of the format of the text file that defines each problem instance (assuming 100 customers).**
+#### Text File Format
+The text files corresponding to the problem instances can be found under the `data/txt/` directory. Each text file is named with respect to its corresponding instance name, e.g.: the text file corresponding to problem instance **C101** is `C101.txt`, and locates at `data/txt/C101.txt`.
+
+Below is a description of the format of the text file that defines each problem instance (assuming 100 customers).
 
 ```
 <Instance name>
@@ -49,6 +51,50 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 5. `READY TIME` is the earliest time at which service may start at the given customer/depot.
 6. `DUE DATE` is the latest time at which service may start at the given customer/depot.
 7. The value of time is equal to the value of distance.
+8. As a backup, you will find a zip-file with the 100 instance definitions [here](http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip).
+
+#### JSON Format
+For the further convenience, the text files are converted to JSON format and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.js`, and locates at `data/json/C101.js`.
+
+Below is a description of the format of the JSON file that defines each problem instance (assuming 100 customers).
+
+{
+    "instance_name" : "<Instance name>",
+    "max_vehicle_number" : K,
+    "vehicle_capacity" : Q,
+    "deport" : {
+        "coordinates" : {
+            "x" : x0,
+            "y" : y0
+        },
+        "demand" : q0,
+        "ready_time" : e0,
+        "due_date" : l0,
+        "service_time" : s0
+    },
+    "customer_1" : {
+        "coordinates" : {
+            "x" : x1,
+            "y" : y2
+        },
+        "demand" : q1,
+        "ready_time" : e1,
+        "due_date" : l1,
+        "service_time" : s1
+    },
+    ...
+    "customer_100" : {
+        "coordinates" : {
+            "x" : x1,
+            "y" : y1
+        },
+        "demand" : q1,
+        "ready_time" : e1,
+        "due_date" : l1,
+        "service_time" : s1
+    }
+}
+```
 
 ## GA Implementation
 **Distributed Evolutionary Algorithms in Python (DEAP)**
