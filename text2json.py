@@ -12,12 +12,12 @@ def distance(customer1, customer2):
 
 def main():
     rootpath = ROOT_PATH
-    txtDataDir = os.path.join(rootpath, 'data', 'txt')
+    textDataDir = os.path.join(rootpath, 'data', 'text')
     jsonDataDir = os.path.join(rootpath,'data', 'json')
 
-    for txtFile in map(lambda txtFilename: os.path.join(txtDataDir, txtFilename), os.listdir(txtDataDir)):
+    for textFile in map(lambda textFilename: os.path.join(textDataDir, textFilename), os.listdir(textDataDir)):
         jsonData = {}
-        with open(txtFile) as f:
+        with open(textFile) as f:
             for lineCount, line in enumerate(f, start=1):
                 if lineCount in [2, 3, 4, 6, 7, 8, 9]:
                     pass

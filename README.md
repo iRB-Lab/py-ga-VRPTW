@@ -23,7 +23,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 See [Solomon's web page](http://web.cba.neu.edu/~msolomon/problems.htm).
 
 #### Text File Format
-The text files corresponding to the problem instances can be found under the `data/txt/` directory. Each text file is named with respect to its corresponding instance name, e.g.: the text file corresponding to problem instance **C101** is `C101.txt`, and locates at `data/txt/C101.txt`.
+The text files corresponding to the problem instances can be found under the `data/text/` directory. Each text file is named with respect to its corresponding instance name, e.g.: the text file corresponding to problem instance **C101** is `C101.txt`, and locates at `data/text/C101.txt`.
 
 Below is a description of the format of the text file that defines each problem instance (assuming 100 customers).
 
@@ -54,7 +54,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 8. As a backup, you will find a zip-file with the 100 instance definitions [here](http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip).
 
 #### JSON Format
-For the further convenience, a Python script named `txt2json.py` is writen to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.js`, and locates at `data/json/C101.js`.
+For the further convenience, a Python script named `text2json.py` is writen to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.js`, and locates at `data/json/C101.js`.
 
 Below is a description of the format of the JSON file that defines each problem instance (assuming 100 customers).
 
@@ -86,13 +86,13 @@ Below is a description of the format of the JSON file that defines each problem 
     ...
     "customer_100" : {
         "coordinates" : {
-            "x" : x1,
-            "y" : y1
+            "x" : x100,
+            "y" : y100
         },
-        "demand" : q1,
-        "ready_time" : e1,
-        "due_date" : l1,
-        "service_time" : s1
+        "demand" : q100,
+        "ready_time" : e100,
+        "due_date" : l100,
+        "service_time" : s100
     },
     "distance_matrix" : [
         [dist0_0, dist0_1, ..., dist0_100],
