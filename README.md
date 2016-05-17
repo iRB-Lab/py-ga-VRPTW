@@ -54,7 +54,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 8. As a backup, you will find a zip-file with the 100 instance definitions [here](http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip).
 
 #### JSON Format
-For the further convenience, the text files are converted to JSON format and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.js`, and locates at `data/json/C101.js`.
+For the further convenience, a Python script named `txt2json.py` is writen to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.js`, and locates at `data/json/C101.js`.
 
 Below is a description of the format of the JSON file that defines each problem instance (assuming 100 customers).
 
@@ -93,9 +93,19 @@ Below is a description of the format of the JSON file that defines each problem 
         "ready_time" : e1,
         "due_date" : l1,
         "service_time" : s1
-    }
+    },
+    "distance_matrix" : [
+        [dist0_0, dist0_1, ..., dist0_100],
+        [dist1_0, dist1_1, ..., dist1_100],
+        ...
+        [dist100_0, dist100_1, ..., dist0_0]
+    ]
 }
 ```
+**Remarks:**
+
+1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
+2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<jsonData>['distance_matrix'][1, 2]`, where `<jsonData>` denotes the name of a Python `dict` object.
 
 ## GA Implementation
 **Distributed Evolutionary Algorithms in Python (DEAP)**

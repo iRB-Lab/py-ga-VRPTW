@@ -5,11 +5,10 @@ import sys
 import json
 from basic.common import ROOT_PATH, makeDirsForFile, existFile
 
-reload(sys)
-sys.setdefaultencoding('utf-8');
 
 def distance(customer1, customer2):
     return ((customer1['coordinates']['x'] - customer2['coordinates']['x'])**2 + (customer1['coordinates']['y'] - customer2['coordinates']['y'])**2)**0.5
+
 
 def main():
     rootpath = ROOT_PATH
