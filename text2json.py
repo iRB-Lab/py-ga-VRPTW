@@ -66,7 +66,8 @@ def main():
         print 'Write to file: %s' % jsonFile
         makeDirsForFile(jsonFile)
         with open(jsonFile, 'w') as f:
-            json.dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
+            json.dump(jsonData, f, sort_keys=True)
+            # json.dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 if __name__ == '__main__':
