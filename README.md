@@ -115,7 +115,7 @@ All visited customers of a route (including several sub-routes) are coded into a
 ```
 Sub-route 1: 0 - 5 - 3 - 2 - 0
 Sub-route 2: 0 - 7 - 1 - 6 - 9 - 0
-Sub-route 3: 0 - 8 - 4 -0
+Sub-route 3: 0 - 8 - 4 - 0
 ```
 are coded as `5 3 2 7 1 6 9 8 4`, which can be stored in a Python `list` object, i.e. `[5, 3, 2, 7, 1, 6, 9, 8, 4]`.
 
