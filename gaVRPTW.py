@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+# gaVRPTW.py
 
 import os
-import sys
 import json
 import random
 from deap import base, creator, tools
-from basic.common import ROOT_PATH, makeDirsForFile, existFile
+from basic.common import ROOT_PATH
 
 
 def ind2route(individual, instance):
@@ -95,7 +95,7 @@ def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayC
         # Update total cost
         totalCost = totalCost + subRouteCost
     fitness = 1.0 / totalCost
-    return (fitness, )
+    return fitness,
 
 
 def cxPartialyMatched(ind1, ind2):
@@ -114,10 +114,10 @@ def cxPartialyMatched(ind1, ind2):
     return ind1, ind2
 
 
-def mutReverseIndexes(ind):
-    start, stop = sorted(random.sample(range(len(ind)), 2))
-    mutant = ind[:start] + ind[stop:start-1:-1] + ind[stop+1:]
-    return (mutant, )
+def mutInverseIndexes(individual):
+    start, stop = sorted(random.sample(range(len(individual)), 2))
+    individual = individual[:start] + individual[stop:start-1:-1] + individual[stop+1:]
+    return individual,
 
 
 def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
@@ -143,7 +143,7 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', cxPartialyMatched)
-    toolbox.register('mutate', mutReverseIndexes)
+    toolbox.register('mutate', mutInverseIndexes)
 
     pop = toolbox.population(n=popSize)
 
@@ -209,39 +209,3 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     print 'Fitness: %s' % bestInd.fitness.values[0]
     printRoute(ind2route(bestInd, instance))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
-
-
-def main():
-    random.seed(64)
-
-    instName = 'R101'
-
-    unitCost = 8.0
-    initCost = 60.0
-    waitCost = 0.5
-    delayCost = 1.5
-
-    indSize = 25
-    popSize = 80
-    cxPb = 0.85
-    mutPb = 0.01
-    NGen = 100
-
-    # instName = 'C204'
-
-    # unitCost = 8.0
-    # initCost = 100.0
-    # waitCost = 1.0
-    # delayCost = 1.5
-
-    # indSize = 100
-    # popSize = 400
-    # cxPb = 0.85
-    # mutPb = 0.02
-    # NGen = 300
-
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
-
-
-if __name__ == '__main__':
-    main()

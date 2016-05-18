@@ -58,7 +58,7 @@ For the further convenience, a Python script named `text2json.py` is writen to c
 
 Below is a description of the format of the JSON file that defines each problem instance (assuming 100 customers).
 
-```
+```json
 {
     "instance_name" : "<Instance name>",
     "max_vehicle_number" : K,
@@ -108,15 +108,431 @@ Below is a description of the format of the JSON file that defines each problem 
 2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<jsonData>['distance_matrix'][1][2]`, where `<jsonData>` denotes the name of a Python `dict` object.
 
 ## GA Implementation
+### Individual (Chromosome)
+#### Individual Coding
+All visited customers of a route (including several sub-routes) are coded into an `individual` in turn. For example, the following route
+
+```
+Sub-route 1: 0 - 5 - 3 - 2 - 0
+Sub-route 2: 0 - 7 - 1 - 6 - 9 - 0
+Sub-route 3: 0 - 8 - 4 -0
+```
+are coded as `5 3 2 7 1 6 9 8 4`, which can be stored in a Python `list` object, i.e. `[5, 3, 2, 7, 1, 6, 9, 8, 4]`.
+
+#### Individual Decoding
+```python
+ind2route(individual, instance)
+```
+Decodes `individual` to `route` representation. To show the difference between an `individual` and a `route`, an example is given below.
+
+```python
+# individual
+[5, 3, 2, 7, 1, 6, 9, 8, 4]
+
+# route
+[[5, 3, 2], [7, 1, 6, 9], [8, 4]]
+``` 
+
+**Parameters:**
+
+* `individual` – An individual to be decoded.
+* `instance` – A problem instance `dict` object, which can be loaded from a JSON format file.
+
+**Returns:**
+
+* A list of decoded sub-routes corresponding to the input individual.
+
+**Definition:**
+
+```python
+def ind2route(individual, instance):
+    route = []
+    vehicleCapacity = instance['vehicle_capacity']
+    deportDueTime =  instance['deport']['due_time']
+    # Initialize a sub-route
+    subRoute = []
+    vehicleLoad = 0
+    elapsedTime = 0
+    lastCustomerID = 0
+    for customerID in individual:
+        # Update vehicle load
+        demand = instance['customer_%d' % customerID]['demand']
+        updatedVehicleLoad = vehicleLoad + demand
+        # Update elapsed time
+        serviceTime = instance['customer_%d' % customerID]['service_time']
+        returnTime = instance['distance_matrix'][customerID][0]
+        updatedElapsedTime = elapsedTime + instance['distance_matrix'][lastCustomerID][customerID] + serviceTime + returnTime
+        # Validate vehicle load and elapsed time
+        if (updatedVehicleLoad <= vehicleCapacity) and (updatedElapsedTime <= deportDueTime):
+            # Add to current sub-route
+            subRoute.append(customerID)
+            vehicleLoad = updatedVehicleLoad
+            elapsedTime = updatedElapsedTime - returnTime
+        else:
+            # Save current sub-route
+            route.append(subRoute)
+            # Initialize a new sub-route and add to it
+            subRoute = [customerID]
+            vehicleLoad = demand
+            elapsedTime = instance['distance_matrix'][0][customerID] + serviceTime
+        # Update last customer ID
+        lastCustomerID = customerID
+    if subRoute != []:
+        # Save current sub-route before return if not empty
+        route.append(subRoute)
+    return route
+```
+
+#### Others
+```python
+printRoute(route, merge=False)
+```
+Prints sub-routes information to screen.
+
+**Parameters:**
+
+* `route` – A `route` decoded by `ind2route(individual, instance)`.
+* `merge` – If `Ture`, detailed sub-routes are displayed in a single line.
+
+**Returns:**
+
+* None
+
+**Definition:**
+
+```python
+def printRoute(route, merge=False):
+    routeStr = '0'
+    subRouteCount = 0
+    for subRoute in route:
+        subRouteCount += 1
+        subRouteStr = '0'
+        for customerID in subRoute:
+            subRouteStr = subRouteStr + ' - ' + str(customerID)
+            routeStr = routeStr + ' - ' + str(customerID)
+        subRouteStr = subRouteStr + ' - 0'
+        if not merge:
+            print '  Vehicle %d\'s route: %s' % (subRouteCount, subRouteStr)
+        routeStr = routeStr + ' - 0'
+    if merge:
+        print routeStr
+    return
+```
+
+### Evaluation
+```python
+evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0)
+```
+Takes one individual as argument and returns its fitness as a Python `tuple` object.
+
+**Parameters:**
+
+* `individual` - An individual to be evaluated.
+* `instance` - A problem instance `dict` object, which can be loaded from a JSON format file.
+* `unitCost` - The transportation cost of one vehicle for a unit distance.
+* `initCost` - The start-up cost of a vehicle.
+* `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
+* `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
+
+**Returns:**
+
+* A tuple of one fitness value of the evaluated individual. 
+
+**Definition:**
+
+```python
+def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0):
+    totalCost = 0
+    route = ind2route(individual, instance)
+    totalCost = 0
+    for subRoute in route:
+        subRouteTimeCost = 0
+        subRouteDistance = 0
+        elapsedTime = 0
+        lastCustomerID = 0
+        for customerID in subRoute:
+            # Calculate section distance
+            distance = instance['distance_matrix'][lastCustomerID][customerID]
+            # Update sub-route distance
+            subRouteDistance = subRouteDistance + distance
+            # Calculate time cost
+            arrivalTime = elapsedTime + distance
+            timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
+            # Update sub-route time cost
+            subRouteTimeCost = subRouteTimeCost + timeCost
+            # Update elapsed time
+            elapsedTime = arrivalTime + instance['customer_%d' % customerID]['service_time']
+            # Update last customer ID
+            lastCustomerID = customerID
+        # Calculate transport cost
+        subRouteDistance = subRouteDistance + instance['distance_matrix'][lastCustomerID][0]
+        subRouteTranCost = initCost + unitCost * subRouteDistance
+        # Obtain sub-route cost
+        subRouteCost = subRouteTimeCost + subRouteTranCost
+        # Update total cost
+        totalCost = totalCost + subRouteCost
+    fitness = 1.0 / totalCost
+    return fitness,
+```
+
+### Selection: Roulette Wheel Selection
+```python
+deap.tools.selRoulette(individuals, k)
+```
+Selects `k` individuals from the input individuals using `k` spins of a roulette. The selection is made by looking only at the first objective of each individual. The list returned contains references to the input individuals.
+
+**Parameters:**
+
+* `individuals` – A list of individuals to select from.
+* `k` – The number of individuals to select.
+
+**Returns:**
+
+* A list of selected individuals.
+
+**Definition:**
+
+```python
+def selRoulette(individuals, k):
+    s_inds = sorted(individuals, key=attrgetter("fitness"), reverse=True)
+    sum_fits = sum(ind.fitness.values[0] for ind in individuals)
+    chosen = []
+    for i in xrange(k):
+        u = random.random() * sum_fits
+        sum_ = 0
+        for ind in s_inds:
+            sum_ += ind.fitness.values[0]
+            if sum_ > u:
+                chosen.append(ind)
+                break
+    return chosen
+```
+
+### Crossover: Partially Matched Crossover
+```python
+cxPartialyMatched(ind1, ind2)
+```
+Executes a partially matched crossover (PMX) on the input individuals. The two individuals are modified in place. This crossover expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
+
+**Parameters:**
+
+* `ind1` – The first individual participating in the crossover.
+* `ind2` – The second individual participating in the crossover.
+
+**Returns:**
+
+* A tuple of two individuals.
+
+**Definition:**
+
+```python
+def cxPartialyMatched(ind1, ind2):
+    size = min(len(ind1), len(ind2))
+    cxpoint1, cxpoint2 = sorted(random.sample(range(size), 2))
+    temp1 = ind1[cxpoint1:cxpoint2+1] + ind2
+    temp2 = ind1[cxpoint1:cxpoint2+1] + ind1
+    ind1 = []
+    for x in temp1:
+        if x not in ind1:
+            ind1.append(x)
+    ind2 = []
+    for x in temp2:
+        if x not in ind2:
+            ind2.append(x)
+    return ind1, ind2
+```
+
+### Mutation: Inverse Operation
+```python
+mutInverseIndexes(individual)
+```
+Inverses the attributes between two random points of the input individual and return the mutant. This mutation expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
+
+**Parameters:**
+
+* `individual` – Individual to be mutated.
+
+**Returns:**
+
+* A tuple of one individual.
+
+**Definition:**
+
+```python
+def mutInverseIndexes(individual):
+    start, stop = sorted(random.sample(range(len(individual)), 2))
+    individual = individual[:start] + individual[stop:start-1:-1] + individual[stop+1:]
+    return individual,
+```
+
+### Algorithm
+```python
+gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+```
+Implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
+
+**Parameters:**
+
+* `instName` - A problem instance name provided in Solomon's VRPTW benchmark problems.
+* `unitCost` - The transportation cost of one vehicle for a unit distance.
+* `initCost` - The start-up cost of a vehicle.
+* `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
+* `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
+* `indSize` - Size of an individual. 
+* `popSize` - Size of a population.
+* `cxPb` - Probability of crossover.
+* `mutPb` - Probability of mutation.
+* `NGen` - Maximum number of generations to terminate evolution. 
+
+**Returns:**
+
+* None
+
+**Definition:**
+
+```python
+def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
+    rootpath = ROOT_PATH
+    jsonDataDir = os.path.join(rootpath,'data', 'json')
+    jsonFile = os.path.join(jsonDataDir, '%s.js' % instName)
+    with open(jsonFile) as f:
+        instance = json.load(f)
+
+    creator.create('FitnessMax', base.Fitness, weights=(1.0,))
+    creator.create('Individual', list, fitness=creator.FitnessMax)
+
+    toolbox = base.Toolbox()
+
+    # Attribute generator
+    toolbox.register('indexes', random.sample, range(1, indSize + 1), indSize)
+
+    # Structure initializers
+    toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
+    toolbox.register('population', tools.initRepeat, list, toolbox.individual)
+
+    # Operator registering
+    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
+    toolbox.register('select', tools.selRoulette)
+    toolbox.register('mate', cxPartialyMatched)
+    toolbox.register('mutate', mutInverseIndexes)
+
+    pop = toolbox.population(n=popSize)
+
+    print 'Start of evolution'
+
+    # Evaluate the entire population
+    fitnesses = list(map(toolbox.evaluate, pop))
+    for ind, fit in zip(pop, fitnesses):
+        ind.fitness.values = fit
+
+    print '  Evaluated %d individuals' % len(pop)
+
+    # Begin the evolution
+    for g in range(NGen):
+        print '-- Generation %d --' % g
+
+        # Select the next generation individuals
+        offspring = toolbox.select(pop, len(pop))
+
+        # Clone the selected individuals
+        offspring = list(map(toolbox.clone, offspring))
+
+        # Apply crossover and mutation on the offspring
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            if random.random() < cxPb:
+                toolbox.mate(child1, child2)
+                del child1.fitness.values
+                del child2.fitness.values
+
+        for mutant in offspring:
+            if random.random() < mutPb:
+                toolbox.mutate(mutant)
+                del mutant.fitness.values
+
+        # Evaluate the individuals with an invalid fitness
+        invalidInd = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = map(toolbox.evaluate, invalidInd)
+        for ind, fit in zip(invalidInd, fitnesses):
+            ind.fitness.values = fit
+
+        print '  Evaluated %d individuals' % len(invalidInd)
+
+        # The population is entirely replaced by the offspring
+        pop[:] = offspring
+
+        # Gather all the fitnesses in one list and print the stats
+        fits = [ind.fitness.values[0] for ind in pop]
+
+        length = len(pop)
+        mean = sum(fits) / length
+        sum2 = sum(x*x for x in fits)
+        std = abs(sum2 / length - mean**2)**0.5
+
+        print '  Min %s' % min(fits)
+        print '  Max %s' % max(fits)
+        print '  Avg %s' % mean
+        print '  Std %s' % std
+
+    print '-- End of (successful) evolution --'
+
+    bestInd = tools.selBest(pop, 1)[0]
+    print 'Best individual: %s' % bestInd
+    print 'Fitness: %s' % bestInd.fitness.values[0]
+    printRoute(ind2route(bestInd, instance))
+    print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
+```
+
+### Sample Code
+```python
+# -*- coding: utf-8 -*-
+# sample.py
+
+import random
+from gaVRPTW import gaVRPTW
+
+
+def main():
+    random.seed(64)
+
+    instName = 'R101'
+
+    unitCost = 8.0
+    initCost = 60.0
+    waitCost = 0.5
+    delayCost = 1.5
+
+    indSize = 25
+    popSize = 80
+    cxPb = 0.85
+    mutPb = 0.01
+    NGen = 100
+
+    # instName = 'C204'
+
+    # unitCost = 8.0
+    # initCost = 100.0
+    # waitCost = 1.0
+    # delayCost = 1.5
+
+    # indSize = 100
+    # popSize = 400
+    # cxPb = 0.85
+    # mutPb = 0.02
+    # NGen = 300
+
+    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+### Further Reading
 **Distributed Evolutionary Algorithms in Python (DEAP)**
 
 * Docs: [http://deap.readthedocs.org/](http://deap.readthedocs.org/)
 * GitHub: [https://github.com/deap/deap/](https://github.com/deap/deap/)
 * PyPI: [https://pypi.python.org/pypi/deap/](https://pypi.python.org/pypi/deap/)
-
-```
-Sample code coming soon...
-```
 
 ## References
 1. [Solomon's VRPTW Benchmark Problems](http://web.cba.neu.edu/~msolomon/problems.htm)
