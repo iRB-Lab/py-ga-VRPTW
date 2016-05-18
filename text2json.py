@@ -40,7 +40,7 @@ def main():
                         },
                         'demand': float(values[3]),
                         'ready_time': float(values[4]),
-                        'due_date': float(values[5]),
+                        'due_time': float(values[5]),
                         'service_time': float(values[6]),
                     }
                 else:
@@ -53,7 +53,7 @@ def main():
                         },
                         'demand': float(values[3]),
                         'ready_time': float(values[4]),
-                        'due_date': float(values[5]),
+                        'due_time': float(values[5]),
                         'service_time': float(values[6]),
                     }
 

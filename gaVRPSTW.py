@@ -43,8 +43,8 @@ def printRoute(route, merge=False):
     return
 
 
-def evalVRPSTW(individual, instance):
-    pass
+def evalVRPSTW(individual, instance, unitCost, initCost, waitCost, delayCost):
+    timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
     return fitness
 
 
