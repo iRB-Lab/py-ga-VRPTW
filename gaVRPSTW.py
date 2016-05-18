@@ -8,6 +8,41 @@ from deap import base, creator, tools
 from basic.common import ROOT_PATH, makeDirsForFile, existFile
 
 
+def ind2route(individual, instance):
+    route = []
+    subRoute = []
+    vehicleCapacity = instance['vehicle_capacity']
+    vehicleLoad = 0
+    for customerID in individual:
+        updateVehicleLoad = vehicleLoad + instance['customer_%d' % customerID]['demand']
+        if updateVehicleLoad <= vehicleCapacity:
+            subRoute.append(customerID)
+            vehicleLoad = updateVehicleLoad
+        else:
+            route.append(subRoute)
+            subRoute = [customerID]
+            vehicleLoad = instance['customer_%d' % customerID]['demand']
+    if subRoute != []:
+        route.append(subRoute)
+    return route
+
+
+def printRoute(route, merge=False):
+    routeStr = '0'
+    for subRoute in route:
+        subRouteStr = '0'
+        for customerID in subRoute:
+            subRouteStr = subRouteStr + ' - ' + str(customerID)
+            routeStr = routeStr + ' - ' + str(customerID)
+        subRouteStr = subRouteStr + ' - 0'
+        if not merge:
+            print subRouteStr
+        routeStr = routeStr + ' - 0'
+    if merge:
+        print routeStr
+    return
+
+
 def evalVRPSTW(individual, instance):
     pass
     return fitness
@@ -22,11 +57,6 @@ def mutReverseIndexes(individual):
 def selImprovedRoulette(individuals, k):
     pass
     return selIndividuals
-
-
-def ind2route(individual):
-    pass
-    return route
 
 
 def gaVRPSTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
@@ -63,11 +93,11 @@ def gaVRPSTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
 
-    print '  Evaluated %i individuals' % len(pop)
+    print '  Evaluated %d individuals' % len(pop)
 
     # Begin the evolution
     for g in range(NGen):
-        print '-- Generation %i --' % g
+        print '-- Generation %d --' % g
 
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
@@ -93,7 +123,7 @@ def gaVRPSTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
-        print '  Evaluated %i individuals' % len(invalid_ind)
+        print '  Evaluated %d individuals' % len(invalid_ind)
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
@@ -145,6 +175,7 @@ def main():
     # NGen = 300
 
     gaVRPSTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+
 
 if __name__ == '__main__':
     main()

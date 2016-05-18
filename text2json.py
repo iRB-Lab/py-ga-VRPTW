@@ -57,7 +57,7 @@ def main():
                         'service_time': float(values[6]),
                     }
 
-        customers = ['deport'] + ['customer_%s' % str(x) for x in range(1, 101)]
+        customers = ['deport'] + ['customer_%d' % x for x in range(1, 101)]
         jsonData['distance_matrix'] = [[distance(jsonData[customer1], jsonData[customer2]) for customer1 in customers] for customer2 in customers]
 
 
