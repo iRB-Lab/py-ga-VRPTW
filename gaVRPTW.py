@@ -10,22 +10,21 @@ from basic.common import ROOT_PATH, makeDirsForFile, existFile
 
 def ind2route(individual, instance):
     route = []
-    subRoute = []
     vehicleCapacity = instance['vehicle_capacity']
-    vehicleLoad = 0
     deportDueTime =  instance['deport']['due_time']
+    # Initialize a sub-route
+    subRoute = []
+    vehicleLoad = 0
     elapsedTime = 0
     lastCustomerID = 0
     for customerID in individual:
         # Update vehicle load
         demand = instance['customer_%d' % customerID]['demand']
         updatedVehicleLoad = vehicleLoad + demand
-
         # Update elapsed time
         serviceTime = instance['customer_%d' % customerID]['service_time']
         returnTime = instance['distance_matrix'][customerID][0]
         updatedElapsedTime = elapsedTime + instance['distance_matrix'][lastCustomerID][customerID] + serviceTime + returnTime
-
         # Validate vehicle load and elapsed time
         if (updatedVehicleLoad <= vehicleCapacity) and (updatedElapsedTime <= deportDueTime):
             # Add to current sub-route
@@ -39,7 +38,10 @@ def ind2route(individual, instance):
             subRoute = [customerID]
             vehicleLoad = demand
             elapsedTime = instance['distance_matrix'][0][customerID] + serviceTime
+        # Update last customer ID
+        lastCustomerID = customerID
     if subRoute != []:
+        # Save current sub-route before return if not empty
         route.append(subRoute)
     return route
 
@@ -55,28 +57,67 @@ def printRoute(route, merge=False):
             routeStr = routeStr + ' - ' + str(customerID)
         subRouteStr = subRouteStr + ' - 0'
         if not merge:
-            print 'Vehicle %d\'s route: %s' % (subRouteCount, subRouteStr)
+            print '  Vehicle %d\'s route: %s' % (subRouteCount, subRouteStr)
         routeStr = routeStr + ' - 0'
     if merge:
         print routeStr
     return
 
 
-def evalVRPTW(individual, instance, unitCost, initCost, waitCost, delayCost):
-    timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
-    fitness = 1.0 / timeCost
-    return fitness
+def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0):
+    totalCost = 0
+    route = ind2route(individual, instance)
+    totalCost = 0
+    for subRoute in route:
+        subRouteTimeCost = 0
+        subRouteDistance = 0
+        elapsedTime = 0
+        lastCustomerID = 0
+        for customerID in subRoute:
+            # Calculate section distance
+            distance = instance['distance_matrix'][lastCustomerID][customerID]
+            # Update sub-route distance
+            subRouteDistance = subRouteDistance + distance
+            # Calculate time cost
+            arrivalTime = elapsedTime + distance
+            timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
+            # Update sub-route time cost
+            subRouteTimeCost = subRouteTimeCost + timeCost
+            # Update elapsed time
+            elapsedTime = arrivalTime + instance['customer_%d' % customerID]['service_time']
+            # Update last customer ID
+            lastCustomerID = customerID
+        # Calculate transport cost
+        subRouteDistance = subRouteDistance + instance['distance_matrix'][lastCustomerID][0]
+        subRouteTranCost = initCost + unitCost * subRouteDistance
+        # Obtain sub-route cost
+        subRouteCost = subRouteTimeCost + subRouteTranCost
+        # Update total cost
+        totalCost = totalCost + subRouteCost
+    fitness = 1.0 / totalCost
+    return (fitness, )
 
 
-def mutReverseIndexes(individual):
+def cxPartialyMatched(ind1, ind2):
+    size = min(len(ind1), len(ind2))
+    cxpoint1, cxpoint2 = sorted(random.sample(range(size), 2))
+    temp1 = ind1[cxpoint1:cxpoint2+1] + ind2
+    temp2 = ind1[cxpoint1:cxpoint2+1] + ind1
+    ind1 = []
+    for x in temp1:
+        if x not in ind1:
+            ind1.append(x)
+    ind2 = []
+    for x in temp2:
+        if x not in ind2:
+            ind2.append(x)
+    return ind1, ind2
+
+
+def mutReverseIndexes(ind):
     start, stop = sorted(random.sample(range(len(ind)), 2))
-    mutant = individual[:start] + individual[stop:start-1:-1] + individual[stop+1:]
+    mutant = ind[:start] + ind[stop:start-1:-1] + ind[stop+1:]
     return (mutant, )
-
-
-def selImprovedRoulette(individuals, k):
-    pass
-    return selIndividuals
 
 
 def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
@@ -92,17 +133,17 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     toolbox = base.Toolbox()
 
     # Attribute generator
-    toolbox.register('indices', random.sample, range(1, indSize + 1), indSize)
+    toolbox.register('indexes', random.sample, range(1, indSize + 1), indSize)
 
     # Structure initializers
-    toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indices)
+    toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
     # Operator registering
-    toolbox.register('evaluate', evalVRPTW)
-    toolbox.register('mate', tools.cxPartialyMatched)
+    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
+    toolbox.register('select', tools.selRoulette)
+    toolbox.register('mate', cxPartialyMatched)
     toolbox.register('mutate', mutReverseIndexes)
-    toolbox.register('select', selImprovedRoulette)
 
     pop = toolbox.population(n=popSize)
 
@@ -138,12 +179,12 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
                 del mutant.fitness.values
 
         # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
+        invalidInd = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = map(toolbox.evaluate, invalidInd)
+        for ind, fit in zip(invalidInd, fitnesses):
             ind.fitness.values = fit
 
-        print '  Evaluated %d individuals' % len(invalid_ind)
+        print '  Evaluated %d individuals' % len(invalidInd)
 
         # The population is entirely replaced by the offspring
         pop[:] = offspring
@@ -163,11 +204,16 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
 
     print '-- End of (successful) evolution --'
 
-    best_ind = tools.selBest(pop, 1)[0]
-    print 'Best individual is %s, %s' % (best_ind, best_ind.fitness.values)
+    bestInd = tools.selBest(pop, 1)[0]
+    print 'Best individual: %s' % bestInd
+    print 'Fitness: %s' % bestInd.fitness.values[0]
+    printRoute(ind2route(bestInd, instance))
+    print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
 
 
 def main():
+    random.seed(64)
+
     instName = 'R101'
 
     unitCost = 8.0
@@ -198,16 +244,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-
-    rootpath = ROOT_PATH
-    jsonDataDir = os.path.join(rootpath,'data', 'json')
-
-    instName = 'R101'
-    jsonFile = os.path.join(jsonDataDir, '%s.js' % instName)
-    with open(jsonFile) as f:
-        instance = json.load(f)
-
-    individual = range(1,11)
-    route = ind2route(individual, instance)
-    printRoute(route)
+    main()
