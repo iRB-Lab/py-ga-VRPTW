@@ -13,15 +13,26 @@ def ind2route(individual, instance):
     subRoute = []
     vehicleCapacity = instance['vehicle_capacity']
     vehicleLoad = 0
+    deportDueTime =  instance['deport']['due_time']
+    elapsedTime = 0
+    lastCustomerID = 0
     for customerID in individual:
-        updateVehicleLoad = vehicleLoad + instance['customer_%d' % customerID]['demand']
-        if updateVehicleLoad <= vehicleCapacity:
+        demand = instance['customer_%d' % customerID]['demand']
+        updatedVehicleLoad = vehicleLoad + demand
+        serviceTime = instance['customer_%d' % customerID]['service_time']
+        returnTime = instance['distance_matrix'][customerID][0]
+        updatedElapsedTime = elapsedTime + instance['distance_matrix'][lastCustomerID][customerID] + serviceTime + returnTime
+        if (updatedVehicleLoad <= vehicleCapacity) and (updatedElapsedTime <= deportDueTime):
             subRoute.append(customerID)
-            vehicleLoad = updateVehicleLoad
+            vehicleLoad = updatedVehicleLoad
+            elapsedTime = updatedElapsedTime - returnTime
         else:
+            # Save current sub-route
             route.append(subRoute)
+            # Initialize a new sub-route
             subRoute = [customerID]
-            vehicleLoad = instance['customer_%d' % customerID]['demand']
+            vehicleLoad = demand
+            elapsedTime = instance['distance_matrix'][0][customerID] + serviceTime
     if subRoute != []:
         route.append(subRoute)
     return route
@@ -29,14 +40,16 @@ def ind2route(individual, instance):
 
 def printRoute(route, merge=False):
     routeStr = '0'
+    subRouteCount = 0
     for subRoute in route:
+        subRouteCount += 1
         subRouteStr = '0'
         for customerID in subRoute:
             subRouteStr = subRouteStr + ' - ' + str(customerID)
             routeStr = routeStr + ' - ' + str(customerID)
         subRouteStr = subRouteStr + ' - 0'
         if not merge:
-            print subRouteStr
+            print 'Vehicle %d\'s route: %s' % (subRouteCount, subRouteStr)
         routeStr = routeStr + ' - 0'
     if merge:
         print routeStr
@@ -45,6 +58,7 @@ def printRoute(route, merge=False):
 
 def evalVRPTW(individual, instance, unitCost, initCost, waitCost, delayCost):
     timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
+    fitness = 1.0 / timeCost
     return fitness
 
 
@@ -178,4 +192,16 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+
+    rootpath = ROOT_PATH
+    jsonDataDir = os.path.join(rootpath,'data', 'json')
+
+    instName = 'R101'
+    jsonFile = os.path.join(jsonDataDir, '%s.js' % instName)
+    with open(jsonFile) as f:
+        instance = json.load(f)
+
+    individual = range(1,11)
+    route = ind2route(individual, instance)
+    printRoute(route)

@@ -105,7 +105,7 @@ Below is a description of the format of the JSON file that defines each problem 
 **Remarks:**
 
 1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
-2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<jsonData>['distance_matrix'][1, 2]`, where `<jsonData>` denotes the name of a Python `dict` object.
+2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<jsonData>['distance_matrix'][1][2]`, where `<jsonData>` denotes the name of a Python `dict` object.
 
 ## GA Implementation
 **Distributed Evolutionary Algorithms in Python (DEAP)**

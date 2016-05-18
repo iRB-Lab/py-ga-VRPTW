@@ -3,7 +3,7 @@
 import os
 
 
-ROOT_PATH = os.path.join(os.environ['HOME'], 'GitHub/py-ga-VRPSTW')
+ROOT_PATH = os.path.join(os.environ['HOME'], 'GitHub/py-ga-VRPTW')
 
 
 def makeDirsForFile(filename):
