@@ -1,5 +1,5 @@
-# py-ga-VRPSTW
-A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Soft Time Windows (VRPSTW)
+# py-ga-VRPTW
+A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
 
 ## Solomon's VRPTW Benchmark Problems
 > R1-type|C1-type|RC1-type|R2-type|C2-type|RC2-type

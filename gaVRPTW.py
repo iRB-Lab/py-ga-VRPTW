@@ -43,7 +43,7 @@ def printRoute(route, merge=False):
     return
 
 
-def evalVRPSTW(individual, instance, unitCost, initCost, waitCost, delayCost):
+def evalVRPTW(individual, instance, unitCost, initCost, waitCost, delayCost):
     timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
     return fitness
 
@@ -59,7 +59,7 @@ def selImprovedRoulette(individuals, k):
     return selIndividuals
 
 
-def gaVRPSTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
+def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
     rootpath = ROOT_PATH
     jsonDataDir = os.path.join(rootpath,'data', 'json')
     jsonFile = os.path.join(jsonDataDir, '%s.js' % instName)
@@ -79,7 +79,7 @@ def gaVRPSTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
     # Operator registering
-    toolbox.register('evaluate', evalVRPSTW)
+    toolbox.register('evaluate', evalVRPTW)
     toolbox.register('mate', tools.cxPartialyMatched)
     toolbox.register('mutate', mutReverseIndexes)
     toolbox.register('select', selImprovedRoulette)
@@ -174,7 +174,7 @@ def main():
     # mutPb = 0.02
     # NGen = 300
 
-    gaVRPSTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
 
 
 if __name__ == '__main__':
