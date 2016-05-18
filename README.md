@@ -58,7 +58,7 @@ For the further convenience, a Python script named `text2json.py` is writen to c
 
 Below is a description of the format of the JSON file that defines each problem instance (assuming 100 customers).
 
-```json
+```js
 {
     "instance_name" : "<Instance name>",
     "max_vehicle_number" : K,
