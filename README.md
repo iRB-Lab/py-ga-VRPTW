@@ -117,7 +117,7 @@ Sub-route 1: 0 - 5 - 3 - 2 - 0
 Sub-route 2: 0 - 7 - 1 - 6 - 9 - 0
 Sub-route 3: 0 - 8 - 4 - 0
 ```
-are coded as `5 3 2 7 1 6 9 8 4`, which can be stored in a Python `list` object, i.e. `[5, 3, 2, 7, 1, 6, 9, 8, 4]`.
+are coded as `5 3 2 7 1 6 9 8 4`, which can be stored in a Python `list` object, i.e., `[5, 3, 2, 7, 1, 6, 9, 8, 4]`.
 
 #### Individual Decoding
 ```python
@@ -131,7 +131,7 @@ Decodes `individual` to `route` representation. To show the difference between a
 
 # route
 [[5, 3, 2], [7, 1, 6, 9], [8, 4]]
-``` 
+```
 
 **Parameters:**
 
@@ -236,7 +236,7 @@ Takes one individual as argument and returns its fitness as a Python `tuple` obj
 
 **Returns:**
 
-* A tuple of one fitness value of the evaluated individual. 
+* A tuple of one fitness value of the evaluated individual.
 
 **Definition:**
 
@@ -378,11 +378,11 @@ Implements a genetic algorithm-based solution to vehicle routing problem with ti
 * `initCost` - The start-up cost of a vehicle.
 * `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
 * `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
-* `indSize` - Size of an individual. 
+* `indSize` - Size of an individual.
 * `popSize` - Size of a population.
 * `cxPb` - Probability of crossover.
 * `mutPb` - Probability of mutation.
-* `NGen` - Maximum number of generations to terminate evolution. 
+* `NGen` - Maximum number of generations to terminate evolution.
 
 **Returns:**
 
