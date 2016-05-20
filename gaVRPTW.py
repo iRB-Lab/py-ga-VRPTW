@@ -123,7 +123,7 @@ def mutInverseIndexes(individual):
 def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
     rootpath = ROOT_PATH
     jsonDataDir = os.path.join(rootpath,'data', 'json')
-    jsonFile = os.path.join(jsonDataDir, '%s.js' % instName)
+    jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
     with open(jsonFile) as f:
         instance = json.load(f)
 

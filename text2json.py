@@ -61,13 +61,13 @@ def main():
         jsonData['distance_matrix'] = [[distance(jsonData[customer1], jsonData[customer2]) for customer1 in customers] for customer2 in customers]
 
 
-        jsonFilename = '%s.js' % jsonData['instance_name']
+        jsonFilename = '%s.json' % jsonData['instance_name']
         jsonFile = os.path.join(jsonDataDir, jsonFilename)
         print 'Write to file: %s' % jsonFile
         makeDirsForFile(jsonFile)
         with open(jsonFile, 'w') as f:
-            json.dump(jsonData, f, sort_keys=True)
-            # json.dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
+            # json.dump(jsonData, f, sort_keys=True)
+            json.dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 if __name__ == '__main__':
