@@ -54,7 +54,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 8. As a backup, you will find a zip-file with the 100 instance definitions [here](http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip).
 
 #### JSON Format
-For the further convenience, a Python script named `text2json.py` is writen to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.js`, and locates at `data/json/C101.js`.
+For the further convenience, a Python script named `text2json.py` is writen to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.json`, and locates at `data/json/C101.json`.
 
 Below is a description of the format of the JSON file that defines each problem instance (assuming 100 customers).
 
@@ -394,7 +394,7 @@ Implements a genetic algorithm-based solution to vehicle routing problem with ti
 def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
     rootpath = ROOT_PATH
     jsonDataDir = os.path.join(rootpath,'data', 'json')
-    jsonFile = os.path.join(jsonDataDir, '%s.js' % instName)
+    jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
     with open(jsonFile) as f:
         instance = json.load(f)
 
