@@ -21,7 +21,9 @@ def main():
     mutPb = 0.01
     NGen = 100
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+    exportCSV = True
+
+    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
 
 
 if __name__ == '__main__':

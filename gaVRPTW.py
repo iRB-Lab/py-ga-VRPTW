@@ -3,9 +3,10 @@
 
 import os
 import json
+import csv
 import random
 from deap import base, creator, tools
-from basic.common import ROOT_PATH
+from basic.common import ROOT_PATH, makeDirsForFile, existFile
 
 
 def ind2route(individual, instance):
@@ -120,12 +121,16 @@ def mutInverseIndexes(individual):
     return individual,
 
 
-def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
+def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False):
     rootpath = ROOT_PATH
     jsonDataDir = os.path.join(rootpath,'data', 'json')
     jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
     with open(jsonFile) as f:
         instance = json.load(f)
+
+    if exportCSV:
+        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvFile = os.path.join(rootpath, 'results', csvFilename)
 
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
     creator.create('Individual', list, fitness=creator.FitnessMax)
@@ -146,6 +151,9 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     toolbox.register('mutate', mutInverseIndexes)
 
     pop = toolbox.population(n=popSize)
+
+    # Results holders for exporting results to CSV file
+    csvData = []
 
     print 'Start of evolution'
 
@@ -202,6 +210,18 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         print '  Avg %s' % mean
         print '  Std %s' % std
 
+        # Write data to holders for exporting results to CSV file
+        if exportCSV:
+            csvRow = {
+                'generation': g,
+                'evaluated_individuals': len(invalidInd),
+                'min_fitness': min(fits),
+                'max_fitness': max(fits),
+                'avg_fitness': mean,
+                'std_fitness': std,
+            }
+            csvData.append(csvRow)
+
     print '-- End of (successful) evolution --'
 
     bestInd = tools.selBest(pop, 1)[0]
@@ -209,3 +229,15 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     print 'Fitness: %s' % bestInd.fitness.values[0]
     printRoute(ind2route(bestInd, instance))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
+
+    if exportCSV:
+        print 'Write to file: %s' % csvFile
+        makeDirsForFile(csvFile)
+        if not existFile(csvFile, overwrite=True):
+            with open(csvFile, 'w') as f:
+                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness']
+                writer = csv.DictWriter(f, fieldnames=fieldnames, dialect='excel')
+
+                writer.writeheader()
+                for csvRow in csvData:
+                    writer.writerow(csvRow)
