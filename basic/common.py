@@ -15,7 +15,7 @@ def getrootpath(paths=ROOT_PATH):
             if os.path.exists(path):
                 return path
     elif isinstance(paths, str):
-        return path
+        return paths
     else:
         pass
 
