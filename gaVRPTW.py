@@ -6,7 +6,7 @@ import json
 import csv
 import random
 from deap import base, creator, tools
-from basic.common import ROOT_PATH, makeDirsForFile, existFile
+from basic.common import getrootpath, makeDirsForFile, existFile
 
 
 def ind2route(individual, instance):
@@ -122,7 +122,7 @@ def mutInverseIndexes(individual):
 
 
 def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False):
-    rootpath = ROOT_PATH
+    rootpath = getrootpath()
     jsonDataDir = os.path.join(rootpath,'data', 'json')
     jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
     with open(jsonFile) as f:

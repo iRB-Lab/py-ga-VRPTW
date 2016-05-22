@@ -3,7 +3,21 @@
 import os
 
 
-ROOT_PATH = os.path.join(os.environ['HOME'], 'GitHub/py-ga-VRPTW')
+ROOT_PATH = [
+    os.path.join(os.environ['HOME'], 'GitHub/py-ga-VRPTW'),
+    os.path.join(os.environ['HOME'], 'py-ga-VRPTW'),
+]
+
+
+def getrootpath(paths=ROOT_PATH):
+    if isinstance(paths, list):
+        for path in ROOT_PATH:
+            if os.path.exists(path):
+                return path
+    elif isinstance(paths, str):
+        return path
+    else:
+        pass
 
 
 def makeDirsForFile(filename):
