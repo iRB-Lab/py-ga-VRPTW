@@ -508,7 +508,9 @@ def main():
     mutPb = 0.01
     NGen = 100
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+    exportCSV = True
+
+    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
 
 
 if __name__ == '__main__':
@@ -540,11 +542,27 @@ def main():
     mutPb = 0.02
     NGen = 300
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+    exportCSV = True
+
+    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
 
 
 if __name__ == '__main__':
     main()
+```
+
+#### View Logs
+The sample codes will print logs on the screen. Meanwhile, a **CSV Format** log file will be found in the `results\` directory after running each sample code, which can be canceled by setting the `exportCSV` flag to `False`, i.e.,
+
+```python
+# -*- coding: utf-8 -*-
+# sample_R101.py
+
+    ...
+    exportCSV = False
+
+    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
+    ...
 ```
 
 ### Further Reading
