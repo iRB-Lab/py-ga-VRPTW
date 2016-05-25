@@ -107,6 +107,35 @@ Below is a description of the format of the JSON file that defines each problem 
 1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
 2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<jsonData>['distance_matrix'][1][2]`, where `<jsonData>` denotes the name of a Python `dict` object.
 
+#### Use Cusomized Instance Data
+You can customize your own problem instances.
+
+##### Supported File Format
+The customized problem instance data file should be either **text file format** or **JSON format**, exactly the same as the above given examples.
+
+##### Directory Set-up
+Customized `*.txt` files should be put under the `data\text_customize\` directory and customized `*.json` files should be put under the `data\json_customize\` directory.
+
+##### Convert `*.txt` to `*.json`
+Run the `text2json.py` script to convert `*.txt` file to `*.json` file.
+
+```python
+# -*- coding: utf-8 -*-
+# text2json_customize.py
+
+from basic.data import text2json
+
+def main():
+    text2json(customize=True)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+##### GA Set-up
+The `customizeData` flag of the `gaVRPTW()` method should be set to `True`. For further understanding, please refer to the sample codes section at the end of this document.
+
 ## GA Implementation
 ### Individual (Chromosome)
 #### Individual Coding
@@ -367,7 +396,7 @@ def mutInverseIndexes(individual):
 
 ### Algorithm
 ```python
-gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False)
 ```
 Implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
 
@@ -383,6 +412,8 @@ Implements a genetic algorithm-based solution to vehicle routing problem with ti
 * `cxPb` - Probability of crossover.
 * `mutPb` - Probability of mutation.
 * `NGen` - Maximum number of generations to terminate evolution.
+* `exportCSV` - If `True`, a CSV format log file will be exported to the `results\` directory.
+* `customizeData` - If `Ture`, customized JSON format problem instance file will be loaded from `data\json_customized\` directory.
 
 **Returns:**
 
@@ -391,12 +422,19 @@ Implements a genetic algorithm-based solution to vehicle routing problem with ti
 **Definition:**
 
 ```python
-def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen):
-    rootpath = ROOT_PATH
-    jsonDataDir = os.path.join(rootpath,'data', 'json')
+def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+    rootpath = getrootpath()
+    if customizeData:
+        jsonDataDir = os.path.join(rootpath,'data', 'json_customize')
+    else:
+        jsonDataDir = os.path.join(rootpath,'data', 'json')
     jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
     with open(jsonFile) as f:
         instance = json.load(f)
+
+    if exportCSV:
+        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvFile = os.path.join(rootpath, 'results', csvFilename)
 
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
     creator.create('Individual', list, fitness=creator.FitnessMax)
@@ -417,6 +455,9 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     toolbox.register('mutate', mutInverseIndexes)
 
     pop = toolbox.population(n=popSize)
+
+    # Results holders for exporting results to CSV file
+    csvData = []
 
     print 'Start of evolution'
 
@@ -473,6 +514,18 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         print '  Avg %s' % mean
         print '  Std %s' % std
 
+        # Write data to holders for exporting results to CSV file
+        if exportCSV:
+            csvRow = {
+                'generation': g,
+                'evaluated_individuals': len(invalidInd),
+                'min_fitness': min(fits),
+                'max_fitness': max(fits),
+                'avg_fitness': mean,
+                'std_fitness': std,
+            }
+            csvData.append(csvRow)
+
     print '-- End of (successful) evolution --'
 
     bestInd = tools.selBest(pop, 1)[0]
@@ -480,6 +533,18 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     print 'Fitness: %s' % bestInd.fitness.values[0]
     printRoute(ind2route(bestInd, instance))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
+
+    if exportCSV:
+        print 'Write to file: %s' % csvFile
+        makeDirsForFile(csvFile)
+        if not existFile(csvFile, overwrite=True):
+            with open(csvFile, 'w') as f:
+                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness']
+                writer = csv.DictWriter(f, fieldnames=fieldnames, dialect='excel')
+
+                writer.writeheader()
+                for csvRow in csvData:
+                    writer.writerow(csvRow)
 ```
 
 ### Sample Codes
@@ -551,8 +616,43 @@ if __name__ == '__main__':
     main()
 ```
 
+#### Customized Instance
+```python
+# -*- coding: utf-8 -*-
+# sample_Customized_Data.py
+
+import random
+from gaVRPTW import gaVRPTW
+
+
+def main():
+    random.seed(64)
+
+    instName = 'Customized_Data'
+
+    unitCost = 8.0
+    initCost = 100.0
+    waitCost = 1.0
+    delayCost = 1.5
+
+    indSize = 100
+    popSize = 400
+    cxPb = 0.85
+    mutPb = 0.02
+    NGen = 300
+
+    exportCSV = True
+    customizeData = True
+
+    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV, customizeData)
+
+
+if __name__ == '__main__':
+    main()
+```
+
 #### View Logs
-The sample codes will print logs on the screen. Meanwhile, a **CSV Format** log file will be found in the `results\` directory after running each sample code, which can be canceled by setting the `exportCSV` flag to `False`, i.e.,
+The sample codes will print logs on the screen. Meanwhile, a **CSV format** log file will be found in the `results\` directory after running each sample code, which can be canceled by setting the `exportCSV` flag to `False`, i.e.,
 
 ```python
 # -*- coding: utf-8 -*-

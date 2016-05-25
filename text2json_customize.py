@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# text2json.py
+# text2json_customize.py
 
 from basic.data import text2json
 
 def main():
-    text2json()
+    text2json(customize=True)
 
 
 if __name__ == '__main__':
