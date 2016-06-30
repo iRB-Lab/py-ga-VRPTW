@@ -652,7 +652,7 @@ if __name__ == '__main__':
 ```
 
 #### View Logs
-The sample codes will print logs on the screen. Meanwhile, a **CSV format** log file will be found in the `results\` directory after running each sample code, which can be canceled by setting the `exportCSV` flag to `False`, i.e.,
+The sample codes will print logs on the screen. Meanwhile, a **CSV format** log file will be saved in the `results\` directory after running each sample code, which can be canceled by setting the `exportCSV` flag to `False`, i.e.,
 
 ```python
 # -*- coding: utf-8 -*-
