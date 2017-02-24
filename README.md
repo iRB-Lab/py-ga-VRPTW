@@ -1,3 +1,9 @@
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW)
+[![Build Status](https://img.shields.io/badge/release-v1.0.1-yellow.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW/releases/tag/v1.0.1)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
+[![Author](https://img.shields.io/badge/author-iROCKBUNNY-D02142.svg)](http://irockbunny.com/)
+[![Organization](https://img.shields.io/badge/org-TEELAB-4078C0.svg)](http://teelab.net/)
+
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
 
