@@ -1,7 +1,6 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW)
 [![Release](https://img.shields.io/github/release/iROCKBUNNY/py-ga-VRPTW.svg)](/releases/tag/v1.0.1)
 [![License](https://img.shields.io/github/license/iROCKBUNNY/py-ga-VRPTW.svg)](/LICENSE)
-
 [![Watchers](https://img.shields.io/github/watchers/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Watch)](/watchers)
 [![Stargazers](https://img.shields.io/github/stars/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Star)](/stargazers)
 [![Forks](https://img.shields.io/github/forks/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Fork)](/network)
