@@ -11,6 +11,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 ## Solomon's VRPTW Benchmark Problems
 > R1-type|C1-type|RC1-type|R2-type|C2-type|RC2-type
 > -------|-------|--------|-------|-------|--------
+> 
 > I generated six sets of problems. Their design highlights several factors that affect the behavior of routing and scheduling algorithms. They are:
 >
 > * geographical data;
