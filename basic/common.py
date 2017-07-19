@@ -40,5 +40,5 @@ def existFile(filename, overwrite=False, displayInfo=True):
             return True
     else:
         if displayInfo:
-            print 'File: %s does not exist. Create new file. ' % filename
+            print 'File: %s does not exist. Create new file.' % filename
         return False
