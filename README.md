@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW)
-[![Release](https://img.shields.io/github/release/iROCKBUNNY/py-ga-VRPTW.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW/releases/tag/v1.0.1)
+[![Release](https://img.shields.io/github/release/iROCKBUNNY/py-ga-VRPTW.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW/releases/tag/1.0.0)
 [![License](https://img.shields.io/github/license/iROCKBUNNY/py-ga-VRPTW.svg)](/LICENSE)
 [![Watchers](https://img.shields.io/github/watchers/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Watch)](https://github.com/iROCKBUNNY/py-ga-VRPTW/watchers)
 [![Stargazers](https://img.shields.io/github/stars/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Star)](https://github.com/iROCKBUNNY/py-ga-VRPTW/stargazers)
@@ -11,7 +11,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 ## Solomon's VRPTW Benchmark Problems
 > R1-type|C1-type|RC1-type|R2-type|C2-type|RC2-type
 > -------|-------|--------|-------|-------|--------
-> 
+>
 > I generated six sets of problems. Their design highlights several factors that affect the behavior of routing and scheduling algorithms. They are:
 >
 > * geographical data;
