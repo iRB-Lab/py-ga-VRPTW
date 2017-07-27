@@ -72,6 +72,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
   ...     ...        ...        ...        ...         ...           ...
   100     x100      y100       q100       e100        l100          s100
 ```
+
 **Remarks:**
 
 1. All constants are integers.
@@ -132,6 +133,7 @@ Below is a description of the format of the JSON file that defines each problem 
     ]
 }
 ```
+
 **Remarks:**
 
 1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
@@ -195,12 +197,12 @@ Decodes `individual` to `route` representation. To show the difference between a
 
 **Parameters:**
 
-* `individual` – An individual to be decoded.
-* `instance` – A problem instance `dict` object, which can be loaded from a JSON format file.
+- `individual` – An individual to be decoded.
+- `instance` – A problem instance `dict` object, which can be loaded from a JSON format file.
 
 **Returns:**
 
-* A list of decoded sub-routes corresponding to the input individual.
+- A list of decoded sub-routes corresponding to the input individual.
 
 **Definition:**
 
@@ -247,16 +249,17 @@ def ind2route(individual, instance):
 ```python
 printRoute(route, merge=False)
 ```
+
 Prints sub-routes information to screen.
 
 **Parameters:**
 
-* `route` – A `route` decoded by `ind2route(individual, instance)`.
-* `merge` – If `Ture`, detailed sub-routes are displayed in a single line.
+- `route` – A `route` decoded by `ind2route(individual, instance)`.
+- `merge` – If `Ture`, detailed sub-routes are displayed in a single line.
 
 **Returns:**
 
-* None
+- None
 
 **Definition:**
 
@@ -283,20 +286,21 @@ def printRoute(route, merge=False):
 ```python
 evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0)
 ```
+
 Takes one individual as argument and returns its fitness as a Python `tuple` object.
 
 **Parameters:**
 
-* `individual` - An individual to be evaluated.
-* `instance` - A problem instance `dict` object, which can be loaded from a JSON format file.
-* `unitCost` - The transportation cost of one vehicle for a unit distance.
-* `initCost` - The start-up cost of a vehicle.
-* `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
-* `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
+- `individual` - An individual to be evaluated.
+- `instance` - A problem instance `dict` object, which can be loaded from a JSON format file.
+- `unitCost` - The transportation cost of one vehicle for a unit distance.
+- `initCost` - The start-up cost of a vehicle.
+- `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
+- `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
 
 **Returns:**
 
-* A tuple of one fitness value of the evaluated individual.
+- A tuple of one fitness value of the evaluated individual.
 
 **Definition:**
 
@@ -339,16 +343,17 @@ def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayC
 ```python
 deap.tools.selRoulette(individuals, k)
 ```
+
 Selects `k` individuals from the input individuals using `k` spins of a roulette. The selection is made by looking only at the first objective of each individual. The list returned contains references to the input individuals.
 
 **Parameters:**
 
-* `individuals` – A list of individuals to select from.
-* `k` – The number of individuals to select.
+- `individuals` – A list of individuals to select from.
+- `k` – The number of individuals to select.
 
 **Returns:**
 
-* A list of selected individuals.
+- A list of selected individuals.
 
 **Definition:**
 
@@ -372,16 +377,17 @@ def selRoulette(individuals, k):
 ```python
 cxPartialyMatched(ind1, ind2)
 ```
+
 Executes a partially matched crossover (PMX) on the input individuals. The two individuals are modified in place. This crossover expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
 
 **Parameters:**
 
-* `ind1` – The first individual participating in the crossover.
-* `ind2` – The second individual participating in the crossover.
+- `ind1` – The first individual participating in the crossover.
+- `ind2` – The second individual participating in the crossover.
 
 **Returns:**
 
-* A tuple of two individuals.
+- A tuple of two individuals.
 
 **Definition:**
 
@@ -406,15 +412,16 @@ def cxPartialyMatched(ind1, ind2):
 ```python
 mutInverseIndexes(individual)
 ```
+
 Inverses the attributes between two random points of the input individual and return the mutant. This mutation expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
 
 **Parameters:**
 
-* `individual` – Individual to be mutated.
+- `individual` – Individual to be mutated.
 
 **Returns:**
 
-* A tuple of one individual.
+- A tuple of one individual.
 
 **Definition:**
 
@@ -442,26 +449,27 @@ gaVRPTW(
     customizeData=False
 )
 ```
+
 Implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
 
 **Parameters:**
 
-* `instName` - A problem instance name provided in Solomon's VRPTW benchmark problems.
-* `unitCost` - The transportation cost of one vehicle for a unit distance.
-* `initCost` - The start-up cost of a vehicle.
-* `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
-* `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
-* `indSize` - Size of an individual.
-* `popSize` - Size of a population.
-* `cxPb` - Probability of crossover.
-* `mutPb` - Probability of mutation.
-* `NGen` - Maximum number of generations to terminate evolution.
-* `exportCSV` - If `True`, a CSV format log file will be exported to the `results\` directory.
-* `customizeData` - If `Ture`, customized JSON format problem instance file will be loaded from `data\json_customized\` directory.
+- `instName` - A problem instance name provided in Solomon's VRPTW benchmark problems.
+- `unitCost` - The transportation cost of one vehicle for a unit distance.
+- `initCost` - The start-up cost of a vehicle.
+- `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
+- `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
+- `indSize` - Size of an individual.
+- `popSize` - Size of a population.
+- `cxPb` - Probability of crossover.
+- `mutPb` - Probability of mutation.
+- `NGen` - Maximum number of generations to terminate evolution.
+- `exportCSV` - If `True`, a CSV format log file will be exported to the `results\` directory.
+- `customizeData` - If `Ture`, customized JSON format problem instance file will be loaded from `data\json_customized\` directory.
 
 **Returns:**
 
-* None
+- None
 
 **Definition:**
 
@@ -732,9 +740,14 @@ The sample codes will print logs on the screen. Meanwhile, a **CSV format** log 
 ### Further Reading
 **Distributed Evolutionary Algorithms in Python (DEAP)**
 
-* Docs: [http://deap.readthedocs.org/](http://deap.readthedocs.org/)
-* GitHub: [https://github.com/deap/deap/](https://github.com/deap/deap/)
-* PyPI: [https://pypi.python.org/pypi/deap/](https://pypi.python.org/pypi/deap/)
+- Docs: [http://deap.readthedocs.org/](http://deap.readthedocs.org/)
+- GitHub: [https://github.com/deap/deap/](https://github.com/deap/deap/)
+- PyPI: [https://pypi.python.org/pypi/deap/](https://pypi.python.org/pypi/deap/)
+
+## References
+1. [Solomon's VRPTW Benchmark Problems](http://web.cba.neu.edu/~msolomon/problems.htm)
+2. [100 Customers Instance Definitions](http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/)
+3. [Distributed Evolutionary Algorithms in Python (DEAP)](https://pypi.python.org/pypi/deap/)
 
 ## API Reference
 ### Module: `gavrptw.core`
@@ -812,8 +825,3 @@ text2json(customize=False)
 ├── LICENSE
 └── .gitignore
 ```
-
-## References
-1. [Solomon's VRPTW Benchmark Problems](http://web.cba.neu.edu/~msolomon/problems.htm)
-2. [100 Customers Instance Definitions](http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/)
-3. [Distributed Evolutionary Algorithms in Python (DEAP)](https://pypi.python.org/pypi/deap/)
