@@ -16,6 +16,8 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 - [Virtualenv](https://virtualenv.pypa.io/en/stable/)
 
 ### Installing with Virtualenv
+On Unix, Linux, BSD, macOS, and Cygwin:
+
 ```sh
 git clone https://github.com/iROCKBUNNY/py-ga-VRPTW.git
 cd py-ga-VRPTW
