@@ -8,6 +8,28 @@
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
 
+## Installation
+### Requirements
+- [macOS](https://www.apple.com/macos/) (Recommended)
+- [Python 2.7](https://docs.python.org/2/)
+- [Pip](https://pypi.python.org/pypi/pip)
+- [Virtualenv](https://virtualenv.pypa.io/en/stable/)
+
+### Installing with Virtualenv
+```sh
+git clone https://github.com/iROCKBUNNY/py-ga-VRPTW.git
+cd py-ga-VRPTW
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Python 3 Support
+See [**@yingriyanlong**](https://github.com/yingriyanlong) [forked version](https://github.com/yingriyanlong/py-ga-VRPTW).
+
+## Quick Start
+See [sample codes](#sample-codes).
+
 ## Solomon's VRPTW Benchmark Problems
 > R1-type|C1-type|RC1-type|R2-type|C2-type|RC2-type
 > -------|-------|--------|-------|-------|--------
@@ -131,7 +153,8 @@ Run the `text2json.py` script to convert `*.txt` file to `*.json` file.
 # -*- coding: utf-8 -*-
 # text2json_customize.py
 
-from basic.data import text2json
+from gavrptw.utils import text2json
+
 
 def main():
     text2json(customize=True)
@@ -404,7 +427,20 @@ def mutInverseIndexes(individual):
 
 ### Algorithm
 ```python
-gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False)
+gaVRPTW(
+    instName,
+    unitCost,
+    initCost,
+    waitCost,
+    delayCost,
+    indSize,
+    popSize,
+    cxPb,
+    mutPb,
+    NGen,
+    exportCSV=False,
+    customizeData=False
+)
 ```
 Implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
 
@@ -431,97 +467,70 @@ Implements a genetic algorithm-based solution to vehicle routing problem with ti
 
 ```python
 def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
-    rootpath = getrootpath()
     if customizeData:
-        jsonDataDir = os.path.join(rootpath,'data', 'json_customize')
+        jsonDataDir = os.path.join(BASE_DIR,'data', 'json_customize')
     else:
-        jsonDataDir = os.path.join(rootpath,'data', 'json')
+        jsonDataDir = os.path.join(BASE_DIR,'data', 'json')
     jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
     with open(jsonFile) as f:
-        instance = json.load(f)
-
-    if exportCSV:
-        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
-        csvFile = os.path.join(rootpath, 'results', csvFilename)
-
+        instance = load(f)
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
     creator.create('Individual', list, fitness=creator.FitnessMax)
-
     toolbox = base.Toolbox()
-
     # Attribute generator
     toolbox.register('indexes', random.sample, range(1, indSize + 1), indSize)
-
     # Structure initializers
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
-
     # Operator registering
     toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', cxPartialyMatched)
     toolbox.register('mutate', mutInverseIndexes)
-
     pop = toolbox.population(n=popSize)
-
     # Results holders for exporting results to CSV file
     csvData = []
-
     print 'Start of evolution'
-
     # Evaluate the entire population
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
-
     print '  Evaluated %d individuals' % len(pop)
-
     # Begin the evolution
     for g in range(NGen):
         print '-- Generation %d --' % g
-
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
-
         # Clone the selected individuals
         offspring = list(map(toolbox.clone, offspring))
-
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < cxPb:
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
-
         for mutant in offspring:
             if random.random() < mutPb:
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
-
         # Evaluate the individuals with an invalid fitness
         invalidInd = [ind for ind in offspring if not ind.fitness.valid]
         fitnesses = map(toolbox.evaluate, invalidInd)
         for ind, fit in zip(invalidInd, fitnesses):
             ind.fitness.values = fit
-
         print '  Evaluated %d individuals' % len(invalidInd)
-
         # The population is entirely replaced by the offspring
         pop[:] = offspring
-
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
-
         length = len(pop)
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)
         std = abs(sum2 / length - mean**2)**0.5
-
         print '  Min %s' % min(fits)
         print '  Max %s' % max(fits)
         print '  Avg %s' % mean
         print '  Std %s' % std
-
         # Write data to holders for exporting results to CSV file
         if exportCSV:
             csvRow = {
@@ -533,23 +542,21 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
                 'std_fitness': std,
             }
             csvData.append(csvRow)
-
     print '-- End of (successful) evolution --'
-
     bestInd = tools.selBest(pop, 1)[0]
     print 'Best individual: %s' % bestInd
     print 'Fitness: %s' % bestInd.fitness.values[0]
     printRoute(ind2route(bestInd, instance))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
-
     if exportCSV:
-        print 'Write to file: %s' % csvFile
-        makeDirsForFile(csvFile)
-        if not existFile(csvFile, overwrite=True):
-            with open(csvFile, 'w') as f:
+        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvPathname = os.path.join(BASE_DIR, 'results', csvFilename)
+        print 'Write to file: %s' % csvPathname
+        makeDirsForFile(pathname=csvPathname)
+        if not exist(pathname=csvPathname, overwrite=True):
+            with open(csvPathname, 'w') as f:
                 fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness']
-                writer = csv.DictWriter(f, fieldnames=fieldnames, dialect='excel')
-
+                writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
                     writer.writerow(csvRow)
@@ -562,7 +569,7 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
 # sample_R101.py
 
 import random
-from gaVRPTW import gaVRPTW
+from gavrptw.core import gaVRPTW
 
 
 def main():
@@ -583,7 +590,19 @@ def main():
 
     exportCSV = True
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
+    gaVRPTW(
+        instName=instName,
+        unitCost=unitCost,
+        initCost=initCost,
+        waitCost=waitCost,
+        delayCost=delayCost,
+        indSize=indSize,
+        popSize=popSize,
+        cxPb=cxPb,
+        mutPb=mutPb,
+        NGen=NGen,
+        exportCSV=exportCSV
+    )
 
 
 if __name__ == '__main__':
@@ -596,7 +615,7 @@ if __name__ == '__main__':
 # sample_C204.py
 
 import random
-from gaVRPTW import gaVRPTW
+from gavrptw.core import gaVRPTW
 
 
 def main():
@@ -617,7 +636,19 @@ def main():
 
     exportCSV = True
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
+    gaVRPTW(
+        instName=instName,
+        unitCost=unitCost,
+        initCost=initCost,
+        waitCost=waitCost,
+        delayCost=delayCost,
+        indSize=indSize,
+        popSize=popSize,
+        cxPb=cxPb,
+        mutPb=mutPb,
+        NGen=NGen,
+        exportCSV=exportCSV
+    )
 
 
 if __name__ == '__main__':
@@ -630,7 +661,7 @@ if __name__ == '__main__':
 # sample_Customized_Data.py
 
 import random
-from gaVRPTW import gaVRPTW
+from gavrptw.core import gaVRPTW
 
 
 def main():
@@ -652,7 +683,20 @@ def main():
     exportCSV = True
     customizeData = True
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV, customizeData)
+    gaVRPTW(
+        instName=instName,
+        unitCost=unitCost,
+        initCost=initCost,
+        waitCost=waitCost,
+        delayCost=delayCost,
+        indSize=indSize,
+        popSize=popSize,
+        cxPb=cxPb,
+        mutPb=mutPb,
+        NGen=NGen,
+        exportCSV=exportCSV,
+        customizeData=customizeData
+    )
 
 
 if __name__ == '__main__':
@@ -669,7 +713,19 @@ The sample codes will print logs on the screen. Meanwhile, a **CSV format** log 
     ...
     exportCSV = False
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
+    gaVRPTW(
+        instName=instName,
+        unitCost=unitCost,
+        initCost=initCost,
+        waitCost=waitCost,
+        delayCost=delayCost,
+        indSize=indSize,
+        popSize=popSize,
+        cxPb=cxPb,
+        mutPb=mutPb,
+        NGen=NGen,
+        exportCSV=exportCSV
+    )
     ...
 ```
 
@@ -679,6 +735,83 @@ The sample codes will print logs on the screen. Meanwhile, a **CSV format** log 
 * Docs: [http://deap.readthedocs.org/](http://deap.readthedocs.org/)
 * GitHub: [https://github.com/deap/deap/](https://github.com/deap/deap/)
 * PyPI: [https://pypi.python.org/pypi/deap/](https://pypi.python.org/pypi/deap/)
+
+## API Reference
+### Module: `gavrptw.core`
+```python
+route = ind2route(individual, instance)
+```
+```python
+printRoute(route, merge=False)
+```
+```python
+evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0)
+```
+```python
+ind1, ind2 = cxPartialyMatched(ind1, ind2)
+```
+```python
+individual, = mutInverseIndexes(individual)
+```
+```python
+gaVRPTW(
+    instName,
+    unitCost,
+    initCost,
+    waitCost,
+    delayCost,
+    indSize,
+    popSize,
+    cxPb,
+    mutPb,
+    NGen,
+    exportCSV=False,
+    customizeData=False
+)
+```
+
+### Module: `gavrptw.utils`
+```python
+makeDirsForFile(pathname)
+```
+```python
+exist(pathname, overwrite=False, displayInfo=True)
+```
+```python
+text2json(customize=False)
+```
+
+## File Structure
+```
+├── data/
+│   ├── json/
+│   │   ├── <Instance name>.json
+│   │   └── ...
+│   ├── json_customize/
+│   │   ├── <Customized instance name>.json
+│   │   └── ...
+│   ├── text/
+│   │   ├── <Instance name>.txt
+│   │   └── ...
+│   └── text_customize/
+│       ├── <Customized instance name>.txt
+│       └── ...
+├── results/
+│   └── ...
+├── gavrptw/
+│   ├── __init__.py
+│   ├── core.py
+│   └── utils.py
+├── text2json.py
+├── text2json_customize.py
+├── sample_R101.py
+├── sample_C204.py
+├── sample_Customized_Data.py
+├── requirements.txt
+├── README.md
+├── LICENSE
+└── .gitignore
+```
 
 ## References
 1. [Solomon's VRPTW Benchmark Problems](http://web.cba.neu.edu/~msolomon/problems.htm)

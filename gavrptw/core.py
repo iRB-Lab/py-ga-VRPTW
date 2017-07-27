@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-# gaVRPTW.py
 
 import os
-import json
-import csv
 import random
+from json import load
+from csv import DictWriter
 from deap import base, creator, tools
-from basic.common import getrootpath, makeDirsForFile, existFile
+from utils import BASE_DIR, makeDirsForFile, exist
 
 
 def ind2route(individual, instance):
@@ -122,97 +121,70 @@ def mutInverseIndexes(individual):
 
 
 def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
-    rootpath = getrootpath()
     if customizeData:
-        jsonDataDir = os.path.join(rootpath,'data', 'json_customize')
+        jsonDataDir = os.path.join(BASE_DIR,'data', 'json_customize')
     else:
-        jsonDataDir = os.path.join(rootpath,'data', 'json')
+        jsonDataDir = os.path.join(BASE_DIR,'data', 'json')
     jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
     with open(jsonFile) as f:
-        instance = json.load(f)
-
-    if exportCSV:
-        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
-        csvFile = os.path.join(rootpath, 'results', csvFilename)
-
+        instance = load(f)
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
     creator.create('Individual', list, fitness=creator.FitnessMax)
-
     toolbox = base.Toolbox()
-
     # Attribute generator
     toolbox.register('indexes', random.sample, range(1, indSize + 1), indSize)
-
     # Structure initializers
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
-
     # Operator registering
     toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', cxPartialyMatched)
     toolbox.register('mutate', mutInverseIndexes)
-
     pop = toolbox.population(n=popSize)
-
     # Results holders for exporting results to CSV file
     csvData = []
-
     print 'Start of evolution'
-
     # Evaluate the entire population
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
-
     print '  Evaluated %d individuals' % len(pop)
-
     # Begin the evolution
     for g in range(NGen):
         print '-- Generation %d --' % g
-
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
-
         # Clone the selected individuals
         offspring = list(map(toolbox.clone, offspring))
-
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < cxPb:
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
-
         for mutant in offspring:
             if random.random() < mutPb:
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
-
         # Evaluate the individuals with an invalid fitness
         invalidInd = [ind for ind in offspring if not ind.fitness.valid]
         fitnesses = map(toolbox.evaluate, invalidInd)
         for ind, fit in zip(invalidInd, fitnesses):
             ind.fitness.values = fit
-
         print '  Evaluated %d individuals' % len(invalidInd)
-
         # The population is entirely replaced by the offspring
         pop[:] = offspring
-
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
-
         length = len(pop)
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)
         std = abs(sum2 / length - mean**2)**0.5
-
         print '  Min %s' % min(fits)
         print '  Max %s' % max(fits)
         print '  Avg %s' % mean
         print '  Std %s' % std
-
         # Write data to holders for exporting results to CSV file
         if exportCSV:
             csvRow = {
@@ -224,23 +196,21 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
                 'std_fitness': std,
             }
             csvData.append(csvRow)
-
     print '-- End of (successful) evolution --'
-
     bestInd = tools.selBest(pop, 1)[0]
     print 'Best individual: %s' % bestInd
     print 'Fitness: %s' % bestInd.fitness.values[0]
     printRoute(ind2route(bestInd, instance))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
-
     if exportCSV:
-        print 'Write to file: %s' % csvFile
-        makeDirsForFile(csvFile)
-        if not existFile(csvFile, overwrite=True):
-            with open(csvFile, 'w') as f:
+        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvPathname = os.path.join(BASE_DIR, 'results', csvFilename)
+        print 'Write to file: %s' % csvPathname
+        makeDirsForFile(pathname=csvPathname)
+        if not exist(pathname=csvPathname, overwrite=True):
+            with open(csvPathname, 'w') as f:
                 fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness']
-                writer = csv.DictWriter(f, fieldnames=fieldnames, dialect='excel')
-
+                writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
                     writer.writerow(csvRow)

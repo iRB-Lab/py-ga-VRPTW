@@ -2,7 +2,7 @@
 # sample_R101.py
 
 import random
-from gaVRPTW import gaVRPTW
+from gavrptw.core import gaVRPTW
 
 
 def main():
@@ -23,7 +23,19 @@ def main():
 
     exportCSV = True
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV)
+    gaVRPTW(
+        instName=instName,
+        unitCost=unitCost,
+        initCost=initCost,
+        waitCost=waitCost,
+        delayCost=delayCost,
+        indSize=indSize,
+        popSize=popSize,
+        cxPb=cxPb,
+        mutPb=mutPb,
+        NGen=NGen,
+        exportCSV=exportCSV
+    )
 
 
 if __name__ == '__main__':

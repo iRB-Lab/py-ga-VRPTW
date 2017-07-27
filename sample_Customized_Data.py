@@ -2,7 +2,7 @@
 # sample_Customized_Data.py
 
 import random
-from gaVRPTW import gaVRPTW
+from gavrptw.core import gaVRPTW
 
 
 def main():
@@ -24,7 +24,20 @@ def main():
     exportCSV = True
     customizeData = True
 
-    gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV, customizeData)
+    gaVRPTW(
+        instName=instName,
+        unitCost=unitCost,
+        initCost=initCost,
+        waitCost=waitCost,
+        delayCost=delayCost,
+        indSize=indSize,
+        popSize=popSize,
+        cxPb=cxPb,
+        mutPb=mutPb,
+        NGen=NGen,
+        exportCSV=exportCSV,
+        customizeData=customizeData
+    )
 
 
 if __name__ == '__main__':
