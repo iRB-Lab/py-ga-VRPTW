@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ```
 
 ### Python 3 Support
-See [**@yingriyanlong**](https://github.com/yingriyanlong) [forked version](https://github.com/yingriyanlong/py-ga-VRPTW).
+See [**@yingriyanlong**](https://github.com/yingriyanlong) forked [version](https://github.com/yingriyanlong/py-ga-VRPTW).
 
 ## Quick Start
 See [sample codes](#sample-codes).
