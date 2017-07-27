@@ -69,7 +69,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 <empty line>
     0       x0        y1         q0         e0          l0            s0
     1       x1        y2         q1         e1          l1            s1
-  ...     ...        ...        ...        ...         ...           ...
+  ...      ...       ...        ...        ...         ...           ...
   100     x100      y100       q100       e100        l100          s100
 ```
 
