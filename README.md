@@ -8,6 +8,46 @@
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
 
+## Quick Reference
+- [Installation](#installation)
+    - [Requirements](#requirements)
+    - [Installing with Virtualenv](#installing-with-virtualenv)
+    - [Python 3 Support](#python-3-support)
+- [Quick Start](#quick-start)
+- [Problem Sets](#problem-sets)
+    - [Solomon's VRPTW Benchmark Problems](#solomons-vrptw-benchmark-problems1)
+    - [Instance Definitions](#instance-definitions)
+        - [Text File Format](#text-file-format)
+        - [JSON Format](#json-format) 
+        - [Use Cusomized Instance Data](#use-cusomized-instance-data)
+            - [Supported File Format](#supported-file-format)
+            - [Directory Set-up](#directory-set-up)
+            - [Convert `*.txt` to `*.json`](#convert-txt-to-json)
+            - [GA Set-up](#ga-set-up)
+- [GA Implementation](#ga-implementation)
+    - [Individual (Chromosome)](#individual-chromosome)
+        - [Individual Coding](#individual-coding)
+        - [Individual Decoding](#individual-decoding)
+        - [Print Route](#print-route)
+    - [Evaluation](#evaluation)
+    - [Selection: Roulette Wheel Selection](#selection-roulette-wheel-selection)
+    - [Crossover: Partially Matched Crossover](#crossover-partially-matched-crossover)
+    - [Mutation: Inverse Operation](#mutation-inverse-operation)
+    - [Algorithm](#algorithm)
+    - [Sample Codes](#sample-codes)
+        - [Instance: R101](#instance-r101)
+        - [Instance: C204](#instance-c204)
+        - [Customized Instance](#customized-instance)
+        - [View Logs](#view-logs)
+- [API Reference](#api-reference)
+    - [Module: `gavrptw`](#module-gavrptw)
+    - [Module: `gavrptw.core`](#module-gavrptwcore)
+    - [Module: `gavrptw.utils`](#module-gavrptwutils)
+- [File Structure](#file-structure)
+- [Further Reading](#further-reading)
+- [References](#references)
+- [License](#license)
+
 ## Installation
 ### Requirements
 - [macOS][macos] (Recommended)
@@ -32,7 +72,8 @@ See **[@yingriyanlong][yingriyanlong-github]**'s fork: [yingriyanlong/py-ga-VRPT
 ## Quick Start
 See [sample codes](#sample-codes).
 
-## Solomon's VRPTW Benchmark Problems<sup>[1][solomon]</sup>
+## Problem Sets
+### Solomon's VRPTW Benchmark Problems<sup>[1][solomon]</sup>
 |Problem Set|Random|Clustered|Random & Clustered|
 |:--|:--|:--|:--|
 |Short Scheduling Horizon|R1-type|C1-type|RC1-type|
@@ -247,7 +288,7 @@ def ind2route(individual, instance):
     return route
 ```
 
-#### Others
+#### Print Route
 ```python
 printRoute(route, merge=False)
 ```
