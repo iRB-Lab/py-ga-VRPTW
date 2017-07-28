@@ -84,7 +84,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 5. `READY TIME` is the earliest time at which service may start at the given customer/depot.
 6. `DUE DATE` is the latest time at which service may start at the given customer/depot.
 7. The value of time is equal to the value of distance.
-8. As a backup, you will find a zip-file with the 100 instance definitions [here][100-customers-zip].
+8. As a backup, you can download a zip-file with the 100 customers instance definitions<sup>[2][100-customers]</sup> [here][100-customers-zip].
 
 #### JSON Format
 For the further convenience, a Python script named `text2json.py` is writen to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.json`, and locates at `data/json/C101.json`.
