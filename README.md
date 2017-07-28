@@ -187,7 +187,7 @@ are coded as `5 3 2 7 1 6 9 8 4`, which can be stored in a Python `list` object,
 ```python
 ind2route(individual, instance)
 ```
-Decodes `individual` to `route` representation. To show the difference between an `individual` and a `route`, an example is given below.
+decodes `individual` to `route` representation. To show the difference between an `individual` and a `route`, an example is given below.
 
 ```python
 # individual
@@ -252,7 +252,7 @@ def ind2route(individual, instance):
 printRoute(route, merge=False)
 ```
 
-Prints sub-routes information to screen.
+prints sub-routes information to screen.
 
 **Parameters:**
 
@@ -289,7 +289,7 @@ def printRoute(route, merge=False):
 evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0)
 ```
 
-Takes one individual as argument and returns its fitness as a Python `tuple` object.
+takes one individual as argument and returns its fitness as a Python `tuple` object.
 
 **Parameters:**
 
@@ -346,7 +346,7 @@ def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayC
 deap.tools.selRoulette(individuals, k)
 ```
 
-Selects `k` individuals from the input individuals using `k` spins of a roulette. The selection is made by looking only at the first objective of each individual. The list returned contains references to the input individuals.
+selects `k` individuals from the input individuals using `k` spins of a roulette. The selection is made by looking only at the first objective of each individual. The list returned contains references to the input individuals.
 
 **Parameters:**
 
@@ -380,7 +380,7 @@ def selRoulette(individuals, k):
 cxPartialyMatched(ind1, ind2)
 ```
 
-Executes a partially matched crossover (PMX) on the input individuals. The two individuals are modified in place. This crossover expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
+executes a partially matched crossover (PMX) on the input individuals. The two individuals are modified in place. This crossover expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
 
 **Parameters:**
 
@@ -415,7 +415,7 @@ def cxPartialyMatched(ind1, ind2):
 mutInverseIndexes(individual)
 ```
 
-Inverses the attributes between two random points of the input individual and return the mutant. This mutation expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
+inverses the attributes between two random points of the input individual and return the mutant. This mutation expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
 
 **Parameters:**
 
@@ -452,7 +452,7 @@ gaVRPTW(
 )
 ```
 
-Implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
+implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
 
 **Parameters:**
 
