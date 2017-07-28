@@ -5,7 +5,8 @@ import random
 from json import load
 from csv import DictWriter
 from deap import base, creator, tools
-from utils import BASE_DIR, makeDirsForFile, exist
+from . import BASE_DIR
+from utils import makeDirsForFile, exist
 
 
 def ind2route(individual, instance):

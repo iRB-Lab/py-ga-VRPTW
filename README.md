@@ -740,6 +740,13 @@ The sample codes will print logs on the screen. Meanwhile, a **CSV format** log 
 ```
 
 ## API Reference
+### Module: `gavrptw`
+Excerpt from `gavrptw/__init__.py`:
+
+```python
+BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+```
+
 ### Module: `gavrptw.core`
 ```python
 route = ind2route(individual, instance)
