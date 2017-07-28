@@ -828,6 +828,9 @@ text2json(customize=False)
 2. [100 Customers Instance Definitions][100-customers]
 3. [Distributed Evolutionary Algorithms in Python (DEAP)][deap-pypi]
 
+## License
+[MIT License](/LICENSE)
+
 [solomon]: http://web.cba.neu.edu/~msolomon/problems.htm "Solomon's VRPTW Benchmark Problems"
 [100-customers]: http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/ "100 Customers Instance Definitions"
 [100-customers-zip]: http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip "100 Customers Instance Definitions (Zip)"
