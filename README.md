@@ -33,15 +33,17 @@ See [**@yingriyanlong**](https://github.com/yingriyanlong) forked [version](http
 See [sample codes](#sample-codes).
 
 ## Solomon's VRPTW Benchmark Problems
-> R1-type|C1-type|RC1-type|R2-type|C2-type|RC2-type
-> -------|-------|--------|-------|-------|--------
+> |Problem Set|Random|Clustered|Random & Clustered|
+> |:--|:--|:--|:--|
+> |Short Scheduling Horizon|R1-type|C1-type|RC1-type|
+> |Long Scheduling Horizon|R2-type|C2-type|RC2-type|
 >
 > I generated six sets of problems. Their design highlights several factors that affect the behavior of routing and scheduling algorithms. They are:
 >
-> * geographical data;
-> * the number of customers serviced by a vehicle;
-> * percent of time-constrained customers; and
-> * tightness and positioning of the time windows.
+> - geographical data;
+> - the number of customers serviced by a vehicle;
+> - percent of time-constrained customers; and
+> - tightness and positioning of the time windows.
 >
 > The geographical data are randomly generated in problem sets R1 and R2, clustered in problem sets C1 and C2, and a mix of random and clustered structures in problem sets by RC1 and RC2. Problem sets R1, C1 and RC1 have a short scheduling horizon and allow only a few customers per route (approximately 5 to 10). In contrast, the sets R2, C2 and RC2 have a long scheduling horizon permitting many customers (more than 30) to be serviced by the same vehicle.
 >
