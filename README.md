@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)][repository]
-[![Python](https://img.shields.io/badge/Python-2.7-blue.svg)][python]
+[![Python](https://img.shields.io/badge/python-2.7-blue.svg)][python]
 [![Release](https://img.shields.io/github/release/iROCKBUNNY/py-ga-VRPTW.svg)][release]
 [![License](https://img.shields.io/github/license/iROCKBUNNY/py-ga-VRPTW.svg)][license]
 [![Watchers](https://img.shields.io/github/watchers/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
