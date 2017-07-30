@@ -1,14 +1,15 @@
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW)
-[![Release](https://img.shields.io/github/release/iROCKBUNNY/py-ga-VRPTW.svg)](https://github.com/iROCKBUNNY/py-ga-VRPTW/releases/tag/1.0.0)
-[![License](https://img.shields.io/github/license/iROCKBUNNY/py-ga-VRPTW.svg)](/LICENSE)
-[![Watchers](https://img.shields.io/github/watchers/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Watch)](https://github.com/iROCKBUNNY/py-ga-VRPTW/watchers)
-[![Stargazers](https://img.shields.io/github/stars/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Star)](https://github.com/iROCKBUNNY/py-ga-VRPTW/stargazers)
-[![Forks](https://img.shields.io/github/forks/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Fork)](https://github.com/iROCKBUNNY/py-ga-VRPTW/network)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)][repository]
+[![Python](https://img.shields.io/badge/Python-2.7-blue.svg)][python]
+[![Release](https://img.shields.io/github/release/iROCKBUNNY/py-ga-VRPTW.svg)][release]
+[![License](https://img.shields.io/github/license/iROCKBUNNY/py-ga-VRPTW.svg)][license]
+[![Watchers](https://img.shields.io/github/watchers/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
+[![Stargazers](https://img.shields.io/github/stars/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Star)][star]
+[![Forks](https://img.shields.io/github/forks/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Fork)][fork]
 
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
 
-## Quick Reference
+## Contents
 - [Installation](#installation)
     - [Requirements](#requirements)
     - [Installing with Virtualenv](#installing-with-virtualenv)
@@ -877,17 +878,26 @@ text2json(customize=False)
 3. [Distributed Evolutionary Algorithms in Python (DEAP)][deap-pypi]
 
 ## License
-[MIT License](/LICENSE)
+[MIT License][license]
 
-[solomon]: http://web.cba.neu.edu/~msolomon/problems.htm "Solomon's VRPTW Benchmark Problems"
-[100-customers]: http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/ "100 Customers Instance Definitions"
-[100-customers-zip]: http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip "100 Customers Instance Definitions (Zip)"
-[deap-docs]: http://deap.readthedocs.org/ "Distributed Evolutionary Algorithms in Python (DEAP) Docs"
-[deap-github]: https://github.com/deap/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) GirHub"
-[deap-pypi]: https://pypi.python.org/pypi/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) PyPI"
+[repository]: https://github.com/iROCKBUNNY/py-ga-VRPTW "iROCKBUNNY/py-ga-VRPTW"
+[release]: https://github.com/iROCKBUNNY/py-ga-VRPTW/releases/latest "Latest Release"
+[license]: https://github.com/iROCKBUNNY/py-ga-VRPTW/LICENSE "License"
+[watch]: https://github.com/iROCKBUNNY/py-ga-VRPTW/watchers "Watchers"
+[star]: https://github.com/iROCKBUNNY/py-ga-VRPTW/stargazers "Stargazers"
+[fork]: https://github.com/iROCKBUNNY/py-ga-VRPTW/network "Forks"
+
 [macos]: https://www.apple.com/macos/ "macOS"
 [python]: https://docs.python.org/2/ "Python 2.7"
 [pip]: https://pypi.python.org/pypi/pip "Pip"
 [virtualenv]: https://virtualenv.pypa.io/en/stable/ "Virtualenv"
 [yingriyanlong-github]: https://github.com/yingriyanlong "@yingriyanlong"
 [yingriyanlong-verison]: https://github.com/yingriyanlong/py-ga-VRPTW "yingriyanlong/py-ga-VRPTW"
+
+[solomon]: http://web.cba.neu.edu/~msolomon/problems.htm "Solomon's VRPTW Benchmark Problems"
+[100-customers]: http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/ "100 Customers Instance Definitions"
+[100-customers-zip]: http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip "100 Customers Instance Definitions (Zip)"
+
+[deap-docs]: http://deap.readthedocs.org/ "Distributed Evolutionary Algorithms in Python (DEAP) Docs"
+[deap-github]: https://github.com/deap/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) GirHub"
+[deap-pypi]: https://pypi.python.org/pypi/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) PyPI"
