@@ -1,10 +1,10 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)][repository]
 [![Python](https://img.shields.io/badge/python-2.7-blue.svg)][python]
-[![Release](https://img.shields.io/github/release/iROCKBUNNY/py-ga-VRPTW.svg)][release]
-[![License](https://img.shields.io/github/license/iROCKBUNNY/py-ga-VRPTW.svg)][license]
-[![Watchers](https://img.shields.io/github/watchers/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
-[![Stargazers](https://img.shields.io/github/stars/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Star)][star]
-[![Forks](https://img.shields.io/github/forks/iROCKBUNNY/py-ga-VRPTW.svg?style=social&label=Fork)][fork]
+[![Release](https://img.shields.io/github/release/iRB-Lab/py-ga-VRPTW.svg)][release]
+[![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
+[![Watchers](https://img.shields.io/github/watchers/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
+[![Stargazers](https://img.shields.io/github/stars/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Star)][star]
+[![Forks](https://img.shields.io/github/forks/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Fork)][fork]
 
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
@@ -19,7 +19,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
     - [Solomon's VRPTW Benchmark Problems](#solomons-vrptw-benchmark-problems1)
     - [Instance Definitions](#instance-definitions)
         - [Text File Format](#text-file-format)
-        - [JSON Format](#json-format) 
+        - [JSON Format](#json-format)
         - [Use Cusomized Instance Data](#use-cusomized-instance-data)
             - [Supported File Format](#supported-file-format)
             - [Directory Set-up](#directory-set-up)
@@ -60,7 +60,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 On Unix, Linux, BSD, macOS, and Cygwin:
 
 ```sh
-git clone https://github.com/iROCKBUNNY/py-ga-VRPTW.git
+git clone https://github.com/iRB-Lab/py-ga-VRPTW.git
 cd py-ga-VRPTW
 virtualenv venv
 source venv/bin/activate
@@ -880,12 +880,12 @@ text2json(customize=False)
 ## License
 [MIT License][license]
 
-[repository]: https://github.com/iROCKBUNNY/py-ga-VRPTW "iROCKBUNNY/py-ga-VRPTW"
-[release]: https://github.com/iROCKBUNNY/py-ga-VRPTW/releases/latest "Latest Release"
-[license]: https://github.com/iROCKBUNNY/py-ga-VRPTW/LICENSE "License"
-[watch]: https://github.com/iROCKBUNNY/py-ga-VRPTW/watchers "Watchers"
-[star]: https://github.com/iROCKBUNNY/py-ga-VRPTW/stargazers "Stargazers"
-[fork]: https://github.com/iROCKBUNNY/py-ga-VRPTW/network "Forks"
+[repository]: https://github.com/iRB-Lab/py-ga-VRPTW "iRB-Lab/py-ga-VRPTW"
+[release]: https://github.com/iRB-Lab/py-ga-VRPTW/releases/latest "Latest Release"
+[license]: https://github.com/iRB-Lab/py-ga-VRPTW/LICENSE "License"
+[watch]: https://github.com/iRB-Lab/py-ga-VRPTW/watchers "Watchers"
+[star]: https://github.com/iRB-Lab/py-ga-VRPTW/stargazers "Stargazers"
+[fork]: https://github.com/iRB-Lab/py-ga-VRPTW/network "Forks"
 
 [macos]: https://www.apple.com/macos/ "macOS"
 [python]: https://docs.python.org/2/ "Python 2.7"
