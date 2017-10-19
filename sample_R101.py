@@ -10,13 +10,13 @@ def main():
 
     instName = 'R101'
 
-    unitCost = 8.0
-    initCost = 60.0
-    waitCost = 0.5
-    delayCost = 1.5
+    unitCost = 1.0
+    initCost = 0.0
+    waitCost = 0.0
+    delayCost = 0.0
 
-    indSize = 25
-    popSize = 80
+    indSize = 100
+    popSize = 500
     cxPb = 0.85
     mutPb = 0.01
     NGen = 100

@@ -51,6 +51,8 @@ def text2json(customize=False):
         jsonDataDir = os.path.join(BASE_DIR, 'data', 'json')
     for textFile in map(lambda textFilename: os.path.join(textDataDir, textFilename), fnmatch.filter(os.listdir(textDataDir), '*.txt')):
         jsonData = {}
+        # Count the number of lines in the file to customize the number of customers
+        size = sum(1 for line in open(textFile))
         with open(textFile) as f:
             for lineNum, line in enumerate(f, start=1):
                 if lineNum in [2, 3, 4, 6, 7, 8, 9]:
@@ -59,10 +61,21 @@ def text2json(customize=False):
                     # <Instance name>
                     jsonData['instance_name'] = line.strip()
                 elif lineNum == 5:
-                    # <Maximum vehicle number>, <Vehicle capacity>
+                    # <Maximum heavy vehicle number>, <Heavy vehicle capacity>,
+                    # <Maximum light vehicle number>, <Light vehicle capacity>, <Light vehicle range>
                     values = line.strip().split()
                     jsonData['max_vehicle_number'] = int(values[0])
                     jsonData['vehicle_capacity'] = float(values[1])
+                    try:
+                        gotdata = values[2]
+                    except IndexError:
+                        gotdata = False
+                    if gotdata:
+                        jsonData['max_light_vehicle_number'] = int(values[2])
+                        jsonData['light_vehicle_capacity'] = float(values[3])
+                        jsonData['light_vehicle_range'] = float(values[4])
+                    else:
+                        pass
                 elif lineNum == 10:
                     # Custom number = 0, deport
                     # <Custom number>, <X coordinate>, <Y coordinate>, <Demand>, <Ready time>, <Due date>, <Service time>
@@ -90,7 +103,9 @@ def text2json(customize=False):
                         'due_time': float(values[5]),
                         'service_time': float(values[6]),
                     }
-        customers = ['deport'] + ['customer_%d' % x for x in range(1, 101)]
+        # There are a constant 9 lines of header text before customers
+        numOfCustomers = size - 9
+        customers = ['deport'] + ['customer_%d' % x for x in range(1, numOfCustomers)]
         jsonData['distance_matrix'] = [[__distance(jsonData[customer1], jsonData[customer2]) for customer1 in customers] for customer2 in customers]
         jsonFilename = '%s.json' % jsonData['instance_name']
         jsonPathname = os.path.join(jsonDataDir, jsonFilename)
