@@ -5,7 +5,7 @@
 import os
 import random
 from json import load
-from gavrptw.core import ind2route, printRoute, evalVRPTW
+from gavrptw.core import ind2routeMS, printRoute, evalVRPMS
 from deap import base, creator, tools
 
 instName = 'VRPMS_Data_Small'
@@ -30,6 +30,6 @@ toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.in
 toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
 individual = toolbox.individual()
-route = ind2route(individual, instance)
+route = ind2routeMS(individual, instance)
 printRoute(route, twoResources=True)
-evalVRPTW(individual, instance, unitCost=1.0, initCost=30, lightUnitCost=1, lightInitCost=10)
+evalVRPMS(individual, instance, unitCost=1.0, initCost=30, lightUnitCost=1, lightInitCost=10)
