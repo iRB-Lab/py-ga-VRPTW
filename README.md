@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)][repository]
-[![Python](https://img.shields.io/badge/python-2.7-blue.svg)][python]
+[![Python](https://img.shields.io/badge/python-2.7%2F3.5-blue.svg)][python]
 [![Release](https://img.shields.io/github/release/iRB-Lab/py-ga-VRPTW.svg)][release]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
 [![Watchers](https://img.shields.io/github/watchers/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
@@ -13,7 +13,6 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 - [Installation](#installation)
     - [Requirements](#requirements)
     - [Installing with Virtualenv](#installing-with-virtualenv)
-    - [Python 3 Support](#python-3-support)
 - [Quick Start](#quick-start)
 - [Problem Sets](#problem-sets)
     - [Solomon's VRPTW Benchmark Problems](#solomons-vrptw-benchmark-problems1)
@@ -52,7 +51,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 ## Installation
 ### Requirements
 - [macOS][macos] (Recommended)
-- [Python 2.7][python]
+- [Python 2.7/3.5][python]
 - [Pip][pip]
 - [Virtualenv][virtualenv]
 
@@ -66,9 +65,6 @@ virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-
-### Python 3 Support
-See **[@yingriyanlong][yingriyanlong-github]**'s fork: [yingriyanlong/py-ga-VRPTW][yingriyanlong-verison].
 
 ## Quick Start
 See [sample codes](#sample-codes).
@@ -319,10 +315,10 @@ def printRoute(route, merge=False):
             routeStr = routeStr + ' - ' + str(customerID)
         subRouteStr = subRouteStr + ' - 0'
         if not merge:
-            print '  Vehicle %d\'s route: %s' % (subRouteCount, subRouteStr)
+            print('  Vehicle %d\'s route: %s' % (subRouteCount, subRouteStr))
         routeStr = routeStr + ' - 0'
     if merge:
-        print routeStr
+        print(routeStr)
     return
 ```
 
@@ -542,15 +538,15 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     pop = toolbox.population(n=popSize)
     # Results holders for exporting results to CSV file
     csvData = []
-    print 'Start of evolution'
+    print('Start of evolution')
     # Evaluate the entire population
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
-    print '  Evaluated %d individuals' % len(pop)
+    print('  Evaluated %d individuals' % len(pop))
     # Begin the evolution
     for g in range(NGen):
-        print '-- Generation %d --' % g
+        print('-- Generation %d --' % g)
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
@@ -570,7 +566,7 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         fitnesses = map(toolbox.evaluate, invalidInd)
         for ind, fit in zip(invalidInd, fitnesses):
             ind.fitness.values = fit
-        print '  Evaluated %d individuals' % len(invalidInd)
+        print('  Evaluated %d individuals' % len(invalidInd))
         # The population is entirely replaced by the offspring
         pop[:] = offspring
         # Gather all the fitnesses in one list and print the stats
@@ -579,10 +575,10 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)
         std = abs(sum2 / length - mean**2)**0.5
-        print '  Min %s' % min(fits)
-        print '  Max %s' % max(fits)
-        print '  Avg %s' % mean
-        print '  Std %s' % std
+        print('  Min %s' % min(fits))
+        print('  Max %s' % max(fits))
+        print('  Avg %s' % mean)
+        print('  Std %s' % std)
         # Write data to holders for exporting results to CSV file
         if exportCSV:
             csvRow = {
@@ -594,16 +590,16 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
                 'std_fitness': std,
             }
             csvData.append(csvRow)
-    print '-- End of (successful) evolution --'
+    print('-- End of (successful) evolution --')
     bestInd = tools.selBest(pop, 1)[0]
-    print 'Best individual: %s' % bestInd
-    print 'Fitness: %s' % bestInd.fitness.values[0]
+    print('Best individual: %s' % bestInd))
+    print('Fitness: %s' % bestInd.fitness.values[0])
     printRoute(ind2route(bestInd, instance))
-    print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
+    print('Total cost: %s' % (1 / bestInd.fitness.values[0]))
     if exportCSV:
         csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
         csvPathname = os.path.join(BASE_DIR, 'results', csvFilename)
-        print 'Write to file: %s' % csvPathname
+        print('Write to file: %s' % csvPathname)
         makeDirsForFile(pathname=csvPathname)
         if not exist(pathname=csvPathname, overwrite=True):
             with open(csvPathname, 'w') as f:
@@ -888,11 +884,9 @@ text2json(customize=False)
 [fork]: https://github.com/iRB-Lab/py-ga-VRPTW/network "Forks"
 
 [macos]: https://www.apple.com/macos/ "macOS"
-[python]: https://docs.python.org/2/ "Python 2.7"
+[python]: https://docs.python.org/ "Python"
 [pip]: https://pypi.python.org/pypi/pip "Pip"
 [virtualenv]: https://virtualenv.pypa.io/en/stable/ "Virtualenv"
-[yingriyanlong-github]: https://github.com/yingriyanlong "@yingriyanlong"
-[yingriyanlong-verison]: https://github.com/yingriyanlong/py-ga-VRPTW "yingriyanlong/py-ga-VRPTW"
 
 [solomon]: http://web.cba.neu.edu/~msolomon/problems.htm "Solomon's VRPTW Benchmark Problems"
 [100-customers]: http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/ "100 Customers Instance Definitions"

@@ -27,16 +27,16 @@ def exist(pathname, overwrite=False, displayInfo=True):
     if os.path.exists(pathname):
         if overwrite:
             if displayInfo:
-                print u'%s: %s exists. Overwrite.' % (__pathType(pathname), pathname)
+                print('%s: %s exists. Overwrite.' % (__pathType(pathname), pathname))
             os.remove(pathname)
             return False
         else:
             if displayInfo:
-                print u'%s: %s exists.' % (__pathType(pathname), pathname)
+                print('%s: %s exists.' % (__pathType(pathname), pathname))
             return True
     else:
         if displayInfo:
-            print u'%s: %s does not exist.' % (__pathType(pathname), pathname)
+            print('%s: %s does not exist.' % (__pathType(pathname), pathname))
         return False
 
 
@@ -94,7 +94,7 @@ def text2json(customize=False):
         jsonData['distance_matrix'] = [[__distance(jsonData[customer1], jsonData[customer2]) for customer1 in customers] for customer2 in customers]
         jsonFilename = '%s.json' % jsonData['instance_name']
         jsonPathname = os.path.join(jsonDataDir, jsonFilename)
-        print 'Write to file: %s' % jsonPathname
+        print('Write to file: %s' % jsonPathname)
         makeDirsForFile(pathname=jsonPathname)
         with open(jsonPathname, 'w') as f:
             dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
