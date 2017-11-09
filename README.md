@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)][repository]
-[![Python](https://img.shields.io/badge/python-2.7%2F3.5-blue.svg)][python]
+[![Python](https://img.shields.io/badge/python-2.7%2F3.5%2B-blue.svg)][python]
 [![Release](https://img.shields.io/github/release/iRB-Lab/py-ga-VRPTW.svg)][release]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
 [![Watchers](https://img.shields.io/github/watchers/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
@@ -51,7 +51,7 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 ## Installation
 ### Requirements
 - [macOS][macos] (Recommended)
-- [Python 2.7/3.5][python]
+- [Python 2.7/3.5+][python]
 - [Pip][pip]
 - [Virtualenv][virtualenv]
 
