@@ -2,6 +2,7 @@
 
 import os
 import fnmatch
+import matplotlib.pyplot as plt
 from json import dump
 from . import BASE_DIR
 
@@ -113,3 +114,9 @@ def text2json(customize=False):
         makeDirsForFile(pathname=jsonPathname)
         with open(jsonPathname, 'w') as f:
             dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
+
+
+def plotResults():
+    resultsDataDir = os.path.join(BASE_DIR, 'results')
+    for csvFile in map(lambda csvFilename: os.path.join(resultsDataDir, csvFilename), fnmatch.filter(os.listdir(resultsDataDir), '*csv')):
+        print csvFile

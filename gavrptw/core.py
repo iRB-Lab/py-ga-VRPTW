@@ -2,6 +2,7 @@
 
 import os
 import random
+import numpy
 from json import load
 from csv import DictWriter
 from deap import base, creator, tools
@@ -137,7 +138,7 @@ def ind2routeMS(individual, instance):
         route.append(subRoute)
     
     # Debug Code:
-    printRoute(route)
+    #printRoute(route)
     # End of Debug
 
     # Code for creating light resource routes within each subroutes served by a heavy
@@ -159,10 +160,10 @@ def ind2routeMS(individual, instance):
         lastCustomerID = 0
         for customerID in subroutes:
             # Debug Code:
-            print("the current subroute is:")
-            print(subroutes)
-            print("Last customer ID: " + str(lastCustomerID))
-            print("Current customer ID: " + str(customerID))
+            #print("the current subroute is:")
+            #print(subroutes)
+            #print("Last customer ID: " + str(lastCustomerID))
+            #print("Current customer ID: " + str(customerID))
             # End of Debug
             # Update light vehicle load
             demand = instance['customer_%d' % customerID]['demand']
@@ -174,8 +175,8 @@ def ind2routeMS(individual, instance):
             # Add skipped customer into the heavySubRoute list
             if heavySubRoute == []:
                 heavySubRoute.append(customerID)
-                print("Appended the first customer into heavySubRoute:")
-                print(heavySubRoute)
+                #print("Appended the first customer into heavySubRoute:")
+                #print(heavySubRoute)
         
             # Validate the capacity and travel range constraints
             # TODO maybe constrain the lightSubRoute to be of a length that is more than 2 customers?
@@ -184,26 +185,26 @@ def ind2routeMS(individual, instance):
                 lightSubRoute.append(customerID)
                 lightVehicleLoad = updatedLightVehicleLoad
                 lightTravelRange = updatedLightTravelRange
-                print("Appended the current customer into lightSubRoute:")
-                print(lightSubRoute)
+                #print("Appended the current customer into lightSubRoute:")
+                #print(lightSubRoute)
                 
             else:
                 # Save the current lightSubRoute
                 # i.e. subRoute = [7,8,9,19,21]; lightSubRoute = [8,9]; heavySubRoute = [7], [19,21]
                 # subRoute = [[7],[8,9],[19,21]]
-                print("Current light load is: %d" % updatedLightVehicleLoad)
-                print("Current light range is: %d" % updatedLightTravelRange)
+                #print("Current light load is: %d" % updatedLightVehicleLoad)
+                #print("Current light range is: %d" % updatedLightTravelRange)
 
                 if lightSubRoute == []:
                     heavySubRoute.append(customerID)
-                    print("Appended the current customer into heavySubRoute:")
-                    print(heavySubRoute)
+                    #print("Appended the current customer into heavySubRoute:")
+                    #print(heavySubRoute)
                 elif lightSubRoute != []:
                     subRoute.append(heavySubRoute)
                     subRoute.append(lightSubRoute)
                     subRoute.append([customerID])
-                    print("Appended the light and heavy routes into subRoute")
-                    print(subRoute)
+                    #print("Appended the light and heavy routes into subRoute")
+                    #print(subRoute)
 
                     # Clean both light/heavySubRoutes
                     lightSubRoute = []
@@ -230,19 +231,19 @@ def ind2routeMS(individual, instance):
             else:
                 subRoute[-1].extend(heavySubRoute)
             subRoute[-1].extend(lightSubRoute) # extend the last heavySubRoute with the rest of lightSubRoute
-            print("Appended the rest of the lightSubRoute as heavySubroute in subRoute")
-            print(subRoute)
+            #print("Appended the rest of the lightSubRoute as heavySubroute in subRoute")
+            #print(subRoute)
         # Add the heavySubRoute to the end of route if not empty    
         elif lightSubRoute == [] and heavySubRoute != []:
             subRoute.append(heavySubRoute)
-            print("Appended the rest of the heavySubRoute in subRoute")
+            #print("Appended the rest of the heavySubRoute in subRoute")
         else:
             pass
         
         # Add the finalized subRoute into routeWithTwoResources
         routeWithTwoResources.append(subRoute)
-        print("routeWithTwoResources looks like:")
-        print(routeWithTwoResources)
+        #print("routeWithTwoResources looks like:")
+        #print(routeWithTwoResources)
 
     return routeWithTwoResources
 
@@ -357,13 +358,15 @@ def evalVRPMS(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayC
         # Update total cost with 2 resources
         totalCostTwoResource = totalCostTwoResource + lightSubRouteCost + heavySubRouteCost
         # Debug
-        print ("The total cost is: %d" % totalCost)
-        print ("The total cost with 2 resources is: %d, with light costing: %d, and heavy costing: %d" % (totalCostTwoResource, lightSubRouteCost, heavySubRouteCost))
+        #print ("The total cost is: %d" % totalCost)
+        #print ("The total cost with 2 resources is: %d, with light costing: %d, and heavy costing: %d" % (totalCostTwoResource, lightSubRouteCost, heavySubRouteCost))
         # End of Debug
-    fitness = 1.0 / totalCostTwoResource
+    fitness = 1 / totalCostTwoResource
     return fitness,
 
-def cxPartialyMatched(ind1, ind2):
+"""
+ This was the implmentation by the original author
+ def cxPartialyMatched(ind1, ind2):
     size = min(len(ind1), len(ind2))
     cxpoint1, cxpoint2 = sorted(random.sample(range(size), 2))
     temp1 = ind1[cxpoint1:cxpoint2+1] + ind2
@@ -376,6 +379,63 @@ def cxPartialyMatched(ind1, ind2):
     for x in temp2:
         if x not in ind2:
             ind2.append(x)
+    return ind1, ind2
+"""
+
+def cxPartialyMatched(ind1, ind2):
+    """Executes a partially matched crossover (PMX) on the input individuals.
+    The two individuals are modified in place. This crossover expects
+    :term:`sequence` individuals of indices, the result for any other type of
+    individuals is unpredictable.
+    
+    :param ind1: The first individual participating in the crossover.
+    :param ind2: The second individual participating in the crossover.
+    :returns: A tuple of two individuals.
+
+    Moreover, this crossover generates two children by matching
+    pairs of values in a certain range of the two parents and swapping the values
+    of those indexes. For more details see [Goldberg1985]_.
+
+    This function uses the :func:`~random.randint` function from the python base
+    :mod:`random` module.
+    
+    .. [Goldberg1985] Goldberg and Lingel, "Alleles, loci, and the traveling
+       salesman problem", 1985.
+    """
+
+    """
+    Author: Paul
+    Changes: decrease the index count by 1 to account for the way indivduals are
+            generated with 0 being the terminal.
+
+    """
+    size = min(len(ind1), len(ind2))
+    p1, p2 = [0]*size, [0]*size
+
+    # Initialize the position of each indices in the individuals
+    for i in xrange(size):
+        p1[ind1[i]-1] = i
+        p2[ind2[i]-1] = i
+    # Choose crossover points
+    cxpoint1 = random.randint(0, size)
+    cxpoint2 = random.randint(0, size - 1)
+    if cxpoint2 >= cxpoint1:
+        cxpoint2 += 1
+    else: # Swap the two cx points
+        cxpoint1, cxpoint2 = cxpoint2, cxpoint1
+    
+    # Apply crossover between cx points
+    for i in xrange(cxpoint1, cxpoint2):
+        # Keep track of the selected values
+        temp1 = ind1[i]
+        temp2 = ind2[i]
+        # Swap the matched value
+        ind1[i], ind1[p1[temp2-1]] = temp2, temp1
+        ind2[i], ind2[p2[temp1-1]] = temp1, temp2
+        # Position bookkeeping
+        p1[temp1-1], p1[temp2-1] = p1[temp2-1], p1[temp1-1]
+        p2[temp1-1], p2[temp2-1] = p2[temp2-1], p2[temp1-1]
+    
     return ind1, ind2
 
 def mutInverseIndexes(individual):
@@ -536,6 +596,14 @@ def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost,
         print '  Evaluated %d individuals' % len(invalidInd)
         # The population is entirely replaced by the offspring
         pop[:] = offspring
+        # Record statistics into the logbook
+        stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+        stats.register('avg', numpy.mean)
+        stats.register('std', numpy.std)
+        stats.register('min', numpy.min)
+        stats.register('max', numpy.max)
+        record = stats.compile(pop)
+        print(record)
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
         length = len(pop)

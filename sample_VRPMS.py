@@ -11,24 +11,24 @@ def main():
     # Init costs associated with the heavy resource
     # Make the heavy resource 10x the cost of the light
     unitCost = 1.0
-    initCost = 100.0
+    initCost = 10.0
     waitCost = 0.0
     delayCost = 0.0
 
     # Init costs associated with the light resource
     lightUnitCost = 0.1
-    lightInitCost = 10.0
+    lightInitCost = 5.0
     lightWaitCost = 0.0
     lightDelayCost = 0.0
 
     # Individual size should match the number of customers
     indSize = 11
-    popSize = 10
+    popSize = 20
     # At a random amount so far
     # TODO sensitivity analysis
     cxPb = 0.85
     mutPb = 0.02
-    NGen = 5
+    NGen = 100
 
     exportCSV = True
     customizeData = True
