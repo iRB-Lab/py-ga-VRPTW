@@ -19,7 +19,7 @@ def main():
     popSize = 500
     cxPb = 0.85
     mutPb = 0.01
-    NGen = 100
+    NGen = 1000
 
     exportCSV = True
 

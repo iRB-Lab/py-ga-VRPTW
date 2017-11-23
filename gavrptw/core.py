@@ -518,6 +518,7 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
                 'max_fitness': max(fits),
                 'avg_fitness': mean,
                 'std_fitness': std,
+                'avg_cost': 1 / mean,
             }
             csvData.append(csvRow)
     print '-- End of (successful) evolution --'
@@ -533,7 +534,7 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         makeDirsForFile(pathname=csvPathname)
         if not exist(pathname=csvPathname, overwrite=True):
             with open(csvPathname, 'w') as f:
-                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness']
+                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness', 'avg_cost']
                 writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
@@ -623,6 +624,7 @@ def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost,
                 'max_fitness': max(fits),
                 'avg_fitness': mean,
                 'std_fitness': std,
+                'avg_cost': 1 / mean,
             }
             csvData.append(csvRow)
     print '-- End of (successful) evolution --'
@@ -638,7 +640,7 @@ def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost,
         makeDirsForFile(pathname=csvPathname)
         if not exist(pathname=csvPathname, overwrite=True):
             with open(csvPathname, 'w') as f:
-                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness']
+                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness', 'avg_cost']
                 writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
