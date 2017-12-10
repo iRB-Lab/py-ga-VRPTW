@@ -878,7 +878,7 @@ text2json(customize=False)
 
 [repository]: https://github.com/iRB-Lab/py-ga-VRPTW "iRB-Lab/py-ga-VRPTW"
 [release]: https://github.com/iRB-Lab/py-ga-VRPTW/releases/latest "Latest Release"
-[license]: https://github.com/iRB-Lab/py-ga-VRPTW/LICENSE "License"
+[license]: https://github.com/iRB-Lab/py-ga-VRPTW/blob/master/LICENSE "License"
 [watch]: https://github.com/iRB-Lab/py-ga-VRPTW/watchers "Watchers"
 [star]: https://github.com/iRB-Lab/py-ga-VRPTW/stargazers "Stargazers"
 [fork]: https://github.com/iRB-Lab/py-ga-VRPTW/network "Forks"
