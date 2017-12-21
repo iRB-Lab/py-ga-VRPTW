@@ -473,10 +473,20 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
+    
+    # DEBUG CODE
+    print(pop)
+    # END OF DEBUG
+
     print '  Evaluated %d individuals' % len(pop)
     # Begin the evolution
     for g in range(NGen):
         print '-- Generation %d --' % g
+
+         # DEBUG CODE
+        print(pop)
+        # END OF DEBUG CODE
+
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
@@ -501,6 +511,13 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         pop[:] = offspring
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
+
+        # DEBUG CODE
+        print(pop)
+        print(fits)
+        # END OF DEBUG CODE
+        break
+
         length = len(pop)
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)

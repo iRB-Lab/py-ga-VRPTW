@@ -1,18 +1,3 @@
-# -*- coding: utf-8 -*-
-# ind2route.py
-# Test code to run the ind2route function from core
-# Also used to test the crossover function PMX
-
-import os
-import random
-from json import load
-from gavrptw.core import ind2routeMS, printRoute, evalVRPMS
-from deap import base, creator, tools
-
-instName = 'VRPMS_Data_Small'
-
-random.seed(64)
-
 def cxPartialyMatched(ind1, ind2):
     """Executes a partially matched crossover (PMX) on the input individuals.
     The two individuals are modified in place. This crossover expects
@@ -45,6 +30,7 @@ def cxPartialyMatched(ind1, ind2):
 
     # Initialize the position of each indices in the individuals
     for i in xrange(size):
+        print ind1[i]
         p1[ind1[i]-1] = i
         p2[ind2[i]-1] = i
     # Choose crossover points
@@ -70,44 +56,3 @@ def cxPartialyMatched(ind1, ind2):
         p2[temp1-1], p2[temp2-1] = p2[temp2-1], p2[temp1-1]
     
     return ind1, ind2
-
-# Customize data dir location
-jsonDataDir = os.path.join('data', 'json_customize')
-jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
-with open(jsonFile) as f:
-    instance = load(f)
-
-# Create individuals
-creator.create('FitnessMax', base.Fitness, weights=(1.0,))
-creator.create('Individual', list, fitness=creator.FitnessMax)
-
-# Initialize values
-toolbox = base.Toolbox()
-IND_SIZE = 10
-# Attribute generator
-toolbox.register('indexes', random.sample, range(1, IND_SIZE + 1), IND_SIZE)
-# Structure initializers
-toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
-toolbox.register('population', tools.initRepeat, list, toolbox.individual)
-toolbox.register('mate', cxPartialyMatched)
-toolbox.register('select', tools.selRoulette)
-toolbox.register('evaluate', evalVRPMS, instance=instance, unitCost=1.0, initCost=30, lightUnitCost=1, lightInitCost=10)
-
-pop = toolbox.population(n=2)
-print(pop)
-
-#individual = toolbox.individual()
-# route1 = ind2routeMS(individual, instance)
-#evalVRPMS(individual, instance, unitCost=1.0, initCost=30, lightUnitCost=1, lightInitCost=10)
-
-fitnesses = list(map(toolbox.evaluate, pop))
-for ind, fit in zip(pop, fitnesses):
-        ind.fitness.values = fit
-print '  Evaluated %d individuals' % len(pop)
-
-offspring = pop
-
-for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            toolbox.mate(child1, child2)
-
-print(offspring)
