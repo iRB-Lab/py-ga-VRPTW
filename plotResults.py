@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # plotReuslts.py
-# TODO produce a graph showing the progress of GA algorithm
+# plot all results from the folder
 
 from gavrptw.utils import plotResults
 

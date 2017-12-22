@@ -4,8 +4,8 @@ import os
 import fnmatch
 import matplotlib.pyplot as plt
 from json import dump
+import pandas as pd
 from . import BASE_DIR
-
 
 def makeDirsForFile(pathname):
     try:
@@ -117,6 +117,23 @@ def text2json(customize=False):
 
 
 def plotResults():
+    plt.style.use('ggplot')
     resultsDataDir = os.path.join(BASE_DIR, 'results')
     for csvFile in map(lambda csvFilename: os.path.join(resultsDataDir, csvFilename), fnmatch.filter(os.listdir(resultsDataDir), '*csv')):
-        print csvFile
+        df = pd.read_csv(csvFile)
+        # Delete the last 2 columns (std_fitness, avg_cost)
+        if len(df.columns) == 6:
+            df.drop(df.columns[[5]], axis=1, inplace=True)
+        else:
+            df.drop(df.columns[[5, 6]], axis=1, inplace=True)
+        # Delete the first 2 columns (generation, evaluated_individuals) 
+        df.drop(df.columns[[0,1]], axis=1, inplace=True)
+        
+        plt.figure()
+        ax = df.plot(figsize=(20,10))
+        ax.set_xlabel('Generation')
+        ax.set_ylabel('Fitness')
+
+        # Save to folder
+        filename = os.path.splitext(csvFile)[0]
+        plt.savefig(filename + '.png')
