@@ -16,10 +16,10 @@ def main():
     delayCost = 0.0
 
     indSize = 31
-    popSize = 5
-    cxPb = 0.95
+    popSize = 100
+    cxPb = 1
     mutPb = 0.00
-    NGen = 3
+    NGen = 400
 
     exportCSV = True
     customizeData = True

@@ -23,7 +23,7 @@ def main():
 
     # Individual size should match the number of customers
     indSize = 11
-    popSize = 30
+    popSize = 100
     # At a random amount so far
     # TODO sensitivity analysis
     cxPb = 0.85

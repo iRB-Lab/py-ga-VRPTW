@@ -49,5 +49,6 @@ printRoute(route)
 # Due to the way EvalVRP is written, a vehicle needs to exceed max capacity before
 # starting a new vehicle. The optimal route leaves certain vehicles below capacity
 # and therefore gives even more optimal (smaller) costs
-
+# The optimal cost of this route in literature is 784
+# My evalVRP code reads this route's cost as 1030
 # TODO: maybe a 2 step optmization is needed
