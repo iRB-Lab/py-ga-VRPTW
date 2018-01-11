@@ -2,6 +2,8 @@
 # sample_A-n32-k5.py
 
 import random
+from timeit import default_timer as timer #for timer
+from deap import base
 from gavrptw.core import gaVRPTW
 
 
@@ -16,10 +18,10 @@ def main():
     delayCost = 0.0
 
     indSize = 31
-    popSize = 100
+    popSize = 800
     cxPb = 1
     mutPb = 0.00
-    NGen = 400
+    NGen = 100
 
     exportCSV = True
     customizeData = True
@@ -39,6 +41,9 @@ def main():
         customizeData=customizeData
     )
 
-
 if __name__ == '__main__':
+    tic = timer()
     main()
+    print timer() - tic
+    #Best time for multiprocessing: 76.3
+    #Best time for normal: 80.93

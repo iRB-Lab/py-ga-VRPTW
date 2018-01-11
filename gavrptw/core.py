@@ -3,6 +3,8 @@
 import os
 import random
 import numpy
+import multiprocessing
+from scoop import futures
 from json import load
 from csv import DictWriter
 from deap import base, creator, tools
@@ -454,6 +456,15 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
     creator.create('Individual', list, fitness=creator.FitnessMax)
     toolbox = base.Toolbox()
+    
+    # Testing multiprocessing/protecting the pool
+    pool = multiprocessing.Pool(processes=4)
+    toolbox.register('map', pool.map)
+    
+    # Testing SCOOP, there is an issue with calling
+    # creator function at the global scope
+    # toolbox.register('map', futures.map) # SHELL: python -m scoop program_name.py
+    
     # Attribute generator
     toolbox.register('indexes', random.sample, range(1, indSize + 1), indSize)
     # Structure initializers
@@ -470,17 +481,19 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     csvData = []
     print 'Start of evolution'
     # Evaluate the entire population
-    fitnesses = list(map(toolbox.evaluate, pop))
+    fitnesses = list(toolbox.map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
-    print '  Evaluated %d individuals' % len(pop)
+    # Debug, suppress print()
+    # print '  Evaluated %d individuals' % len(pop)
     # Begin the evolution
     for g in range(NGen):
-        print '-- Generation %d --' % g
+        # Debug, suppress print()
+        # print '-- Generation %d --' % g
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
-        offspring = list(map(toolbox.clone, offspring))
+        offspring = list(toolbox.map(toolbox.clone, offspring))
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < cxPb:
@@ -493,10 +506,11 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
                 del mutant.fitness.values
         # Evaluate the individuals with an invalid fitness
         invalidInd = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = map(toolbox.evaluate, invalidInd)
+        fitnesses = toolbox.map(toolbox.evaluate, invalidInd)
         for ind, fit in zip(invalidInd, fitnesses):
             ind.fitness.values = fit
-        print '  Evaluated %d individuals' % len(invalidInd)
+        # Debug, suppress print()
+        # print '  Evaluated %d individuals' % len(invalidInd)
         # The population is entirely replaced by the offspring
         pop[:] = offspring
         # Gather all the fitnesses in one list and print the stats
@@ -505,10 +519,11 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)
         std = abs(sum2 / length - mean**2)**0.5
-        print '  Min %s' % min(fits)
-        print '  Max %s' % max(fits)
-        print '  Avg %s' % mean
-        print '  Std %s' % std
+        # Debug, suppress print()
+        # print '  Min %s' % min(fits)
+        # print '  Max %s' % max(fits)
+        # print '  Avg %s' % mean
+        # print '  Std %s' % std
         # Write data to holders for exporting results to CSV file
         if exportCSV:
             csvRow = {
