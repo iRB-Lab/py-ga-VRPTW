@@ -3,8 +3,6 @@
 import os
 import random
 import numpy
-import multiprocessing
-from scoop import futures
 from json import load
 from csv import DictWriter
 from deap import base, creator, tools
@@ -445,7 +443,7 @@ def mutInverseIndexes(individual):
     individual = individual[:start] + individual[stop:start-1:-1] + individual[stop+1:]
     return individual,
 
-def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+''' def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join(BASE_DIR,'data', 'json_customize')
     else:
@@ -456,15 +454,7 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
     creator.create('Individual', list, fitness=creator.FitnessMax)
     toolbox = base.Toolbox()
-    
-    # Testing multiprocessing/protecting the pool
-    pool = multiprocessing.Pool(processes=4)
-    toolbox.register('map', pool.map)
-    
-    # Testing SCOOP, there is an issue with calling
-    # creator function at the global scope
-    # toolbox.register('map', futures.map) # SHELL: python -m scoop program_name.py
-    
+
     # Attribute generator
     toolbox.register('indexes', random.sample, range(1, indSize + 1), indSize)
     # Structure initializers
@@ -553,7 +543,7 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
                 writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
-                    writer.writerow(csvRow)
+                    writer.writerow(csvRow) '''
 
 def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost, 
             lightUnitCost, lightInitCost, lightWaitCost, lightDelayCost,

@@ -1,10 +1,125 @@
 # -*- coding: utf-8 -*-
 # sample_A-n32-k5.py
 
+import os
 import random
+import numpy
+from json import load
+from csv import DictWriter
+from deap import base, creator, tools
 from timeit import default_timer as timer #for timer
-from deap import base
-from gavrptw.core import gaVRPTW
+import multiprocessing
+from gavrptw.core import evalVRPTW, cxPartialyMatched, mutInverseIndexes, printRoute, ind2route
+from gavrptw.utils import makeDirsForFile, exist
+
+# Create Fitness and Individual Classes
+creator.create('FitnessMax', base.Fitness, weights=(1.0,))
+creator.create('Individual', list, fitness=creator.FitnessMax)
+toolbox = base.Toolbox()
+
+# Create Individual Type
+IND_SIZE = 31
+# Attribute generator
+toolbox.register('indexes', random.sample, range(1, IND_SIZE + 1), IND_SIZE)
+# Structure initializers
+toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
+toolbox.register('population', tools.initRepeat, list, toolbox.individual)
+
+# GA Tools
+def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+    if customizeData:
+        jsonDataDir = os.path.join('data', 'json_customize')
+    else:
+        jsonDataDir = os.path.join('data', 'json')
+    jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
+    with open(jsonFile) as f:
+        instance = load(f)
+
+    # Operator registering
+    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
+    toolbox.register('select', tools.selRoulette)
+    toolbox.register('mate', cxPartialyMatched)
+    toolbox.register('mutate', mutInverseIndexes)
+
+    pop=pop
+
+    # Results holders for exporting results to CSV file
+    csvData = []
+    print 'Start of evolution'
+    # Evaluate the entire population
+    fitnesses = list(toolbox.map(toolbox.evaluate, pop))
+    for ind, fit in zip(pop, fitnesses):
+        ind.fitness.values = fit
+    # Debug, suppress print()
+    # print '  Evaluated %d individuals' % len(pop)
+    # Begin the evolution
+    for g in range(NGen):
+        # Debug, suppress print()
+        # print '-- Generation %d --' % g
+        # Select the next generation individuals
+        offspring = toolbox.select(pop, len(pop))
+        # Clone the selected individuals
+        offspring = list(toolbox.map(toolbox.clone, offspring))
+        # Apply crossover and mutation on the offspring
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            if random.random() < cxPb:
+                toolbox.mate(child1, child2)
+                del child1.fitness.values
+                del child2.fitness.values
+        for mutant in offspring:
+            if random.random() < mutPb:
+                toolbox.mutate(mutant)
+                del mutant.fitness.values
+        # Evaluate the individuals with an invalid fitness
+        invalidInd = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = toolbox.map(toolbox.evaluate, invalidInd)
+        for ind, fit in zip(invalidInd, fitnesses):
+            ind.fitness.values = fit
+        # Debug, suppress print()
+        # print '  Evaluated %d individuals' % len(invalidInd)
+        # The population is entirely replaced by the offspring
+        pop[:] = offspring
+        # Gather all the fitnesses in one list and print the stats
+        fits = [ind.fitness.values[0] for ind in pop]
+        length = len(pop)
+        mean = sum(fits) / length
+        sum2 = sum(x*x for x in fits)
+        std = abs(sum2 / length - mean**2)**0.5
+        # Debug, suppress print()
+        # print '  Min %s' % min(fits)
+        # print '  Max %s' % max(fits)
+        # print '  Avg %s' % mean
+        # print '  Std %s' % std
+        # Write data to holders for exporting results to CSV file
+        if exportCSV:
+            csvRow = {
+                'generation': g,
+                'evaluated_individuals': len(invalidInd),
+                'min_fitness': min(fits),
+                'max_fitness': max(fits),
+                'avg_fitness': mean,
+                'std_fitness': std,
+                'avg_cost': 1 / mean,
+            }
+            csvData.append(csvRow)
+    print '-- End of (successful) evolution --'
+    bestInd = tools.selBest(pop, 1)[0]
+    print 'Best individual: %s' % bestInd
+    print 'Fitness: %s' % bestInd.fitness.values[0]
+    printRoute(ind2route(bestInd, instance))
+    print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
+    if exportCSV:
+        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvPathname = os.path.join('results', csvFilename)
+        print 'Write to file: %s' % csvPathname
+        makeDirsForFile(pathname=csvPathname)
+        if not exist(pathname=csvPathname, overwrite=True):
+            with open(csvPathname, 'w') as f:
+                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness', 'avg_cost']
+                writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
+                writer.writeheader()
+                for csvRow in csvData:
+                    writer.writerow(csvRow)
 
 
 def main():
@@ -21,12 +136,17 @@ def main():
     popSize = 800
     cxPb = 1
     mutPb = 0.00
-    NGen = 100
+    NGen = 800
 
     exportCSV = True
     customizeData = True
 
+    # Global creation of the individuals for GA
+    # Initialize the population
+    pop = toolbox.population(n=800)
+
     gaVRPTW(
+        pop=pop,
         instName=instName,
         unitCost=unitCost,
         initCost=initCost,
@@ -42,8 +162,18 @@ def main():
     )
 
 if __name__ == '__main__':
+    # Testing multiprocessing/protecting the pool
+    #pool = multiprocessing.Pool()
+    #toolbox.register('map', pool.map)
+
     tic = timer()
     main()
     print timer() - tic
-    #Best time for multiprocessing: 76.3
-    #Best time for normal: 80.93
+
+    pool.close()
+    #Best time for multiprocessing p800 n100: 76.3
+    #Best time for normal p800 n100: 80.93
+    #Best time for multiproccessing p800 n800: 709.5
+    #Best time for normal p800 n800: 804.5
+    #Best time for multiproccessing -w p800 n800: 305.7
+    #Best time for normal -w p800 n800: 420.7
