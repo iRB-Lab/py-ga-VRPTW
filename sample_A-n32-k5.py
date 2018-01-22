@@ -133,17 +133,17 @@ def main():
     delayCost = 0.0
 
     indSize = 31
-    popSize = 800
+    popSize = 12800
     cxPb = 1
     mutPb = 0.00
-    NGen = 800
+    NGen = 12800
 
     exportCSV = True
     customizeData = True
 
     # Global creation of the individuals for GA
     # Initialize the population
-    pop = toolbox.population(n=800)
+    pop = toolbox.population(n=12800)
 
     gaVRPTW(
         pop=pop,
@@ -163,8 +163,8 @@ def main():
 
 if __name__ == '__main__':
     # Testing multiprocessing/protecting the pool
-    #pool = multiprocessing.Pool()
-    #toolbox.register('map', pool.map)
+    pool = multiprocessing.Pool()
+    toolbox.register('map', pool.map)
 
     tic = timer()
     main()
