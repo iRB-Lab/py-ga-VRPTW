@@ -5,6 +5,9 @@
 [![Stargazers](https://img.shields.io/github/stars/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Star)][star]
 [![Forks](https://img.shields.io/github/forks/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Fork)][fork]
 
+# py-ga-VRPMV
+Forked iRB-Lab to implment the basic GA solution to solve Vehicle Routing Problem with Movement Syncronization (VRPMV)
+
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
 
