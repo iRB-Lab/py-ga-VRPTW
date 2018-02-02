@@ -55,12 +55,10 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     # print '  Evaluated %d individuals' % len(pop)
     # Begin the evolution
     for g in range(NGen):
-        print '-- Generation %d --' % g
-        print fitnesses
+        # print '-- Generation %d --' % g
         # Select the next generation individuals
         # Select elite - the best offspring, keep this past crossover/mutate
         elite = tools.selBest(pop, 1)
-        print elite
         # Keep top 10% of all offspring
         # Roulette select the rest 90% of offsprings
         offspring = tools.selBest(pop, int(numpy.ceil(len(pop)*0.1)))
@@ -71,8 +69,6 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < cxPb:
-                print child1
-                print child2
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
@@ -89,7 +85,6 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
         # print '  Evaluated %d individuals' % len(invalidInd)
         # The population is entirely replaced by the offspring
         offspring.extend(elite)
-        print offspring
         pop[:] = offspring
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
@@ -145,10 +140,10 @@ def main():
     delayCost = 0.0
 
     indSize = 31
-    popSize = 100
-    cxPb = 0.95
-    mutPb = 0.05
-    NGen = 200
+    popSize = 400
+    cxPb = 0.8
+    mutPb = 0.1
+    NGen = 100
 
     exportCSV = True
     customizeData = True
@@ -179,6 +174,6 @@ if __name__ == '__main__':
 
     tic = timer()
     main()
-    print timer() - tic
+    print 'Computing Time: %s' % (timer() - tic)
 
     pool.close()
