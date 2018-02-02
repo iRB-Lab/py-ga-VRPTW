@@ -42,6 +42,7 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     toolbox.register('mutate', mutInverseIndexes)
 
     pop=pop
+    print pop
 
     # Results holders for exporting results to CSV file
     csvData = []
@@ -55,13 +56,23 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     # Begin the evolution
     for g in range(NGen):
         print '-- Generation %d --' % g
+        print fitnesses 
         # Select the next generation individuals
-        offspring = toolbox.select(pop, len(pop))
+        # Select elite - the best offpsring, keep this past crossover/mutate
+        elite = tools.selBest(pop, 1)
+        print elite
+        # Select top 10% of all offspring
+        # Roulette select the rest 90% of offsprings
+        offspring = tools.selBest(pop, int(numpy.ceil(len(pop)*0.1)))
+        offspringRoulette = toolbox.select(pop, int(numpy.floor(len(pop)*0.9))-1)
+        offspring.extend(offspringRoulette)
         # Clone the selected individuals
         offspring = list(toolbox.map(toolbox.clone, offspring))
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < cxPb:
+                print child1
+                print child2
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
@@ -77,8 +88,8 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
         # Debug, suppress print()
         # print '  Evaluated %d individuals' % len(invalidInd)
         # The population is entirely replaced by the offspring
-        # Debug, printing offspring and original pop
-        print pop
+        # Debug, printing offspring
+        offspring.extend(elite)
         print offspring
         pop[:] = offspring
         
@@ -126,7 +137,7 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
 
 
 def main():
-    random.seed(4664)
+    random.seed(64)
 
     instName = 'P-n5-k1'
 
@@ -136,17 +147,17 @@ def main():
     delayCost = 0.0
 
     indSize = 5
-    popSize = 4
-    cxPb = 1
-    mutPb = 0.00
-    NGen = 4
+    popSize = 15
+    cxPb = 0.8
+    mutPb = 0.1
+    NGen = 100
 
     exportCSV = True
     customizeData = True
 
     # Global creation of the individuals for GA
     # Initialize the population
-    pop = toolbox.population(n=4)
+    pop = toolbox.population(n=popSize)
 
     gaVRPTW(
         pop=pop,
