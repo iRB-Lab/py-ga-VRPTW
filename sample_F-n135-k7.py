@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
-# sample_P-n5-k1.py
-# Used to test the GA setup on a very small TSP problem with 5 customers
-# Determined the need for elite, and selBest()
+# sample_F-n135-k7.py
+# Route #1: 115 114 106 107 108 109 120 
+# Route #2: 46 118 18 17 132 131 116 117 119 130 65 19 
+# Route #3: 73 74 76 134 77 64 63 79 67 80 33 71 66 
+# Route #4: 91 21 25 26 27 28 92 29 94 93 45 43 44 40 3 41 42 2 4 5 6 7 8 9 10 11 12 14 88 15 13 16 90 89 87 86 85 84 83 20 82 
+# Route #5: 60 61 54 55 57 105 97 96 38 39 95 37 36 35 99 100 98 104 101 102 50 49 34 32 47 72 
+# Route #6: 81 113 129 128 127 121 122 123 125 111 112 126 124 110 69 70 68 133 78 
+# Route #7: 22 24 23 59 31 30 58 56 103 53 52 51 62 48 1 75
+# Cost 1162
 
 import os
 import random
@@ -9,18 +15,20 @@ import numpy
 from json import load
 from csv import DictWriter
 from deap import base, creator, tools
-from timeit import default_timer as timer
+from timeit import default_timer as timer #for timer
 import multiprocessing
-from gavrptw.core import evalVRPTW, cxPartialyMatched, mutInverseIndexes, printRoute, ind2route
+from gavrptw.core import *
 from gavrptw.utils import makeDirsForFile, exist
+
+# Global constant for individual size
+# Check before running
+IND_SIZE = 134
 
 # Create Fitness and Individual Classes
 creator.create('FitnessMax', base.Fitness, weights=(1.0,))
 creator.create('Individual', list, fitness=creator.FitnessMax)
 toolbox = base.Toolbox()
 
-# Create Individual Type
-IND_SIZE = 5
 # Attribute generator
 toolbox.register('indexes', random.sample, range(1, IND_SIZE + 1), IND_SIZE)
 # Structure initializers
@@ -44,7 +52,6 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     toolbox.register('mutate', mutInverseIndexes)
 
     pop=pop
-    print pop
 
     # Results holders for exporting results to CSV file
     csvData = []
@@ -57,13 +64,11 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     # print '  Evaluated %d individuals' % len(pop)
     # Begin the evolution
     for g in range(NGen):
-        print '-- Generation %d --' % g
-        print fitnesses 
+        # print '-- Generation %d --' % g
         # Select the next generation individuals
-        # Select elite - the best offpsring, keep this past crossover/mutate
+        # Select elite - the best offspring, keep this past crossover/mutate
         elite = tools.selBest(pop, 1)
-        print elite
-        # Select top 10% of all offspring
+        # Keep top 10% of all offspring
         # Roulette select the rest 90% of offsprings
         offspring = tools.selBest(pop, int(numpy.ceil(len(pop)*0.1)))
         offspringRoulette = toolbox.select(pop, int(numpy.floor(len(pop)*0.9))-1)
@@ -73,8 +78,6 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             if random.random() < cxPb:
-                print child1
-                print child2
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
@@ -90,11 +93,8 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
         # Debug, suppress print()
         # print '  Evaluated %d individuals' % len(invalidInd)
         # The population is entirely replaced by the offspring
-        # Debug, printing offspring
         offspring.extend(elite)
-        print offspring
         pop[:] = offspring
-        
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
         length = len(pop)
@@ -141,18 +141,18 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
 def main():
     random.seed(64)
 
-    instName = 'P-n5-k1'
+    instName = 'F-n135-k7'
 
     unitCost = 1.0
     initCost = 0.0
     waitCost = 0.0
     delayCost = 0.0
 
-    indSize = 5
-    popSize = 15
+    indSize = IND_SIZE
+    popSize = 800
     cxPb = 0.8
     mutPb = 0.1
-    NGen = 100
+    NGen = 400
 
     exportCSV = True
     customizeData = True

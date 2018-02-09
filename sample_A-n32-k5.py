@@ -9,16 +9,18 @@ from csv import DictWriter
 from deap import base, creator, tools
 from timeit import default_timer as timer #for timer
 import multiprocessing
-from gavrptw.core import evalVRPTW, cxPartialyMatched, mutInverseIndexes, printRoute, ind2route
+from gavrptw.core import * 
 from gavrptw.utils import makeDirsForFile, exist
+
+# Global constant for individual size
+# Check before running
+IND_SIZE = 31
 
 # Create Fitness and Individual Classes
 creator.create('FitnessMax', base.Fitness, weights=(1.0,))
 creator.create('Individual', list, fitness=creator.FitnessMax)
 toolbox = base.Toolbox()
 
-# Create Individual Type
-IND_SIZE = 31
 # Attribute generator
 toolbox.register('indexes', random.sample, range(1, IND_SIZE + 1), IND_SIZE)
 # Structure initializers
@@ -140,7 +142,7 @@ def main():
     delayCost = 0.0
 
     indSize = 31
-    popSize = 400
+    popSize = 100
     cxPb = 0.8
     mutPb = 0.1
     NGen = 100
