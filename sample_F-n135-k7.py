@@ -149,10 +149,10 @@ def main():
     delayCost = 0.0
 
     indSize = IND_SIZE
-    popSize = 6400
+    popSize = 12800
     cxPb = 0.8
     mutPb = 0.1
-    NGen = 800
+    NGen = 100
 
     exportCSV = True
     customizeData = True

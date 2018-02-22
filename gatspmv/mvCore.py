@@ -9,7 +9,7 @@ SAMPLE_TSP_TOUR = [77, 64, 76, 134, 62, 102, 49, 32, 24, 22, 23, 118]
 instName = 'F-n135-k7'
 isCustomize = True
 
-def distanceBetweenCustomers(instance, individual):
+def distanceList(instance, individual):
     # Use the distance matrix and find the distances between all the
     # customers in the TSP tour
     # NOTE: this distance list has depot and first customer, but not the last
@@ -21,7 +21,7 @@ def distanceBetweenCustomers(instance, individual):
         lastCustomerID = customerID
     return distance
 
-def demandOfCustomers(instance, individual):
+def demandList(instance, individual):
     # Use the distance matrix and find the demand of all the
     # customers in the TSP tour
     demand = []
@@ -32,12 +32,12 @@ def demandOfCustomers(instance, individual):
 def culmulativeDistance(instance, individual, startIndex, endIndex):
     # Returns the distance between the start and end index of customers.
     # If the customer is at the beginning or end, includes the depot
-    distanceList = distanceBetweenCustomers(instance, individual)
+    distList = distanceList(instance, individual)
     
     if endIndex < len(individual):
-        distance = sum(distanceList[startIndex:endIndex+1])
+        distance = sum(distList[startIndex:endIndex+1])
     elif endIndex == len(individual):
-        distance = sum(distanceList[startIndex:endIndex+1]) 
+        distance = sum(distList[startIndex:endIndex+1]) 
         distance += instance['distance_matrix'][individual[endIndex]][0]
     elif endIndex > len(individual):
         distance = 999999999999999999999
@@ -45,11 +45,14 @@ def culmulativeDistance(instance, individual, startIndex, endIndex):
 
 def culmulativeDemand(instance, individual, startIndex, endIndex):
     # Returns the total demand of the start and end index of customers.
-    demandList = demandOfCustomers(instance, individual)
-    demand = sum(demandList[startIndex:endIndex+1])
+    dmdList = demandList(instance, individual)
+    demand = sum(dmdList[startIndex:endIndex+1])
     return demand
 
-def clusterLightCustomers(instance, individual, lightRange=100, lightCapacity=35):
+def distanceBetweenCustomers(instance, fromCustomer, toCustomer):
+    return instance['distance_matrix'][fromCustomer][toCustomer]
+
+def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=35):
     # The method takes in a TSP tour, the light resource's 
     # range and capacity constraint
     # Returns a list indicating customers that the light resource
@@ -60,9 +63,9 @@ def clusterLightCustomers(instance, individual, lightRange=100, lightCapacity=35
     clusterList = [0] * len(individual) #zero list with length of individual
 
     # Determine the order of the distance list
-    distanceList = distanceBetweenCustomers(instance, individual)
-    s = sorted(distanceList)
-    sortedDistanceList = [s.index(x) for x in distanceList]
+    distList = distanceList(instance, individual)
+    s = sorted(distList)
+    sortedDistanceList = [s.index(x) for x in distList]
 
     # Start the cluster with the closest pair and add neighbouring customers until
     # the range or capacity constraint is reached. Then find the next closest pair 
@@ -120,11 +123,39 @@ def clusterLightCustomers(instance, individual, lightRange=100, lightCapacity=35
                     break
     return clusterList
 
-# def locatlImprovement():
-    # 
+def initMVIndividuals(icls, lightList, individual):
+    # Custom method to produce individuals for GA
+    # individual = [[L], [L], ..., [H]]
+    # [L] = [depart, delivery, delivery, ..., rejoin]
+    genome = list()
+    
+    # Find the indicies of where lightList change from 0 to 1
+    splitLocation = numpy.where(numpy.roll(lightList,1)!=lightList)[0]
 
-# TODO update the GAVRPMS evaluate function to be able to find the
-# cost of these new individuals
+    # Split the individual
+    splitList = numpy.split(individual, splitLocation)
+
+    # Flatten a list of odd elements from the splitList
+    heavyGenome = ([item for sublist in splitList[0::2] for item in sublist])
+
+    for i in range(2, len(splitList), 2):
+        lightGenome = list()
+        lightGenome.extend(random.sample(splitList[i-2], 1))
+        lightGenome.extend(splitList[i-1])
+        lightGenome.extend(random.sample(splitList[i], 1))
+        genome.append(lightGenome)
+    
+    genome.append(heavyGenome)
+    return icls(genome)
+    
+
+# def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0,
+#                                     lightUnitCost=1.0, lightInitCost=0, lightWaitCost=0, lightDelayCost=0):
+#     # Evaluate the cost of a MVIndividual, created by the initMVIndividual method
+#     route = MVindividual
+#     totalCost = 0
+#     for subRoute in route:
+        
 
 # testing the code
 random.seed(64)
@@ -135,8 +166,18 @@ jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
 with open(jsonFile) as f:
     instance = load(f)
 
-d = clusterLightCustomers(instance, SAMPLE_TSP_TOUR)
+d = splitLightCustomers(instance, SAMPLE_TSP_TOUR)
 print d
+
+testIndividual = [77, 64, 76, 134, 62, 102, 49, 32, 24, 22, 23, 118]
+
+creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+creator.create("Individual", list, fitness=creator.FitnessMax)
+toolbox = base.Toolbox()
+toolbox.register('individual', initMVIndividuals, creator.Individual, d, testIndividual)
+
+testIndividual = toolbox.individual()
+print testIndividual
 
 #[13.341664064126334, 0.8, 2.220360331117452, 0.7280109889280518, 8.238931969618392, 
 #4.707440918375928, 6.3150613615387785, 5.0990195135927845, 10.890362712049585, 
