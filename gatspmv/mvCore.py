@@ -148,14 +148,76 @@ def initMVIndividuals(icls, lightList, individual):
     genome.append(heavyGenome)
     return icls(genome)
     
+def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0,
+                                    lightUnitCost=1.0, lightInitCost=0, lightWaitCost=0, lightDelayCost=0):
+    # Evaluate the cost of a MVIndividual, created by the initMVIndividual method
+    # Includes: init cost, travel cost and delay cost of light and heavy resource
+    # Expects the MSindividual to be [[L], [L], ..., [H]] format
+    route = MVindividual
+    totalCost = 0
+    lightCost = 0
+    heavyCost = 0
 
-# def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0,
-#                                     lightUnitCost=1.0, lightInitCost=0, lightWaitCost=0, lightDelayCost=0):
-#     # Evaluate the cost of a MVIndividual, created by the initMVIndividual method
-#     route = MVindividual
-#     totalCost = 0
-#     for subRoute in route:
-        
+    # Dictionary to store the heavy arrival time at this customer
+    heavyArrivalTime = dict()
+    # Dictionary to store the heavy departure time at this customer
+    heavyDepartureTime = dict()
+    # Dictionary to store the delay time from the heavy POV at this customer
+    # Updated as the light resource are rejoining at this customer
+    # Calculated as light resource arrival time - heavy resource departure time
+    # If value is positive then heavy resource was waiting
+    # If value is negative then light resource was waiting
+    resourceDelayTime = dict()
+
+    # Update the heavyArrivalTime and heavyDepartureTime of
+    # all heavy resource customers, and calculate the heavy travel cost
+    lastCustomerID = 0
+    heavyTravelTime = 0
+    heavyServiceTime = 0
+    heavyTimeCost = 0
+    heavyStartTime = 0
+    for customerID in route[-1]:
+        heavyTravelTime = heavyTravelTime + instance['distance_matrix'][lastCustomerID][customerID]
+        heavyServiceTime = heavyServiceTime + instance['customer_%d' % customerID]['service_time']
+        heavyStartTime =  heavyStartTime + heavyTravelTime
+        heavyFinishedTime = heavyStartTime + heavyServiceTime
+        heavyTimeCost = heavyTimeCost + (waitCost * max(instance['customer_%d' % customerID]['ready_time'] - (heavyTravelTime + heavyStartTime), 0) 
+                            + delayCost * max((heavyStartTime + heavyTravelTime) - instance['customer_%d' % customerID]['due_time'], 0))
+        heavyArrivalTime[str(customerID)] = heavyStartTime
+        heavyDepartureTime[str(customerID)] = heavyFinishedTime
+    heavyCost = heavyTimeCost + (unitCost * heavyTravelTime)
+
+    # Given the heavyArrivalTime, calculate the light travel time and cost
+    # Update the resourceDelayTime accordingly
+    for subLightRoute in route[:-1]:
+        lightElapsedTime = 0
+        lightTimeCost = 0
+        lightTravelTime = 0
+        lightServiceTime = 0
+        lastCustomerID = subLightRoute[0]
+        lightStartTime = heavyArrivalTime[str(subLightRoute[0])]
+        for customerID in subLightRoute[1:]:
+            lightTravelTime = lightTravelTime + instance['distance_matrix'][lastCustomerID][customerID]
+            # Consider any delay or waiting time because the light resource is earlier than customer ready time
+            # or later than customer due time
+            lightTimeCost = lightTimeCost + (lightWaitCost * max(instance['customer_%d' % customerID]['ready_time'] - (lightElapsedTime + lightStartTime), 0) 
+                            + lightDelayCost * max((lightStartTime + lightElapsedTime) - instance['customer_%d' % customerID]['due_time'], 0))
+            lightServiceTime = lightServiceTime + instance['customer_%d' % customerID]['service_time']
+            lightElapsedTime = lightElapsedTime + lightTravelTime + lightServiceTime
+            lastCustomerID = customerID
+        lightFinishTime = lightStartTime + lightElapsedTime
+        lightCost = lightCost + (lightUnitCost * lightElapsedTime) + lightTimeCost
+        # update the delayTime for the ending customer of the lightSubRoute
+        resourceDelayTime[str(customerID)] = lightFinishTime - heavyDepartureTime[str(customerID)]
+
+    # Calculate the waiting penalty given the resourceDelayTime
+    for customerID in resourceDelayTime:
+        if resourceDelayTime[customerID] <= 0:
+            totalCost = totalCost + (lightWaitCost * resourceDelayTime[customerID])
+        else:
+            totalCost = totalCost + (waitCost * resourceDelayTime[customerID])
+    
+    return totalCost
 
 # testing the code
 random.seed(64)
@@ -178,6 +240,8 @@ toolbox.register('individual', initMVIndividuals, creator.Individual, d, testInd
 
 testIndividual = toolbox.individual()
 print testIndividual
+cost = evalTSPMS(testIndividual, instance)
+print cost
 
 #[13.341664064126334, 0.8, 2.220360331117452, 0.7280109889280518, 8.238931969618392, 
 #4.707440918375928, 6.3150613615387785, 5.0990195135927845, 10.890362712049585, 
