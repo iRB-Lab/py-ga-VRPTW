@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# sample_A-n32-k5.py
+# sample_A-n32-k5-VRPMV.py
 
 import os
 import random
@@ -9,26 +9,13 @@ from csv import DictWriter
 from deap import base, creator, tools
 from timeit import default_timer as timer #for timer
 import multiprocessing
-from gavrptw.core import * 
-from gavrptw.utils import makeDirsForFile, exist
-
-# Global constant for individual size
-# Check before running
-IND_SIZE = 31
-
-# Create Fitness and Individual Classes
-creator.create('FitnessMax', base.Fitness, weights=(1.0,))
-creator.create('Individual', list, fitness=creator.FitnessMax)
-toolbox = base.Toolbox()
-
-# Attribute generator
-toolbox.register('indexes', random.sample, range(1, IND_SIZE + 1), IND_SIZE)
-# Structure initializers
-toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
-toolbox.register('population', tools.initRepeat, list, toolbox.individual)
+from gatspmv import mvCore
+from gavrptw import core
 
 # GA Tools
-def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, popSize, 
+                            lightUnitCost, lightInitCost, lightWaitCost, lightDelayCost,
+                            cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join('data', 'json_customize')
     else:
@@ -37,13 +24,25 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     with open(jsonFile) as f:
         instance = load(f)
 
-    # Operator registering
-    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
-    toolbox.register('select', tools.selRoulette)
-    toolbox.register('mate', cxPartialyMatched)
-    toolbox.register('mutate', mutInverseIndexes)
+    # Create Fitness and Individual Classes
+    creator.create('FitnessMax', base.Fitness, weights=(1.0,))
+    creator.create('Individual', list, fitness=creator.FitnessMax)
+    toolbox = base.Toolbox()
+    print "tsp at the moment is:" 
+    print tsp
+    splitLightList = mvCore.splitLightCustomers(instance, tsp)
+    toolbox.register('individual', mvCore.initMVIndividuals, creator.Individual, splitLightList, tsp)
+    toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
-    pop=pop
+    pop = toolbox.population(n=popSize)
+
+    # Operator registering
+    toolbox.register('evaluate', mvCore.evalTSPMS, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost,
+                                                    lightUnitCost=lightUnitCost, lightInitCost=lightInitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost)
+    toolbox.register('select', tools.selRoulette)
+    toolbox.register('mate', mvCore.cxSinglePointSwap)
+    toolbox.register('mutate', core.mutInverseIndexes) #TODO make a new mutation method, maybe unecessary
+
     print pop
 
     # Results holders for exporting results to CSV file
@@ -115,7 +114,7 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     bestInd = tools.selBest(pop, 1)[0]
     print 'Best individual: %s' % bestInd
     print 'Fitness: %s' % bestInd.fitness.values[0]
-    printRoute(ind2route(bestInd, instance))
+
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
     if exportCSV:
         csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
@@ -129,7 +128,7 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
                 writer.writeheader()
                 for csvRow in csvData:
                     writer.writerow(csvRow)
-    return ind2route(bestInd, instance)
+    return bestInd, bestInd.fitness.values[0]
 
 def main():
     random.seed(64)
@@ -140,45 +139,52 @@ def main():
     initCost = 0.0
     waitCost = 0.0
     delayCost = 0.0
+    lightUnitCost = 1.0
+    lightInitCost = 0
+    lightWaitCost = 0
+    lightDelayCost = 0
 
-    indSize = IND_SIZE
-    popSize = 100
-    cxPb = 0.8
-    mutPb = 0.1
-    NGen = 100
+    popSize = 10
+    cxPb = 0
+    mutPb = 0
+    NGen = 1
 
-    exportCSV = True
+    exportCSV = False
     customizeData = True
 
-    # Global creation of the individuals for GA
-    # Initialize the population
-    pop = toolbox.population(n=popSize)
+    bestVRP = [[8, 11, 4, 22, 29, 23, 30, 14], [12, 16, 5, 25, 10, 20], [15, 9, 6, 3, 1, 27, 26], [19, 17, 31, 21, 13, 28, 18], [24, 2, 7]]
+    bestVRPMV = []
+    bestVRPMVCost = 0
 
-    bestIndividual = gaVRPTW(
-        pop=pop,
-        instName=instName,
-        unitCost=unitCost,
-        initCost=initCost,
-        waitCost=waitCost,
-        delayCost=delayCost,
-        indSize=indSize,
-        popSize=popSize,
-        cxPb=cxPb,
-        mutPb=mutPb,
-        NGen=NGen,
-        exportCSV=exportCSV,
-        customizeData=customizeData
-    )
+    for tsp in bestVRP:
+        indSize = len(tsp)
+        # Try first without multiprocessing for this substep
+        bestSubTSP, bestSubTSPFitness = gaTSPMV(
+            instName=instName,
+            tsp=tsp,
+            unitCost=unitCost,
+            initCost=initCost,
+            waitCost=waitCost,
+            delayCost=delayCost,
+            lightUnitCost=lightUnitCost,
+            lightInitCost=lightInitCost,
+            lightWaitCost=lightWaitCost,
+            lightDelayCost=lightDelayCost,
+            indSize=indSize,
+            popSize=popSize,
+            cxPb=cxPb,
+            mutPb=mutPb,
+            NGen=NGen,
+            exportCSV=exportCSV,
+            customizeData=customizeData
+        )
 
-    print bestIndividual
+        bestVRPMV.append(bestSubTSP)
+        bestVRPMVCost = bestVRPMVCost + 1/bestSubTSPFitness
+        print bestVRPMV, bestVRPMVCost
     return
 
 if __name__ == '__main__':
-    pool = multiprocessing.Pool()
-    toolbox.register('map', pool.map)
-
     tic = timer()
     main()
     print 'Computing Time: %s' % (timer() - tic)
-
-    pool.close()
