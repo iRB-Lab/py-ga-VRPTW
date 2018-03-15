@@ -9,8 +9,7 @@ from csv import DictWriter
 from deap import base, creator, tools
 from timeit import default_timer as timer #for timer
 import multiprocessing
-from gavrptw.core import * 
-from gavrptw.utils import makeDirsForFile, exist
+from gavrptw import core, utils
 
 # Global constant for individual size
 # Check before running
@@ -28,7 +27,8 @@ toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.in
 toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
 # GA Tools
-def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, 
+            indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join('data', 'json_customize')
     else:
@@ -38,12 +38,12 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
         instance = load(f)
 
     # Operator registering
-    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
+    toolbox.register('evaluate', core.evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
     toolbox.register('select', tools.selRoulette)
-    toolbox.register('mate', cxPartialyMatched)
-    toolbox.register('mutate', mutInverseIndexes)
+    toolbox.register('mate', core.cxPartialyMatched)
+    toolbox.register('mutate', core.mutInverseIndexes)
 
-    pop=pop
+    pop = pop
     print pop
 
     # Results holders for exporting results to CSV file
@@ -115,21 +115,21 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     bestInd = tools.selBest(pop, 1)[0]
     print 'Best individual: %s' % bestInd
     print 'Fitness: %s' % bestInd.fitness.values[0]
-    printRoute(ind2route(bestInd, instance))
+    core.printRoute(core.ind2route(bestInd, instance))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
     if exportCSV:
         csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
         csvPathname = os.path.join('results', csvFilename)
         print 'Write to file: %s' % csvPathname
-        makeDirsForFile(pathname=csvPathname)
-        if not exist(pathname=csvPathname, overwrite=True):
+        utils.makeDirsForFile(pathname=csvPathname)
+        if not utils.exist(pathname=csvPathname, overwrite=True):
             with open(csvPathname, 'w') as f:
                 fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness', 'avg_cost']
                 writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
                     writer.writerow(csvRow)
-    return ind2route(bestInd, instance)
+    return core.ind2route(bestInd, instance)
 
 def main():
     random.seed(64)

@@ -1,3 +1,13 @@
+"""mvcore.py docstring
+
+This module includes function required for the genetic algorithm
+process to solve a travelling salesman problem with movement synchronization
+
+Todo:
+    * Combine the evalution method with the eval() method from core.py
+
+"""
+
 import os
 import random
 import numpy
@@ -82,13 +92,15 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
             distance = 99999999999 #don't consider the last customer as light resource deliverable
         else:
             clusterEdgeLocation = [considerCustomer-1, considerCustomer+1]
-            distance = culmulativeDistance(instance, individual, clusterEdgeLocation[0], clusterEdgeLocation[1])
+            distance = culmulativeDistance(instance, individual,
+                                        clusterEdgeLocation[0], clusterEdgeLocation[1])
 
         # Calculate the demand of considerCustomer
         demand = culmulativeDemand(instance, individual, considerCustomer, considerCustomer)
 
         # First check if the customer is already considered, range feasibility and demand feasibility
-        if any(considerList[clusterEdgeLocation[0]:clusterEdgeLocation[1]+1]) == True or distance > lightRange or demand > lightCapacity:
+        if (any(considerList[clusterEdgeLocation[0]:clusterEdgeLocation[1]+1]) == True 
+                or distance > lightRange or demand > lightCapacity):
             continue
         # Passes all tests, initialize considerCustomer as lightCluster
         else:
@@ -104,10 +116,14 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
             # Check range feasibility
             # Check demand feasibility
             for j in range(0, endList):
-                distanceForward = culmulativeDistance(instance, individual, clusterEdgeLocation[0], clusterEdgeLocation[1]+1)
-                distanceBackward = culmulativeDistance(instance, individual, clusterEdgeLocation[0]-1, clusterEdgeLocation[1])
-                demandForward =  culmulativeDemand(instance, individual, clusterEdgeLocation[0]+1, clusterEdgeLocation[1])
-                demandBackward = culmulativeDemand(instance, individual, clusterEdgeLocation[0], clusterEdgeLocation[1]-1)
+                distanceForward = culmulativeDistance(instance, individual,
+                                                    clusterEdgeLocation[0], clusterEdgeLocation[1]+1)
+                distanceBackward = culmulativeDistance(instance, individual,
+                                                    clusterEdgeLocation[0]-1, clusterEdgeLocation[1])
+                demandForward =  culmulativeDemand(instance, individual,
+                                                    clusterEdgeLocation[0]+1, clusterEdgeLocation[1])
+                demandBackward = culmulativeDemand(instance, individual,
+                                                    clusterEdgeLocation[0], clusterEdgeLocation[1]-1)
 
                 # Greedy approach: look at the shortest distance neighbouring node to add to cluster
                 # If neighbouring node succesfully pass the demand and range constraint
@@ -262,7 +278,7 @@ def cxSinglePointSwap(ind1, ind2):
     # Iterate both individuals simultaneously since ind1 and ind2
     # are the same length
     for (subRoute1, subRoute2) in (zip(ind1[:-1], ind2[:-1])):
-        # swap the depart point if random number is less than 0.5
+        # swap the depart customer if random number is less than 0.5
         if random.uniform(0,1) < 0.5:
             # keep track of the selected values
             temp1 = subRoute1[0]
@@ -270,7 +286,7 @@ def cxSinglePointSwap(ind1, ind2):
             # swap the selected values
             subRoute1[0] = temp2
             subRoute2[0] = temp1
-        # swap the reunion point if random number is greater or equal to 0.5
+        # swap the reunion customer if random number is greater or equal to 0.5
         else: 
             temp1 = subRoute1[-1]
             temp2 = subRoute2[-1]
@@ -278,38 +294,38 @@ def cxSinglePointSwap(ind1, ind2):
             subRoute2[-1] = temp1
     return ind1, ind2
 
-# testing the code
-random.seed(64)
+# # testing the code
+# random.seed(64)
 
-SAMPLE_TSP_TOUR = [8, 11, 4, 22, 29, 23, 30, 14, 12, 16, 5, 25, 10, 20]
-instName = 'A-n32-k5'
-isCustomize = True
-# Customize data dir location
-jsonDataDir = os.path.join('data', 'json_customize')
-jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
-with open(jsonFile) as f:
-    instance = load(f)
+# SAMPLE_TSP_TOUR = [8, 11, 4, 22, 29, 23, 30, 14, 12, 16, 5, 25, 10, 20]
+# instName = 'A-n32-k5'
+# isCustomize = True
+# # Customize data dir location
+# jsonDataDir = os.path.join('data', 'json_customize')
+# jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
+# with open(jsonFile) as f:
+#     instance = load(f)
 
-d = splitLightCustomers(instance, SAMPLE_TSP_TOUR)
-print d
+# d = splitLightCustomers(instance, SAMPLE_TSP_TOUR)
+# print d
 
-creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-creator.create("Individual", list, fitness=creator.FitnessMax)
-toolbox = base.Toolbox()
-toolbox.register('individual', initMVIndividuals, creator.Individual, d, SAMPLE_TSP_TOUR)
-toolbox.register('population', tools.initRepeat, list, toolbox.individual)
-toolbox.register('mate', cxSinglePointSwap)
+# creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+# creator.create("Individual", list, fitness=creator.FitnessMax)
+# toolbox = base.Toolbox()
+# toolbox.register('individual', initMVIndividuals, creator.Individual, d, SAMPLE_TSP_TOUR)
+# toolbox.register('population', tools.initRepeat, list, toolbox.individual)
+# toolbox.register('mate', cxSinglePointSwap)
 
-pop = toolbox.population(n=2)
-print pop
-toolbox.register('evaluate', evalTSPMS, instance=instance, unitCost=1, initCost=0, waitCost=0, delayCost=0,
-                                                    lightUnitCost=1, lightInitCost=0, lightWaitCost=0, lightDelayCost=0)
-fitnesses = list(toolbox.map(toolbox.evaluate, pop))
-print fitnesses
-# Apply crossover and mutation on the offspring
-for child1, child2 in zip(pop[::2], pop[1::2]):
-    toolbox.mate(child1, child2)
-    del child1.fitness.values
-    del child2.fitness.values
+# pop = toolbox.population(n=2)
+# print pop
+# toolbox.register('evaluate', evalTSPMS, instance=instance, unitCost=1, initCost=0, waitCost=0, delayCost=0,
+#                                                     lightUnitCost=1, lightInitCost=0, lightWaitCost=0, lightDelayCost=0)
+# fitnesses = list(toolbox.map(toolbox.evaluate, pop))
+# print fitnesses
+# # Apply crossover on the offspring
+# for child1, child2 in zip(pop[::2], pop[1::2]):
+#     toolbox.mate(child1, child2)
+#     del child1.fitness.values
+#     del child2.fitness.values
 
-print pop
+# print pop

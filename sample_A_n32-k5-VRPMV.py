@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 # sample_A-n32-k5-VRPMV.py
 
+"""
+
+TODO:
+    * make a new mutation method, maybe unecessary
+
+"""
+
+
 import os
 import random
 import numpy
@@ -8,13 +16,13 @@ from json import load
 from csv import DictWriter
 from deap import base, creator, tools
 from timeit import default_timer as timer #for timer
-import multiprocessing
-from gatspmv import mvCore
-from gavrptw import core
+from gatspmv import mvcore
+from gavrptw import core, utils
 
 # GA Tools
 def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, popSize, 
                             lightUnitCost, lightInitCost, lightWaitCost, lightDelayCost,
+                            lightRange, lightCapacity,
                             cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join('data', 'json_customize')
@@ -30,19 +38,18 @@ def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, pop
     toolbox = base.Toolbox()
     print "tsp at the moment is:" 
     print tsp
-    splitLightList = mvCore.splitLightCustomers(instance, tsp)
-    toolbox.register('individual', mvCore.initMVIndividuals, creator.Individual, splitLightList, tsp)
+    splitLightList = mvcore.splitLightCustomers(instance, tsp, lightRange=lightRange, lightCapacity=lightCapacity)
+    toolbox.register('individual', mvcore.initMVIndividuals, creator.Individual, splitLightList, tsp)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
     pop = toolbox.population(n=popSize)
 
     # Operator registering
-    toolbox.register('evaluate', mvCore.evalTSPMS, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost,
+    toolbox.register('evaluate', mvcore.evalTSPMS, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost,
                                                     lightUnitCost=lightUnitCost, lightInitCost=lightInitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost)
     toolbox.register('select', tools.selRoulette)
-    toolbox.register('mate', mvCore.cxSinglePointSwap)
-    toolbox.register('mutate', core.mutInverseIndexes) #TODO make a new mutation method, maybe unecessary
-
+    toolbox.register('mate', mvcore.cxSinglePointSwap)
+    toolbox.register('mutate', core.mutInverseIndexes)
     print pop
 
     # Results holders for exporting results to CSV file
@@ -120,8 +127,8 @@ def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, pop
         csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
         csvPathname = os.path.join('results', csvFilename)
         print 'Write to file: %s' % csvPathname
-        makeDirsForFile(pathname=csvPathname)
-        if not exist(pathname=csvPathname, overwrite=True):
+        utils.makeDirsForFile(pathname=csvPathname)
+        if not utils.exist(pathname=csvPathname, overwrite=True):
             with open(csvPathname, 'w') as f:
                 fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness', 'avg_cost']
                 writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
@@ -143,6 +150,8 @@ def main():
     lightInitCost = 0
     lightWaitCost = 0
     lightDelayCost = 0
+    lightRange = 100
+    lightCapacity = 50
 
     popSize = 10
     cxPb = 0
@@ -152,6 +161,7 @@ def main():
     exportCSV = False
     customizeData = True
 
+    # This should be the outcome of running the gavrptw module
     bestVRP = [[8, 11, 4, 22, 29, 23, 30, 14], [12, 16, 5, 25, 10, 20], [15, 9, 6, 3, 1, 27, 26], [19, 17, 31, 21, 13, 28, 18], [24, 2, 7]]
     bestVRPMV = []
     bestVRPMVCost = 0
@@ -170,6 +180,8 @@ def main():
             lightInitCost=lightInitCost,
             lightWaitCost=lightWaitCost,
             lightDelayCost=lightDelayCost,
+            lightRange=lightRange,
+            lightCapacity=lightCapacity,
             indSize=indSize,
             popSize=popSize,
             cxPb=cxPb,
@@ -178,7 +190,6 @@ def main():
             exportCSV=exportCSV,
             customizeData=customizeData
         )
-
         bestVRPMV.append(bestSubTSP)
         bestVRPMVCost = bestVRPMVCost + 1/bestSubTSPFitness
         print bestVRPMV, bestVRPMVCost
