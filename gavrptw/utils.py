@@ -3,7 +3,7 @@
 import os
 import fnmatch
 import matplotlib.pyplot as plt
-from json import dump
+import json
 import pandas as pd
 from . import BASE_DIR
 
@@ -113,7 +113,7 @@ def text2json(customize=False):
         print('Write to file: %s' % jsonPathname)
         makeDirsForFile(pathname=jsonPathname)
         with open(jsonPathname, 'w') as f:
-            dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
+            json.dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def plotResults():
@@ -137,3 +137,98 @@ def plotResults():
         # Save to folder
         filename = os.path.splitext(csvFile)[0]
         plt.savefig(filename + '.png')
+
+def visualizeRoutes(instanceName, instance, route, containsLightResource=False):
+    # Takes in the instance and a route list and plots the
+    # routes. It could be a VRPMS routes or standard VRP routes
+   
+    # Read the instance and save the x, y coordinates in a dataframe object
+    df = pd.DataFrame()
+    for customer in instance:
+        if customer.startswith("customer"):
+            row = [[str(customer), instance[customer]["coordinates"]["x"], instance[customer]["coordinates"]["y"]]]
+            df = df.append(row, ignore_index=True)
+        elif customer.startswith("deport"):
+            row = [["customer_0", instance[customer]["coordinates"]["x"], instance[customer]["coordinates"]["y"]]]
+            df = df.append(row, ignore_index=True)
+        else:
+            next
+    df.columns = ['customer_number', 'x_pos', 'y_pos']
+
+    plt.style.use('ggplot')
+    plotDataDir = os.path.join(BASE_DIR, 'data', 'plot')
+    
+    # Plot the scatter plot of customers
+    plt.figure()
+    ax = df.plot.scatter(x='x_pos', y='y_pos', color='red')
+    
+    # Annotate the depot
+    x_depot, y_depot = (float(df.loc[df['customer_number'] == "customer_0"]['x_pos']),
+                        float(df.loc[df['customer_number'] == "customer_0"]['y_pos']))
+    ax.text(x_depot, y_depot, "depot")
+
+    # Label the axis
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+
+    # Plot the connections of routes
+    # For VRP only routes
+    if containsLightResource == False:
+        # Iterate through all the subRoutes in the route
+        for subRoutes in route:
+            lastCustomer = 0
+            for customer in subRoutes: 
+                i, j = zip([float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['x_pos']),
+                        float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['y_pos'])],
+                        [float(df.loc[df['customer_number'] == "customer_%d" % customer]['x_pos']),
+                        float(df.loc[df['customer_number'] == "customer_%d" % customer]['y_pos'])])
+                plt.plot(i, j, 'b')
+
+                # Annotate the customer numbers
+                ax.text(i[1], j[1], str(customer))
+                lastCustomer = customer
+            # Add the return trip to the depot
+            customer = 0
+            i, j = zip([float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['x_pos']),
+            float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['y_pos'])],
+            [float(df.loc[df['customer_number'] == "customer_%d" % customer]['x_pos']),
+            float(df.loc[df['customer_number'] == "customer_%d" % customer]['y_pos'])])
+            plt.plot(i, j, 'b')
+        
+        else:
+            # route = [[[L1], [H1]], [[H2]], [[L3], [H3]]]
+            # subRoutes = [[L1], [H1]]
+
+            for subRoutes in route:
+                # Only heavy
+                if len(subRoutes==1):
+                    lastCustomer = 0
+                    for customers in subRoutes[0]: 
+                        i, j = zip([float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['x_pos']),
+                                float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['y_pos'])],
+                                [float(df.loc[df['customer_number'] == "customer_%d" % customer]['x_pos']),
+                                float(df.loc[df['customer_number'] == "customer_%d" % customer]['y_pos'])])
+                        plt.plot(i, j, 'b')
+
+                        # Annotate the customer numbers
+                        ax.text(i[1], j[1], str(customer))
+                        lastCustomer = customer
+                    # Add the return trip to the depot
+                    customer = 0
+                    i, j = zip([float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['x_pos']),
+                    float(df.loc[df['customer_number'] == "customer_%d" % lastCustomer]['y_pos'])],
+                    [float(df.loc[df['customer_number'] == "customer_%d" % customer]['x_pos']),
+                    float(df.loc[df['customer_number'] == "customer_%d" % customer]['y_pos'])])
+                    plt.plot(i, j, 'b')
+
+                # Contains light and heavy
+                elif len(subRoutes>1):
+                    # TODO add code for this, consider somehow using a method to draw.
+                    continue
+                else:
+                    print "something is wrong!"
+
+
+    # Save to folder
+    filelocation = os.path.join(plotDataDir, instanceName)
+    plt.savefig(filelocation + '.png')

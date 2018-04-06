@@ -199,3 +199,16 @@ if __name__ == '__main__':
     tic = timer()
     main()
     print 'Computing Time: %s' % (timer() - tic)
+
+# The output of the route: [[8, 11, 4, 22, 29, 23, 30, 14], [12, 16, 5, 25, 10, 20], [15, 9, 6, 3, 1, 27, 26], [19, 17, 31, 21, 13, 28, 18], [24, 2, 7]]
+# Is the mixed route: [[[11, 4, 22, 29], [8, 11, 29, 23, 30, 14]], [[12, 16, 5, 25, 10, 20]], [[15, 9, 6, 3, 1, 27, 26]], [[19, 31, 21, 13, 28], [19, 17, 28, 18]], [[24, 2, 7]]]
+# route 1 light: 11, 4, 22, 29
+# route 1 heavy: 0 - 8, 11, 29, 23, 30, 14 - 0
+# route 2 light: n/a
+# route 2 heavy: 0 - 12, 16, 5, 25, 10, 20 - 0
+# route 3 light: n/a
+# route 3 heavy: 0 - 15, 9, 6, 3, 1, 27, 26 - 0
+# route 4 light: [19, 31, 21, 13, 28]
+# route 4 heavy: 0 - 19, 17, 28, 18 - 0
+# route 5 light: n/a
+# route 5 heavy: 0 - 24, 2, 7 - 0

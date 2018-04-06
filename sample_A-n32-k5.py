@@ -137,21 +137,20 @@ def main():
     instName = 'A-n32-k5'
 
     unitCost = 1.0
-    initCost = 0.0
     waitCost = 0.0
     delayCost = 0.0
-
+    initCost = 0.0
     indSize = IND_SIZE
-    popSize = 100
+    popSize = 1200
     cxPb = 0.8
     mutPb = 0.1
-    NGen = 100
+    NGen = 800
 
     exportCSV = True
     customizeData = True
 
-    # Global creation of the individuals for GA
-    # Initialize the population
+    # Initialize the population.
+    # This method can't be parallelized at the moment
     pop = toolbox.population(n=popSize)
 
     bestIndividual = gaVRPTW(

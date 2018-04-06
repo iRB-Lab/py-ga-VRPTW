@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/amelialy/anaconda/envs/py-ga/bin/python"
+    "python.pythonPath": "/Users/amelialy/miniconda2/envs/py-ga/bin/python",
+    "python.linting.enabled": true
 }
