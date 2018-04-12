@@ -10,14 +10,14 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 
 ## Important Notes
 ### Project Origin (Backstory)
-This project is originated from a university course project. 
+This project is originated from a university course project.
 
-One day in 2016, one of my friends, who is majored in logistic engineering, came to discuss his course work project with me. He wanted to solve his logistic problem, which was the VRPTW, with some genetic algorithm stuff, which I happened to know a little bit of. The discussion went well and my friend got what he needed. 
+One day in 2016, one of my friends, who is majored in logistic engineering, came to discuss his course work project with me. He wanted to solve his logistic problem, which was the VRPTW, with some genetic algorithm stuff, which I happened to know a little bit of. The discussion went well and my friend got what he needed.
 
 After that, I got an idea of implementing the approach in Python. I completed the first version of the this project that night.
 
 ### Performance Issue (Frequently Asked)
-I wrote this project on the spur of that moment. However, after running a few tests with several combinations of parameters and set-ups, I realized that implemanting the idea is one thing, and tuning the algorithm to yield a converged result is another thing. The latter would definitely require much more effort. 
+I wrote this project on the spur of that moment. However, after running a few tests with several combinations of parameters and set-ups, I realized that implementing the idea is one thing, and tuning the algorithm to yield a converged result is another thing. The latter would definitely require much more effort.
 
 Therefore, I should say, **to be precise, the performances of the given examples are poor.**
 
@@ -33,7 +33,7 @@ Of course, tuning improvements of this algorithm and forks are always welcome.
     - [Instance Definitions](#instance-definitions)
         - [Text File Format](#text-file-format)
         - [JSON Format](#json-format)
-        - [Use Cusomized Instance Data](#use-cusomized-instance-data)
+        - [Use Customized Instance Data](#use-customized-instance-data)
             - [Supported File Format](#supported-file-format)
             - [Directory Set-up](#directory-set-up)
             - [Convert `*.txt` to `*.json`](#convert-txt-to-json)
@@ -139,7 +139,7 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
 8. As a backup, you can download a zip-file with the 100 customers instance definitions<sup>[2][100-customers]</sup> [here][100-customers-zip].
 
 #### JSON Format
-For the further convenience, a Python script named `text2json.py` is writen to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.json`, and locates at `data/json/C101.json`.
+For the further convenience, a Python script named `text2json.py` is written to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.json`, and locates at `data/json/C101.json`.
 
 Below is a description of the format of the JSON file that defines each problem instance (assuming 100 customers).
 
@@ -193,7 +193,7 @@ Below is a description of the format of the JSON file that defines each problem 
 1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
 2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<jsonData>['distance_matrix'][1][2]`, where `<jsonData>` denotes the name of a Python `dict` object.
 
-#### Use Cusomized Instance Data
+#### Use Customized Instance Data
 You can customize your own problem instances.
 
 ##### Supported File Format
@@ -906,5 +906,5 @@ text2json(customize=False)
 [100-customers-zip]: http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip "100 Customers Instance Definitions (Zip)"
 
 [deap-docs]: http://deap.readthedocs.org/ "Distributed Evolutionary Algorithms in Python (DEAP) Docs"
-[deap-github]: https://github.com/deap/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) GirHub"
+[deap-github]: https://github.com/deap/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) GitHub"
 [deap-pypi]: https://pypi.python.org/pypi/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) PyPI"
