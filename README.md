@@ -14,7 +14,7 @@ This project is originated from a university course project.
 
 One day in 2016, one of my friends, who is majored in logistic engineering, came to discuss his course work project with me. He wanted to solve his logistic problem, which was the VRPTW, with some genetic algorithm stuff, which I happened to know a little bit of. The discussion went well and my friend got what he needed.
 
-After that, I got an idea of implementing the approach in Python. I completed the first version of the this project that night.
+After that, I got an idea of implementing the approach in Python. The first version of the this project came out that night.
 
 ### Performance Issue (Frequently Asked)
 I wrote this project on the spur of that moment. However, after running a few tests with several combinations of parameters and set-ups, I realized that implementing the idea is one thing, and tuning the algorithm to yield a converged result is another thing. The latter would definitely require much more effort.
