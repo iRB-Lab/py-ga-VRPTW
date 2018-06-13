@@ -791,9 +791,11 @@ The sample codes will print logs on the screen. Meanwhile, a **CSV format** log 
     - [Crossover of Individual with MV](#crossover-mv)
 
 ## Modifications to the GA Implementation for VRPTW
+
 Several modifications are made to improve the performance of the iRB-lab's GA implementation.
 
 #### Selection: Elite Selection
+
 Instead of solely relying on the roulette selection process to pick the individuals for crossover and mutation, select one elite `individual` to keep past the crossover and mutation step, select the top 10% of the current generation and roulette select the other 90%. The selection methods are using built-in `deap` tools
 
 ```python
@@ -803,9 +805,10 @@ deap.tools.selRoulette(individuals, k)
 ```
 
 #### Partially Matched Crossover Method
-The partially matched crossover (PMX) method originally coded is based on a paper by Goldberg [(1985)][goldberg-1985]. The method was not working as intended, and I replaced it with the built-in version from `deap` with a small modificaiton to account for the depot naming convention.
 
-PMX is suited for problems where the optimal values and locations of the chromosomes matter. PMX works by randomly selecting a range of customers to swap between the routes. As each customer is swapped between the two routes, the duplicates are also swapped. For example if ther are two `individuals`.
+The partially matched crossover (PMX) method originally coded is based on a paper by Goldberg [(1985)][goldberg-1985]. The method was not working as intended, and I replaced it with the built-in version from `deap` with a small modification to account for the depot naming convention.
+
+PMX is suited for problems where the optimal values and locations of the chromosomes matter. PMX works by randomly selecting a range of customers to swap between the routes. As each customer is swapped between the two routes, the duplicates are also swapped. For example if there are two `individuals`.
 
 ```python
 A = [9, 8, 4, 5, 6, 7, 1, 3, 2, 10]
