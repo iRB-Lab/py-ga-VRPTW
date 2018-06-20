@@ -73,8 +73,13 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
 
     # Determine the order of the distance list
     distList = distanceList(instance, individual)
-    s = sorted(distList)
-    sortedDistanceList = [s.index(x) for x in distList]
+    sortedDistanceList= [0] * len(distList)
+    for i, x in enumerate(sorted(range(len(distList)), key=lambda y: distList[y])):
+        sortedDistanceList[x] = i
+    # Since some distances values are non-unique, this method creates ties
+    # s = sorted(distList)  
+    # sortedDistanceList = [s.index(x) for x in distList]
+
 
     # Start the cluster with the closest pair and add neighbouring customers until
     # the range or capacity constraint is reached. Then find the next closest pair

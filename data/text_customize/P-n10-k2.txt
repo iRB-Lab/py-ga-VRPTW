@@ -1,0 +1,20 @@
+P-n10-k2
+
+HEAVY VEHICLE        
+NUMBER     CAPACITY
+  1         50
+
+CUSTOMER
+CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE   TIME
+
+    0      0          0          0          0       1200          0
+    1      1          4          2          0       1100         2.9
+    2      6          4          1          0       1100         3.5
+    3      3          7          6          0       1100         2.6
+    4      5          7          3          0       1100         4.7
+    5      11         1          2          0       1100         1.1
+    6      0          5          9          0       1100         5.0
+    7      9          6          8          0       1100         3.8
+    8      2          1          4          0       1100         4.2
+    9      14         0          3          0       1100         4.2
+    10      4         6          8          0       1100         1.8
