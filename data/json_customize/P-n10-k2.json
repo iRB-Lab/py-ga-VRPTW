@@ -255,6 +255,6 @@
         ]
     ],
     "instance_name": "P-n10-k2",
-    "max_vehicle_number": 1,
-    "vehicle_capacity": 50.0
+    "max_vehicle_number": 2,
+    "vehicle_capacity": 25.0
 }

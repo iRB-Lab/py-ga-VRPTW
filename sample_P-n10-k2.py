@@ -141,7 +141,7 @@ def main():
     delayCost = 0.0
 
     indSize = 10
-    popSize = 100
+    popSize = 200
     cxPb = 0.9
     mutPb = 0.05
     NGen = 50

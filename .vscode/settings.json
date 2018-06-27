@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\paull\\AppData\\Local\\conda\\conda\\envs\\py-ga\\python.exe",
+    "python.pythonPath": "/Users/amelialy/miniconda2/envs/py-ga/bin/python",
     "python.linting.enabled": true
 }

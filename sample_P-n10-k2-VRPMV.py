@@ -43,7 +43,6 @@ def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, pop
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', mvcore.cxSinglePointSwap)
     toolbox.register('mutate', core.mutInverseIndexes)
-    print pop
 
     # Results holders for exporting results to CSV file
     csvData = []
@@ -140,22 +139,22 @@ def main():
     waitCost = 0.0
     delayCost = 0.0
     lightUnitCost = 1.0
-    lightInitCost = 0
-    lightWaitCost = 0
-    lightDelayCost = 0
+    lightInitCost = 0.0
+    lightWaitCost = 0.0
+    lightDelayCost = 0.0
     lightRange = 50
-    lightCapacity = 20
+    lightCapacity = 3
 
-    popSize = 100
-    cxPb = 0.8
+    popSize = 200
+    cxPb = 0.9
     mutPb = 0
-    NGen = 50
+    NGen = 100
 
     exportCSV = False
     customizeData = True
 
     # This should be the outcome of running the gavrptw module
-    bestVRP = [[1, 6, 3, 10, 4, 7, 9, 5, 2, 8]]
+    bestVRP = [[1, 6, 3, 8], [10, 4, 7, 9, 5, 2]]
     bestVRPMV = []
     bestVRPMVCost = 0
 

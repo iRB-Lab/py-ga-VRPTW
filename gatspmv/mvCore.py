@@ -5,7 +5,7 @@ process to solve a travelling salesman problem with movement synchronization
 
 Todo:
     * Combine the evalution method with the eval() method from core.py
-
+    * Greedy search based on customer demand
 """
 
 import os
@@ -40,14 +40,13 @@ def culmulativeDistance(instance, individual, startIndex, endIndex):
     # If the customer is at the beginning or end, includes the depot
     distList = distanceList(instance, individual)
 
-    if endIndex < len(individual):
+    if startIndex == 0 or endIndex > len(individual):
+        distance = 9999999999999999999
+    elif endIndex < len(individual):
         distance = sum(distList[startIndex:endIndex+1])
     elif endIndex == len(individual):
-        print individual
         distance = sum(distList[startIndex:endIndex+1])
         distance += instance['distance_matrix'][individual[endIndex-1]][0]
-    elif endIndex > len(individual):
-        distance = 999999999999999999999
     return distance
 
 def culmulativeDemand(instance, individual, startIndex, endIndex):
@@ -73,20 +72,17 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
 
     # Determine the order of the distance list
     distList = distanceList(instance, individual)
+    print distList
     sortedDistanceList= [0] * len(distList)
     for i, x in enumerate(sorted(range(len(distList)), key=lambda y: distList[y])):
         sortedDistanceList[x] = i
-    # Since some distances values are non-unique, this method creates ties
-    # s = sorted(distList)  
-    # sortedDistanceList = [s.index(x) for x in distList]
-
 
     # Start the cluster with the closest pair and add neighbouring customers until
     # the range or capacity constraint is reached. Then find the next closest pair
     # not part of any cluster and repeat until all customers are considered
     for i in range(len(individual)):
         considerCustomer = sortedDistanceList.index(i)
-        # print "consider customer: %d" % considerCustomer
+        print "consider customer index: %d" % considerCustomer
         # Determine the neighbouring nodes of the considerCustomer
         # Calculate the distance (include rendezvous)
         if considerCustomer == 0:
@@ -111,16 +107,11 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
         else:
             considerList[clusterEdgeLocation[0]:clusterEdgeLocation[1]+1] = [True] * (clusterEdgeLocation[1]-clusterEdgeLocation[0]+1)
             clusterList[considerCustomer] = 1
-            # Calculate the distance between considerCustomer and end of individual
-            if considerCustomer <= len(individual)/2:
-                endList = considerCustomer
-            elif considerCustomer > len(individual)/2:
-                endList = len(individual) - considerCustomer - 1
 
-            # Incrementally add the neighbouring customers
+            # Incrementally add the neighbouring customers until the edge of cluster reaches the ends of the list
             # Check range feasibility
             # Check demand feasibility
-            for j in range(0, endList):
+            while clusterEdgeLocation[0] != 0 or clusterEdgeLocation[1]+1 != len(individual):
                 distanceForward = culmulativeDistance(instance, individual,
                                                     clusterEdgeLocation[0], clusterEdgeLocation[1]+1)
                 distanceBackward = culmulativeDistance(instance, individual,
@@ -129,6 +120,9 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
                                                     clusterEdgeLocation[0]+1, clusterEdgeLocation[1])
                 demandBackward = culmulativeDemand(instance, individual,
                                                     clusterEdgeLocation[0], clusterEdgeLocation[1]-1)
+                print "Demand from %d to %d is: %d" % (clusterEdgeLocation[0]+1, clusterEdgeLocation[1], demandForward)
+                print "Demand from %d to %d is: %d" % (clusterEdgeLocation[0], clusterEdgeLocation[1]-1, demandBackward)
+                print "Range is: %d and %d" % (distanceForward, distanceBackward)
 
                 # Greedy approach: look at the shortest distance neighbouring node to add to cluster
                 # If neighbouring node succesfully pass the demand and range constraint
@@ -139,14 +133,17 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
                     considerList[clusterEdgeLocation[0]+1:clusterEdgeLocation[1]+1] = [True] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
                     clusterList[clusterEdgeLocation[0]+1:clusterEdgeLocation[1]+1] = [1] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
                     clusterEdgeLocation[1] = clusterEdgeLocation[1] + 1
+                    print "Cluster forwards is added"
                 elif (distanceForward > distanceBackward and distanceBackward < lightRange and demandBackward < lightCapacity
                     and clusterList[clusterEdgeLocation[0]-1] == False):
                     considerList[clusterEdgeLocation[0]:clusterEdgeLocation[1]] = [True] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
                     clusterList[clusterEdgeLocation[0]:clusterEdgeLocation[1]] = [1] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
                     clusterEdgeLocation[0] = clusterEdgeLocation[0] - 1
+                    print "Cluster backwards is added"
                 else:
                     break
                 print clusterList
+                print "The cluster edge is at: %d and %d" % (clusterEdgeLocation[0], clusterEdgeLocation[1])
     return clusterList
 
 def initMVIndividuals(icls, lightList, individual):
