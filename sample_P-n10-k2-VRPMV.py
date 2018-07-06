@@ -13,8 +13,8 @@ from gatspmv import mvcore
 from gavrptw import core, utils
 
 # GA Tools
-def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, popSize, 
-                            lightUnitCost, lightInitCost, lightWaitCost, lightDelayCost,
+def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, speed, indSize, popSize, 
+                            lightUnitCost, lightInitCost, lightWaitCost, lightDelayCost, lightSpeed,
                             lightRange, lightCapacity,
                             cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
@@ -38,8 +38,8 @@ def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, pop
     pop = toolbox.population(n=popSize)
 
     # Operator registering
-    toolbox.register('evaluate', mvcore.evalTSPMS, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost,
-                                                    lightUnitCost=lightUnitCost, lightInitCost=lightInitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost)
+    toolbox.register('evaluate', mvcore.evalTSPMS, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost, speed=speed,
+                                                    lightUnitCost=lightUnitCost, lightInitCost=lightInitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost, lightSpeed=lightSpeed)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', mvcore.cxSinglePointSwap)
     toolbox.register('mutate', core.mutInverseIndexes)
@@ -134,16 +134,18 @@ def main():
 
     instName = 'P-n10-k2'
 
-    unitCost = 10.0
+    unitCost = 1.0
     initCost = 0.0
     waitCost = 0.0
     delayCost = 0.0
+    speed = 5
     lightUnitCost = 1.0
     lightInitCost = 0.0
     lightWaitCost = 0.0
     lightDelayCost = 0.0
+    lightSpeed = 1
     lightRange = 50
-    lightCapacity = 3
+    lightCapacity = 10
 
     popSize = 200
     cxPb = 0.9
@@ -154,13 +156,12 @@ def main():
     customizeData = True
 
     # This should be the outcome of running the gavrptw module
-    bestVRP = [[1, 6, 3, 8], [10, 4, 7, 9, 5, 2]]
+    bestVRP = [[1, 6, 3, 10, 4, 7, 9, 5, 2, 8]] #[[1, 6, 3, 8], [10, 4, 7, 9, 5, 2]]
     bestVRPMV = []
     bestVRPMVCost = 0
 
     for tsp in bestVRP:
         indSize = len(tsp)
-        # Try first without multiprocessing for this substep
         bestSubTSP, bestSubTSPFitness = gaTSPMV(
             instName=instName,
             tsp=tsp,
@@ -168,10 +169,12 @@ def main():
             initCost=initCost,
             waitCost=waitCost,
             delayCost=delayCost,
+            speed=speed,
             lightUnitCost=lightUnitCost,
             lightInitCost=lightInitCost,
             lightWaitCost=lightWaitCost,
             lightDelayCost=lightDelayCost,
+            lightSpeed=lightSpeed,
             lightRange=lightRange,
             lightCapacity=lightCapacity,
             indSize=indSize,

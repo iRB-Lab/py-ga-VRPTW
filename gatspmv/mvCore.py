@@ -174,10 +174,11 @@ def initMVIndividuals(icls, lightList, individual):
     genome.append(heavyGenome)
     return icls(genome)
 
-def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0,
-                                    lightUnitCost=1.0, lightInitCost=0, lightWaitCost=0, lightDelayCost=0):
+def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0, speed=1,
+                                    lightUnitCost=1.0, lightInitCost=0, lightWaitCost=0, lightDelayCost=0, lightSpeed=1):
     # Evaluate the cost of a MVIndividual, created by the initMVIndividual method
     # Includes: init cost, travel cost and delay cost of light and heavy resource
+    # speed and lightSpeed are speed reducers for the heavy and light resource respectively 
     # Expects the MSindividual to be [[L], [L], ..., [H]] format
     # The waitCost is when the resource has to wait for the arrival of another resource
     # or the beginning of the delivery window
@@ -208,7 +209,7 @@ def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, dela
     heavyTravelCost = 0
     heavyFinishedTime = 0
     for customerID in route[-1]:
-        heavyTravelTime = instance['distance_matrix'][lastCustomerID][customerID]
+        heavyTravelTime = instance['distance_matrix'][lastCustomerID][customerID] * speed
         heavyStartTime =  heavyFinishedTime + heavyTravelTime
         heavyArrivalTime[str(customerID)] = heavyStartTime
         heavyServiceTime = instance['customer_%d' % customerID]['service_time']
@@ -234,7 +235,7 @@ def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, dela
         lightStartTime = heavyArrivalTime[str(subLightRoute[0])]
         # Considers the travel cost and time cost of all light customers except rejoining back
         for customerID in subLightRoute[1:-1]:
-            lightTravelTime = instance['distance_matrix'][lastCustomerID][customerID]
+            lightTravelTime = instance['distance_matrix'][lastCustomerID][customerID] * lightSpeed
             # print "lightTravelTime is between %d and %d is: %f" % (lastCustomerID, customerID, lightTravelTime)
             lightServiceTime = instance['customer_%d' % customerID]['service_time']
             lightElapsedTime = lightElapsedTime + lightTravelTime + lightServiceTime
