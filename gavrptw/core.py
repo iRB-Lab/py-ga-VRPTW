@@ -6,8 +6,8 @@ import numpy
 from json import load
 from csv import DictWriter
 from deap import base, creator, tools
-from . import BASE_DIR
-from .utils import makeDirsForFile, exist
+#from . import BASE_DIR
+#from .utils import makeDirsForFile, exist
 
 def printRoute(route, merge=False, twoResources=False):
     routeStr = '0'
@@ -61,7 +61,7 @@ def printRoute(route, merge=False, twoResources=False):
 
     return
 
-def ind2route(individual, instance):
+def ind2route(individual, instance, speed=1.0):
     route = []
     vehicleCapacity = instance['vehicle_capacity']
     deportDueTime =  instance['deport']['due_time']
@@ -76,8 +76,8 @@ def ind2route(individual, instance):
         updatedVehicleLoad = vehicleLoad + demand
         # Update elapsed time
         serviceTime = instance['customer_%d' % customerID]['service_time']
-        returnTime = instance['distance_matrix'][customerID][0]
-        updatedElapsedTime = elapsedTime + instance['distance_matrix'][lastCustomerID][customerID] + serviceTime + returnTime
+        returnTime = instance['distance_matrix'][customerID][0] * speed
+        updatedElapsedTime = elapsedTime + (instance['distance_matrix'][lastCustomerID][customerID] * speed) + serviceTime + returnTime
         # Validate vehicle load and elapsed time
         if (updatedVehicleLoad <= vehicleCapacity) and (updatedElapsedTime <= deportDueTime):
             # Add to current sub-route
@@ -90,7 +90,7 @@ def ind2route(individual, instance):
             # Initialize a new sub-route and add to it
             subRoute = [customerID]
             vehicleLoad = demand
-            elapsedTime = instance['distance_matrix'][0][customerID] + serviceTime
+            elapsedTime = (instance['distance_matrix'][0][customerID] * speed) + serviceTime
         # Update last customer ID
         lastCustomerID = customerID
     if subRoute != []:
@@ -247,9 +247,9 @@ def ind2routeMS(individual, instance):
 
     return routeWithTwoResources
 
-def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0):
+def evalVRPTW(individual, instance, unitCost=1.0, waitCost=0, delayCost=0, speed=1):
     totalCost = 0
-    route = ind2route(individual, instance)
+    route = ind2route(individual, instance, speed)
     totalCost = 0
     for subRoute in route:
         subRouteTimeCost = 0
@@ -258,11 +258,13 @@ def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayC
         lastCustomerID = 0
         for customerID in subRoute:
             # Calculate section distance
-            distance = instance['distance_matrix'][lastCustomerID][customerID]
+            distance = instance['distance_matrix'][lastCustomerID][customerID] * speed
             # Update sub-route distance
             subRouteDistance = subRouteDistance + distance
             # Calculate time cost
             arrivalTime = elapsedTime + distance
+            # print "this is customer %f" % customerID
+            # print "arrival time: %f" % arrivalTime
             timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
             # Update sub-route time cost
             subRouteTimeCost = subRouteTimeCost + timeCost
@@ -271,17 +273,19 @@ def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayC
             # Update last customer ID
             lastCustomerID = customerID
         # Calculate transport cost
-        subRouteDistance = subRouteDistance + instance['distance_matrix'][lastCustomerID][0]
-        subRouteTranCost = initCost + unitCost * subRouteDistance
+        subRouteDistance = subRouteDistance + (instance['distance_matrix'][lastCustomerID][0] * speed)
+        subRouteTranCost = unitCost * subRouteDistance
         # Obtain sub-route cost
         subRouteCost = subRouteTimeCost + subRouteTranCost
+        # print subRouteTimeCost
+        # print subRouteTranCost
         # Update total cost
         totalCost = totalCost + subRouteCost
     fitness = 1.0 / totalCost
     return fitness,
 
-def evalVRPMS(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0,
-                                    lightUnitCost=1.0, lightInitCost=0, lightWaitCost=0, lightDelayCost=0):
+def evalVRPMS(individual, instance, unitCost=1.0, waitCost=0, delayCost=0,
+                                    lightUnitCost=1.0, lightWaitCost=0, lightDelayCost=0):
     route = ind2routeMS(individual, instance)
     totalCost = 0
     totalCostTwoResource = 0
@@ -343,11 +347,11 @@ def evalVRPMS(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayC
 
         # Calculate transport cost
         subRouteDistance = subRouteDistance + instance['distance_matrix'][lastCustomerID][0]
-        subRouteTranCost = initCost + unitCost * subRouteDistance
+        subRouteTranCost = unitCost * subRouteDistance
         # Calculate heavy/light transport cost
-        lightSubRouteTransCost = lightInitCost + lightUnitCost * (lightSubRouteDistance + lightRendezvousDistance)
+        lightSubRouteTransCost = lightUnitCost * (lightSubRouteDistance + lightRendezvousDistance)
         heavySubRouteDistance = heavySubRouteDistance + heavyRendezvousDistance + instance['distance_matrix'][lastCustomerID][0]
-        heavySubRouteTransCost = initCost + unitCost * heavySubRouteDistance
+        heavySubRouteTransCost = unitCost * heavySubRouteDistance
         # Obtain sub-route cost
         subRouteCost = subRouteTimeCost + subRouteTranCost
         # Obtain heavy/light subRoute cost
@@ -443,7 +447,7 @@ def mutInverseIndexes(individual):
     individual = individual[:start] + individual[stop:start-1:-1] + individual[stop+1:]
     return individual,
 
-''' def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+def gaVRPTW(instName, unitCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join(BASE_DIR,'data', 'json_customize')
     else:
@@ -461,7 +465,7 @@ def mutInverseIndexes(individual):
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
     # Operator registering
-    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
+    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, waitCost=waitCost, delayCost=delayCost)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', cxPartialyMatched)
     toolbox.register('mutate', mutInverseIndexes)
@@ -533,7 +537,7 @@ def mutInverseIndexes(individual):
     printRoute(ind2route(bestInd, instance))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
     if exportCSV:
-        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvFilename = '%s_uC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
         csvPathname = os.path.join(BASE_DIR, 'results', csvFilename)
         print 'Write to file: %s' % csvPathname
         makeDirsForFile(pathname=csvPathname)
@@ -543,10 +547,10 @@ def mutInverseIndexes(individual):
                 writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
-                    writer.writerow(csvRow) '''
+                    writer.writerow(csvRow)
 
-def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost, 
-            lightUnitCost, lightInitCost, lightWaitCost, lightDelayCost,
+def gaVRPMS(instName, unitCost, waitCost, delayCost, 
+            lightUnitCost, lightWaitCost, lightDelayCost,
             indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join(BASE_DIR,'data', 'json_customize')
@@ -564,7 +568,7 @@ def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost,
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
     # Operator registering
-    toolbox.register('evaluate', evalVRPMS, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost, lightUnitCost=lightUnitCost, lightInitCost=lightInitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost)
+    toolbox.register('evaluate', evalVRPMS, instance=instance, unitCost=unitCost, waitCost=waitCost, delayCost=delayCost, lightUnitCost=lightUnitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', cxPartialyMatched)
     toolbox.register('mutate', mutInverseIndexes)
@@ -639,7 +643,7 @@ def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost,
     printRoute(ind2route(bestInd, instance))
     print('Total cost: %s' % (1 / bestInd.fitness.values[0]))
     if exportCSV:
-        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvFilename = '%s_uC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
         csvPathname = os.path.join(BASE_DIR, 'results', csvFilename)
         print('Write to file: %s' % csvPathname)
         makeDirsForFile(pathname=csvPathname)
@@ -650,3 +654,15 @@ def gaVRPMS(instName, unitCost, initCost, waitCost, delayCost,
                 writer.writeheader()
                 for csvRow in csvData:
                     writer.writerow(csvRow)
+
+# SAMPLE_TSP = [42, 26, 6, 12, 21, 4, 9, 18, 16, 34, 2, 15, 45, 1, 25, 27, 40, 19, 50, 20, 41, 11, 10, 39, 38, 48, 36, 37, 8, 13, 30, 29, 32, 49, 28, 3, 17, 14, 35, 44, 7, 23, 43, 24, 46, 33, 5, 47, 31, 22]
+# instName = 'P-n50-0'
+# isCustomize = True
+# # Customize data dir location
+# jsonDataDir = os.path.join('data', 'json_customize')
+# jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
+# with open(jsonFile) as f:
+#     instance = load(f)
+
+# cost= evalVRPTW(SAMPLE_TSP, instance, unitCost=0.1, waitCost=0.05, delayCost=0.01, speed=5)
+# print 1/cost[0]

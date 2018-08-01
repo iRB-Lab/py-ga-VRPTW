@@ -132,14 +132,20 @@ def splitLightCustomers(instance, individual, lightRange=100, lightCapacity=50):
                     and clusterList[clusterEdgeLocation[1]+1] == False):
                     considerList[clusterEdgeLocation[0]+1:clusterEdgeLocation[1]+1] = [True] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
                     clusterList[clusterEdgeLocation[0]+1:clusterEdgeLocation[1]+1] = [1] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
-                    clusterEdgeLocation[1] = clusterEdgeLocation[1] + 1
-                    print "Cluster forwards is added"
+                    if clusterEdgeLocation[1]+1 != len(individual)-1:
+                        # Make sure you don't add the first node or the end node
+                        clusterEdgeLocation[1] = clusterEdgeLocation[1] + 1
+                        print "Cluster forwards is added"
+                    else:
+                        break
                 elif (distanceForward > distanceBackward and distanceBackward < lightRange and demandBackward < lightCapacity
                     and clusterList[clusterEdgeLocation[0]-1] == False):
                     considerList[clusterEdgeLocation[0]:clusterEdgeLocation[1]] = [True] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
                     clusterList[clusterEdgeLocation[0]:clusterEdgeLocation[1]] = [1] * (clusterEdgeLocation[1]-clusterEdgeLocation[0])
-                    clusterEdgeLocation[0] = clusterEdgeLocation[0] - 1
-                    print "Cluster backwards is added"
+                    if clusterEdgeLocation[0]-1 != 0:
+                        clusterEdgeLocation[0] = clusterEdgeLocation[0] - 1
+                        print "Cluster backwards is added"
+                    else: break
                 else:
                     break
                 print clusterList
@@ -174,8 +180,8 @@ def initMVIndividuals(icls, lightList, individual):
     genome.append(heavyGenome)
     return icls(genome)
 
-def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0, speed=1,
-                                    lightUnitCost=1.0, lightInitCost=0, lightWaitCost=0, lightDelayCost=0, lightSpeed=1):
+def evalTSPMS(MVindividual, instance, unitCost=1.0, waitCost=0, delayCost=0, speed=1,
+                                    lightUnitCost=1.0, lightWaitCost=0, lightDelayCost=0, lightSpeed=1):
     # Evaluate the cost of a MVIndividual, created by the initMVIndividual method
     # Includes: init cost, travel cost and delay cost of light and heavy resource
     # speed and lightSpeed are speed reducers for the heavy and light resource respectively 
@@ -183,7 +189,6 @@ def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, dela
     # The waitCost is when the resource has to wait for the arrival of another resource
     # or the beginning of the delivery window
     # The delayCost is when the resource is late to the delivery window
-    # lightInitCost accrues each time there is a light subroute
     route = MVindividual
     totalCost = 0
     lightCost = 0
@@ -212,7 +217,7 @@ def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, dela
         heavyTravelTime = instance['distance_matrix'][lastCustomerID][customerID] * speed
         heavyStartTime =  heavyFinishedTime + heavyTravelTime
         heavyArrivalTime[str(customerID)] = heavyStartTime
-        heavyServiceTime = instance['customer_%d' % customerID]['service_time']
+        heavyServiceTime = instance['customer_%d' % customerID]['service_time'] * 2
         heavyFinishedTime = heavyStartTime + heavyServiceTime
         heavyDepartureTime[str(customerID)] = heavyFinishedTime
         heavyTimeCost = heavyTimeCost + (waitCost * max(instance['customer_%d' % customerID]['ready_time'] - (heavyTravelTime + heavyStartTime), 0)
@@ -220,8 +225,10 @@ def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, dela
         heavyTravelCost = heavyTravelCost + (unitCost * heavyTravelTime)
         lastCustomerID = customerID
 
-    heavyCost = heavyTimeCost + heavyTravelCost + initCost + (instance['distance_matrix'][customerID][0] * unitCost)
+    heavyCost = heavyTimeCost + heavyTravelCost + (instance['distance_matrix'][customerID][0] * speed * unitCost)
     # print "Heavy cost is: %f" % heavyCost
+    # print "Heavy time cost: %f" % heavyTimeCost
+    # print "Heavy travel cost: %f" % heavyTravelCost
 
     # Given the heavyArrivalTime, calculate the light travel time and cost
     # Update the resourceDelayTime accordingly for the rendezvous customer points
@@ -250,7 +257,7 @@ def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, dela
         # print "last leg travel time between %d and %d is: %f" % (lastCustomerID, subLightRoute[-1], lightTravelTime)
         lightFinishTime = lightStartTime + lightElapsedTime + lightTravelTime
         # print "the finish time is: %f" % lightFinishTime
-        lightCost = lightCost + lightTravelCost + lightTimeCost + (lightUnitCost * lightTravelTime) + lightInitCost
+        lightCost = lightCost + lightTravelCost + lightTimeCost + (lightUnitCost * lightTravelTime)
         # update the resourceDelayTime for the ending customer of the lightSubRoute
         resourceDelayTime[str(subLightRoute[-1])] = min(lightFinishTime - heavyDepartureTime[str(subLightRoute[-1])],
                                                         lightFinishTime - heavyArrivalTime[str(subLightRoute[-1])], key=abs)
@@ -268,6 +275,8 @@ def evalTSPMS(MVindividual, instance, unitCost=1.0, initCost=0, waitCost=0, dela
     # print heavyArrivalTime
     # print heavyDepartureTime
     # print resourceDelayTime
+
+    # print "total cost is: %f" % totalCost
 
     totalCost = totalCost + lightCost + heavyCost
     fitness = 1/totalCost
@@ -300,8 +309,8 @@ def cxSinglePointSwap(ind1, ind2):
 # # testing the code
 # random.seed(64)
 
-# SAMPLE_TSP_TOUR = [8, 11, 4, 22, 29, 23, 30, 14, 12, 16, 5, 25, 10, 20]
-# instName = 'A-n32-k5'
+# SAMPLE_VRPMS = [[32, 28, 3, 17, 14, 35, 44, 7, 23], [23, 43, 24], [24, 46, 33, 5, 47, 31, 22], [32, 49, 23, 24, 22]]
+# instName = 'P-n50-0'
 # isCustomize = True
 # # Customize data dir location
 # jsonDataDir = os.path.join('data', 'json_customize')
@@ -309,26 +318,5 @@ def cxSinglePointSwap(ind1, ind2):
 # with open(jsonFile) as f:
 #     instance = load(f)
 
-# d = splitLightCustomers(instance, SAMPLE_TSP_TOUR)
-# print d
-
-# creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-# creator.create("Individual", list, fitness=creator.FitnessMax)
-# toolbox = base.Toolbox()
-# toolbox.register('individual', initMVIndividuals, creator.Individual, d, SAMPLE_TSP_TOUR)
-# toolbox.register('population', tools.initRepeat, list, toolbox.individual)
-# toolbox.register('mate', cxSinglePointSwap)
-
-# pop = toolbox.population(n=2)
-# print pop
-# toolbox.register('evaluate', evalTSPMS, instance=instance, unitCost=1, initCost=0, waitCost=0, delayCost=0,
-#                                                     lightUnitCost=1, lightInitCost=0, lightWaitCost=0, lightDelayCost=0)
-# fitnesses = list(toolbox.map(toolbox.evaluate, pop))
-# print fitnesses
-# # Apply crossover on the offspring
-# for child1, child2 in zip(pop[::2], pop[1::2]):
-#     toolbox.mate(child1, child2)
-#     del child1.fitness.values
-#     del child2.fitness.values
-
-# print pop
+# cost= evalTSPMS(SAMPLE_VRPMS, instance, unitCost=0.1, waitCost=0.05, delayCost=0.01, speed=5, lightUnitCost=0.06, lightWaitCost=0, lightDelayCost=0.01, lightSpeed=2.5)
+# print 1/cost[0]

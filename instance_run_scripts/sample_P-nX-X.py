@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# sample_P-n10-k2.py
-# Used to test the GA setup against the MIP solution
+# sample_P-n10-x.py
+# Used to test the GA setup against the MIP solution by solving the P instances
 
 import os
 import random
@@ -10,8 +10,6 @@ from csv import DictWriter
 from deap import base, creator, tools
 from timeit import default_timer as timer
 import multiprocessing
-from gavrptw.core import evalVRPTW, cxPartialyMatched, mutInverseIndexes, printRoute, ind2route
-from gavrptw.utils import makeDirsForFile, exist
 
 # Create Fitness and Individual Classes
 creator.create('FitnessMax', base.Fitness, weights=(1.0,))
@@ -19,7 +17,7 @@ creator.create('Individual', list, fitness=creator.FitnessMax)
 toolbox = base.Toolbox()
 
 # Create Individual Type
-IND_SIZE = 10
+IND_SIZE = 100
 # Attribute generator
 toolbox.register('indexes', random.sample, range(1, IND_SIZE + 1), IND_SIZE)
 # Structure initializers
@@ -27,7 +25,7 @@ toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.in
 toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
 # GA Tools
-def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+def gaVRPTW(pop, instName, unitCost, waitCost, delayCost, speed, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join('data', 'json_customize')
     else:
@@ -37,10 +35,10 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
         instance = load(f)
 
     # Operator registering
-    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
+    toolbox.register('evaluate', core.evalVRPTW, instance=instance, unitCost=unitCost, waitCost=waitCost, delayCost=delayCost, speed=speed)
     toolbox.register('select', tools.selRoulette)
-    toolbox.register('mate', cxPartialyMatched)
-    toolbox.register('mutate', mutInverseIndexes)
+    toolbox.register('mate', core.cxPartialyMatched)
+    toolbox.register('mutate', core.mutInverseIndexes)
     pop=pop
 
     # Results holders for exporting results to CSV file
@@ -114,37 +112,37 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, pop
     bestInd = tools.selBest(pop, 1)[0]
     print 'Best individual: %s' % bestInd
     print 'Fitness: %s' % bestInd.fitness.values[0]
-    printRoute(ind2route(bestInd, instance))
+    core.printRoute(core.ind2route(bestInd, instance, speed))
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
     if exportCSV:
-        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvFilename = '%s_uC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
         csvPathname = os.path.join('results', csvFilename)
         print 'Write to file: %s' % csvPathname
-        makeDirsForFile(pathname=csvPathname)
-        if not exist(pathname=csvPathname, overwrite=True):
+        utils.makeDirsForFile(pathname=csvPathname)
+        if not utils.exist(pathname=csvPathname, overwrite=True):
             with open(csvPathname, 'w') as f:
                 fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness', 'avg_cost']
                 writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
                 for csvRow in csvData:
                     writer.writerow(csvRow)
-
+    return core.ind2route(bestInd, instance, speed)
 
 def main():
-    random.seed(64)
+    random.seed(73)
 
-    instName = 'P-n10-k2'
+    instName = 'P-n100-0'
 
-    unitCost = 10.0
-    initCost = 0.0
-    waitCost = 0.0
-    delayCost = 0.0
+    unitCost = 0.1
+    waitCost = 0.05
+    delayCost = 0.01
+    speed = 5.0
 
-    indSize = 10
-    popSize = 200
+    indSize = IND_SIZE
+    popSize = 2000
     cxPb = 0.9
     mutPb = 0.05
-    NGen = 50
+    NGen = 400
 
     exportCSV = True
     customizeData = True
@@ -157,9 +155,9 @@ def main():
         pop=pop,
         instName=instName,
         unitCost=unitCost,
-        initCost=initCost,
         waitCost=waitCost,
         delayCost=delayCost,
+        speed=speed,
         indSize=indSize,
         popSize=popSize,
         cxPb=cxPb,
@@ -170,6 +168,13 @@ def main():
     )
 
 if __name__ == '__main__':
+    if __package__ is None:
+        import sys
+        from os import path
+        sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+        from gavrptw import core, utils
+    else:
+        from ..gavrptw import core, utils
     pool = multiprocessing.Pool()
     toolbox.register('map', pool.map)
 

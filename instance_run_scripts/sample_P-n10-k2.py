@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# sample_A-n32-k5.py
+# sample_P-n10-k2.py
+# Used to test the GA setup against the MIP solution
 
 import os
 import random
@@ -7,19 +8,16 @@ import numpy
 from json import load
 from csv import DictWriter
 from deap import base, creator, tools
-from timeit import default_timer as timer #for timer
+from timeit import default_timer as timer
 import multiprocessing
-from gavrptw import core, utils
-
-# Global constant for individual size
-# Check before running
-IND_SIZE = 31
 
 # Create Fitness and Individual Classes
 creator.create('FitnessMax', base.Fitness, weights=(1.0,))
 creator.create('Individual', list, fitness=creator.FitnessMax)
 toolbox = base.Toolbox()
 
+# Create Individual Type
+IND_SIZE = 10
 # Attribute generator
 toolbox.register('indexes', random.sample, range(1, IND_SIZE + 1), IND_SIZE)
 # Structure initializers
@@ -27,8 +25,7 @@ toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.in
 toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
 # GA Tools
-def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, 
-            indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
+def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
         jsonDataDir = os.path.join('data', 'json_customize')
     else:
@@ -42,9 +39,7 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost,
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', core.cxPartialyMatched)
     toolbox.register('mutate', core.mutInverseIndexes)
-
-    pop = pop
-    print pop
+    pop=pop
 
     # Results holders for exporting results to CSV file
     csvData = []
@@ -57,11 +52,11 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost,
     # print '  Evaluated %d individuals' % len(pop)
     # Begin the evolution
     for g in range(NGen):
-        # print '-- Generation %d --' % g
+        print '-- Generation %d --' % g
         # Select the next generation individuals
-        # Select elite - the best offspring, keep this past crossover/mutate
+        # Select elite - the best offpsring, keep this past crossover/mutate
         elite = tools.selBest(pop, 1)
-        # Keep top 10% of all offspring
+        # Select top 10% of all offspring
         # Roulette select the rest 90% of offsprings
         offspring = tools.selBest(pop, int(numpy.ceil(len(pop)*0.1)))
         offspringRoulette = toolbox.select(pop, int(numpy.floor(len(pop)*0.9))-1)
@@ -86,8 +81,10 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost,
         # Debug, suppress print()
         # print '  Evaluated %d individuals' % len(invalidInd)
         # The population is entirely replaced by the offspring
+        # Debug, printing offspring
         offspring.extend(elite)
         pop[:] = offspring
+        
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
         length = len(pop)
@@ -134,26 +131,27 @@ def gaVRPTW(pop, instName, unitCost, initCost, waitCost, delayCost,
 def main():
     random.seed(64)
 
-    instName = 'A-n32-k5'
+    instName = 'P-n10-k2'
 
-    unitCost = 1.0
+    unitCost = 10.0
+    initCost = 0.0
     waitCost = 0.0
     delayCost = 0.0
-    initCost = 0.0
-    indSize = IND_SIZE
-    popSize = 100
-    cxPb = 0.8
-    mutPb = 0.1
-    NGen = 100
+
+    indSize = 10
+    popSize = 200
+    cxPb = 0.9
+    mutPb = 0.05
+    NGen = 50
 
     exportCSV = True
     customizeData = True
 
-    # Initialize the population.
-    # This method can't be parallelized at the moment
+    # Global creation of the individuals for GA
+    # Initialize the population
     pop = toolbox.population(n=popSize)
 
-    bestIndividual = gaVRPTW(
+    gaVRPTW(
         pop=pop,
         instName=instName,
         unitCost=unitCost,
@@ -169,10 +167,14 @@ def main():
         customizeData=customizeData
     )
 
-    print bestIndividual
-    return
-
 if __name__ == '__main__':
+    if __package__ is None:
+        import sys
+        from os import path
+        sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+        from gavrptw import core, utils
+    else:
+        from ..gavrptw import core, utils
     pool = multiprocessing.Pool()
     toolbox.register('map', pool.map)
 

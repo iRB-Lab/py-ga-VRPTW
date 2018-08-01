@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
-# sample_A-n32-k5-VRPMV.py
-
-"""
-
-TODO:
-    * make a new mutation method, maybe unecessary
-
-"""
-
+# The VRPMS portion of P-n10-x instances
 
 import os
 import random
@@ -16,12 +8,10 @@ from json import load
 from csv import DictWriter
 from deap import base, creator, tools
 from timeit import default_timer as timer #for timer
-from gatspmv import mvcore
-from gavrptw import core, utils
 
 # GA Tools
-def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, popSize, 
-                            lightUnitCost, lightInitCost, lightWaitCost, lightDelayCost,
+def gaTSPMV(instName, tsp, unitCost, waitCost, delayCost, speed, indSize, popSize, 
+                            lightUnitCost, lightWaitCost, lightDelayCost, lightSpeed,
                             lightRange, lightCapacity,
                             cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
     if customizeData:
@@ -45,12 +35,11 @@ def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, pop
     pop = toolbox.population(n=popSize)
 
     # Operator registering
-    toolbox.register('evaluate', mvcore.evalTSPMS, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost,
-                                                    lightUnitCost=lightUnitCost, lightInitCost=lightInitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost)
+    toolbox.register('evaluate', mvcore.evalTSPMS, instance=instance, unitCost=unitCost, waitCost=waitCost, delayCost=delayCost, speed=speed,
+                                                    lightUnitCost=lightUnitCost, lightWaitCost=lightWaitCost, lightDelayCost=lightDelayCost, lightSpeed=lightSpeed)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', mvcore.cxSinglePointSwap)
     toolbox.register('mutate', core.mutInverseIndexes)
-    print pop
 
     # Results holders for exporting results to CSV file
     csvData = []
@@ -124,7 +113,9 @@ def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, pop
 
     print 'Total cost: %s' % (1 / bestInd.fitness.values[0])
     if exportCSV:
-        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
+        csvFilename = '%s-VRPMS_uC%s_wC%s_dC%s_sP%s_luC%s_lwC%s_ldC%s_lsP%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, waitCost, delayCost, speed,
+                                                                                          lightUnitCost, lightWaitCost, lightDelayCost, lightSpeed,
+                                                                                          indSize, popSize, cxPb, mutPb, NGen)
         csvPathname = os.path.join('results', csvFilename)
         print 'Write to file: %s' % csvPathname
         utils.makeDirsForFile(pathname=csvPathname)
@@ -138,48 +129,47 @@ def gaTSPMV(instName, tsp, unitCost, initCost, waitCost, delayCost, indSize, pop
     return bestInd, bestInd.fitness.values[0]
 
 def main():
-    random.seed(64)
+    random.seed(73)
 
-    instName = 'A-n32-k5'
+    instName = 'P-n100-0'
 
-    unitCost = 1.0
-    initCost = 0.0
-    waitCost = 0.0
-    delayCost = 0.0
-    lightUnitCost = 1.0
-    lightInitCost = 0
-    lightWaitCost = 0
-    lightDelayCost = 0
-    lightRange = 100
-    lightCapacity = 50
+    unitCost = 0.1
+    waitCost = 0.05
+    delayCost = 0.01
+    speed = 5
+    lightUnitCost = 0.02
+    lightWaitCost = 0.0
+    lightDelayCost = 0.01
+    lightSpeed = 1
+    lightRange = 200
+    lightCapacity = 10
 
-    popSize = 10
-    cxPb = 0
+    popSize = 500
+    cxPb = 0.9
     mutPb = 0
-    NGen = 1
+    NGen = 200
 
-    exportCSV = False
+    exportCSV = True
     customizeData = True
 
     # This should be the outcome of running the gavrptw module
-    bestVRP = [[8, 11, 4, 22, 29, 23, 30, 14], [12, 16, 5, 25, 10, 20], [15, 9, 6, 3, 1, 27, 26], [19, 17, 31, 21, 13, 28, 18], [24, 2, 7]]
+    bestVRP = [[53, 23, 65, 7, 14, 51, 45, 74, 61, 30, 76, 82, 19, 6, 73, 80, 10, 91, 68, 26, 48, 38, 100, 36, 37, 86, 57, 69, 3, 67, 64, 17, 62, 59, 39, 40, 1, 95, 44, 94], [22, 70, 52, 20, 56, 50, 85, 32, 49, 87, 97, 92, 21, 11, 2, 15, 88, 58, 46, 16, 66, 29, 31, 63, 41, 34, 27, 25, 79, 55, 24, 77, 84, 81, 18, 33, 9, 83, 12, 99, 35], [90, 8, 43, 54, 47, 4, 89, 5, 42, 75, 93, 13, 28, 98, 71, 60, 78, 72, 96]]
     bestVRPMV = []
     bestVRPMVCost = 0
 
     for tsp in bestVRP:
         indSize = len(tsp)
-        # Try first without multiprocessing for this substep
         bestSubTSP, bestSubTSPFitness = gaTSPMV(
             instName=instName,
             tsp=tsp,
             unitCost=unitCost,
-            initCost=initCost,
             waitCost=waitCost,
             delayCost=delayCost,
+            speed=speed,
             lightUnitCost=lightUnitCost,
-            lightInitCost=lightInitCost,
             lightWaitCost=lightWaitCost,
             lightDelayCost=lightDelayCost,
+            lightSpeed=lightSpeed,
             lightRange=lightRange,
             lightCapacity=lightCapacity,
             indSize=indSize,
@@ -192,23 +182,20 @@ def main():
         )
         bestVRPMV.append(bestSubTSP)
         bestVRPMVCost = bestVRPMVCost + 1/bestSubTSPFitness
-        print bestVRPMV, bestVRPMVCost
+        print "Best VRPMS Cost is: %f" % bestVRPMVCost
+        print bestVRPMV
     return
 
 if __name__ == '__main__':
+    if __package__ is None:
+        import sys
+        from os import path
+        sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+        from gatspmv import mvcore
+        from gavrptw import core, utils 
+    else:
+        from ..gatspmv import mvcore
+        from ..gavrptw import core, utils 
     tic = timer()
     main()
     print 'Computing Time: %s' % (timer() - tic)
-
-# The output of the route: [[8, 11, 4, 22, 29, 23, 30, 14], [12, 16, 5, 25, 10, 20], [15, 9, 6, 3, 1, 27, 26], [19, 17, 31, 21, 13, 28, 18], [24, 2, 7]]
-# Is the mixed route: [[[11, 4, 22, 29], [8, 11, 29, 23, 30, 14]], [[12, 16, 5, 25, 10, 20]], [[15, 9, 6, 3, 1, 27, 26]], [[19, 31, 21, 13, 28], [19, 17, 28, 18]], [[24, 2, 7]]]
-# route 1 light: 11, 4, 22, 29
-# route 1 heavy: 0 - 8, 11, 29, 23, 30, 14 - 0
-# route 2 light: n/a
-# route 2 heavy: 0 - 12, 16, 5, 25, 10, 20 - 0
-# route 3 light: n/a
-# route 3 heavy: 0 - 15, 9, 6, 3, 1, 27, 26 - 0
-# route 4 light: [19, 31, 21, 13, 28]
-# route 4 heavy: 0 - 19, 17, 28, 18 - 0
-# route 5 light: n/a
-# route 5 heavy: 0 - 24, 2, 7 - 0
