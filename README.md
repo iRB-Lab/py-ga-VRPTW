@@ -252,4 +252,17 @@ executes a single point crossover between rendezvous customers of light sub-rout
 ## License
 [MIT License][license]
 
+[repository]: https://github.com/paulliwali/py-ga-VRPTW "paulliwali/py-ga-VRPTW"
+[license]: https://github.com/paulliwali/py-ga-VRPTW/blob/master/LICENSE "License"
+
+[multiprocessing]: https://docs.python.org/2/library/multiprocessing.html "multiprocessing"
+
+[solomon]: http://web.cba.neu.edu/~msolomon/problems.htm "Solomon's VRPTW Benchmark Problems"
+[100-customers]: http://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/100-customers/ "100 Customers Instance Definitions"
+[100-customers-zip]: http://www.sintef.no/globalassets/project/top/vrptw/solomon/solomon-100.zip "100 Customers Instance Definitions (Zip)"
+
+[deap-docs]: http://deap.readthedocs.org/ "Distributed Evolutionary Algorithms in Python (DEAP) Docs"
+[deap-github]: https://github.com/deap/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) GitHub"
+[deap-pypi]: https://pypi.python.org/pypi/deap/ "Distributed Evolutionary Algorithms in Python (DEAP) PyPI"
+
 [goldberg-1985]: https://books.google.ca/books?hl=en&lr=&id=lI17AgAAQBAJ&oi=fnd&pg=PA154&dq=Alleles,+loci,+and+the+traveling+salesman+problem&ots=0LkXa9L20z&sig=Q7f4TPgLODK_h9uSF0dLUvkgn5M#v=onepage&q=Alleles%2C%20loci%2C%20and%20the%20traveling%20salesman%20problem&f=false "Alleles Loci and the Traveling Salesman Problem"
