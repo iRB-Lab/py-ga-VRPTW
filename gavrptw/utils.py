@@ -8,7 +8,7 @@ from . import BASE_DIR
 
 def makeDirsForFile(pathname):
     try:
-        os.makedirs(os.path.split(pathname)[0])
+        os.makedirs(os.path.dirname(pathname))
     except:
         pass
 
