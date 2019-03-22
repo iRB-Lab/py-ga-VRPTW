@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)][repository]
+[![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW.svg)][commit]
 [![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
 [![Watchers](https://img.shields.io/github/watchers/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
@@ -933,6 +933,7 @@ text2json(customize=False)
 [MIT License][license]
 
 [repository]: https://github.com/iRB-Lab/py-ga-VRPTW "iRB-Lab/py-ga-VRPTW"
+[commit]: https://github.com/iRB-Lab/py-ga-VRPTW/commits/master "Last Commit"
 [license]: https://github.com/iRB-Lab/py-ga-VRPTW/blob/master/LICENSE "License"
 [watch]: https://github.com/iRB-Lab/py-ga-VRPTW/watchers "Watchers"
 [star]: https://github.com/iRB-Lab/py-ga-VRPTW/stargazers "Stargazers"
