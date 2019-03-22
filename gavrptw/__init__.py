@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+'''gavrptw/__init__.py'''
+
 import os
 
 

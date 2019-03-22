@@ -1,73 +1,94 @@
 # -*- coding: utf-8 -*-
 
+'''gavrptw/uitls.py'''
+
 import os
+import io
 import fnmatch
-from json import dump
+from json import load, dump
 from . import BASE_DIR
 
 
-def makeDirsForFile(pathname):
+def make_dirs_for_file(path):
+    '''gavrptw.uitls.make_dirs_for_file(path)'''
     try:
-        os.makedirs(os.path.dirname(pathname))
-    except:
+        os.makedirs(os.path.dirname(path))
+    except OSError:
         pass
 
 
-def exist(pathname, overwrite=False, displayInfo=True):
-    def __pathType(pathname):
-        if os.path.isfile(pathname):
-            return 'File'
-        if os.path.isdir(pathname):
-            return 'Directory'
-        if os.path.islink(pathname):
-            return 'Symbolic Link'
-        if os.path.ismount(pathname):
-            return 'Mount Point'
-        return 'Path'
-    if os.path.exists(pathname):
+def guess_path_type(path):
+    '''gavrptw.uitls.guess_path_type(path)'''
+    if os.path.isfile(path):
+        return 'File'
+    if os.path.isdir(path):
+        return 'Directory'
+    if os.path.islink(path):
+        return 'Symbolic Link'
+    if os.path.ismount(path):
+        return 'Mount Point'
+    return 'Path'
+
+
+def exist(path, overwrite=False, display_info=True):
+    '''gavrptw.uitls.exist(path, overwrite=False, display_info=True)'''
+    if os.path.exists(path):
         if overwrite:
-            if displayInfo:
-                print('%s: %s exists. Overwrite.' % (__pathType(pathname), pathname))
-            os.remove(pathname)
+            if display_info:
+                print('{}: {} exists. Overwrite.'.format(guess_path_type(path), path))
+            os.remove(path)
             return False
-        else:
-            if displayInfo:
-                print('%s: %s exists.' % (__pathType(pathname), pathname))
-            return True
-    else:
-        if displayInfo:
-            print('%s: %s does not exist.' % (__pathType(pathname), pathname))
-        return False
+        if display_info:
+            print('{}: {} exists.'.format(guess_path_type(path), path))
+        return True
+    if display_info:
+        print('{}: {} does not exist.'.format(guess_path_type(path), path))
+    return False
+
+
+def load_instance(json_file):
+    '''gavrptw.uitls.load_instance(json_file)'''
+    if exist(path=json_file, overwrite=False, display_info=True):
+        with io.open(json_file, 'rt', newline='') as file_object:
+            return load(file_object)
+    return None
+
+
+def calculate_distance(customer1, customer2):
+    '''gavrptw.uitls.calculate_distance(customer1, customer2)'''
+    return ((customer1['coordinates']['x'] - customer2['coordinates']['x'])**2 + \
+        (customer1['coordinates']['y'] - customer2['coordinates']['y'])**2)**0.5
 
 
 def text2json(customize=False):
-    def __distance(customer1, customer2):
-        return ((customer1['coordinates']['x'] - customer2['coordinates']['x'])**2 + (customer1['coordinates']['y'] - customer2['coordinates']['y'])**2)**0.5
+    '''gavrptw.uitls.text2json(customize=False)'''
     if customize:
-        textDataDir = os.path.join(BASE_DIR, 'data', 'text_customize')
-        jsonDataDir = os.path.join(BASE_DIR, 'data', 'json_customize')
+        text_data_dir = os.path.join(BASE_DIR, 'data', 'text_customize')
+        json_data_dir = os.path.join(BASE_DIR, 'data', 'json_customize')
     else:
-        textDataDir = os.path.join(BASE_DIR, 'data', 'text')
-        jsonDataDir = os.path.join(BASE_DIR, 'data', 'json')
-    for textFile in map(lambda textFilename: os.path.join(textDataDir, textFilename), fnmatch.filter(os.listdir(textDataDir), '*.txt')):
-        jsonData = {}
-        with open(textFile) as f:
-            for lineNum, line in enumerate(f, start=1):
-                if lineNum in [2, 3, 4, 6, 7, 8, 9]:
+        text_data_dir = os.path.join(BASE_DIR, 'data', 'text')
+        json_data_dir = os.path.join(BASE_DIR, 'data', 'json')
+    for text_file in map(lambda text_filename: os.path.join(text_data_dir, text_filename), \
+        fnmatch.filter(os.listdir(text_data_dir), '*.txt')):
+        json_data = {}
+        with io.open(text_file, 'rt', newline='') as file_object:
+            for line_count, line in enumerate(file_object, start=1):
+                if line_count in [2, 3, 4, 6, 7, 8, 9]:
                     pass
-                elif lineNum == 1:
+                elif line_count == 1:
                     # <Instance name>
-                    jsonData['instance_name'] = line.strip()
-                elif lineNum == 5:
+                    json_data['instance_name'] = line.strip()
+                elif line_count == 5:
                     # <Maximum vehicle number>, <Vehicle capacity>
                     values = line.strip().split()
-                    jsonData['max_vehicle_number'] = int(values[0])
-                    jsonData['vehicle_capacity'] = float(values[1])
-                elif lineNum == 10:
+                    json_data['max_vehicle_number'] = int(values[0])
+                    json_data['vehicle_capacity'] = float(values[1])
+                elif line_count == 10:
                     # Custom number = 0, deport
-                    # <Custom number>, <X coordinate>, <Y coordinate>, <Demand>, <Ready time>, <Due date>, <Service time>
+                    # <Custom number>, <X coordinate>, <Y coordinate>,
+                    # ... <Demand>, <Ready time>, <Due date>, <Service time>
                     values = line.strip().split()
-                    jsonData['deport'] = {
+                    json_data['deport'] = {
                         'coordinates': {
                             'x': float(values[1]),
                             'y': float(values[2]),
@@ -78,9 +99,10 @@ def text2json(customize=False):
                         'service_time': float(values[6]),
                     }
                 else:
-                    # <Custom number>, <X coordinate>, <Y coordinate>, <Demand>, <Ready time>, <Due date>, <Service time>
+                    # <Custom number>, <X coordinate>, <Y coordinate>,
+                    # ... <Demand>, <Ready time>, <Due date>, <Service time>
                     values = line.strip().split()
-                    jsonData['customer_%s' % values[0]] = {
+                    json_data['customer_{}'.format(values[0])] = {
                         'coordinates': {
                             'x': float(values[1]),
                             'y': float(values[2]),
@@ -90,11 +112,12 @@ def text2json(customize=False):
                         'due_time': float(values[5]),
                         'service_time': float(values[6]),
                     }
-        customers = ['deport'] + ['customer_%d' % x for x in range(1, 101)]
-        jsonData['distance_matrix'] = [[__distance(jsonData[customer1], jsonData[customer2]) for customer1 in customers] for customer2 in customers]
-        jsonFilename = '%s.json' % jsonData['instance_name']
-        jsonPathname = os.path.join(jsonDataDir, jsonFilename)
-        print('Write to file: %s' % jsonPathname)
-        makeDirsForFile(pathname=jsonPathname)
-        with open(jsonPathname, 'w') as f:
-            dump(jsonData, f, sort_keys=True, indent=4, separators=(',', ': '))
+        customers = ['deport'] + ['customer_{}'.format(x) for x in range(1, 101)]
+        json_data['distance_matrix'] = [[calculate_distance(json_data[customer1], json_data[customer2]) \
+            for customer1 in customers] for customer2 in customers]
+        json_file_name = '{}.json'.format(json_data['instance_name'])
+        json_file = os.path.join(json_data_dir, json_file_name)
+        print('Write to file: {}'.format(json_file))
+        make_dirs_for_file(path=json_file)
+        with io.open(json_file, 'wt', newline='') as file_object:
+            dump(json_data, file_object, sort_keys=True, indent=4, separators=(',', ': '))

@@ -1,40 +1,42 @@
 # -*- coding: utf-8 -*-
-# sample_R101.py
+
+'''sample_R101.py'''
 
 import random
-from gavrptw.core import gaVRPTW
+from gavrptw.core import run_gavrptw
 
 
 def main():
+    '''main()'''
     random.seed(64)
 
-    instName = 'R101'
+    instance_name = 'R101'
 
-    unitCost = 8.0
-    initCost = 60.0
-    waitCost = 0.5
-    delayCost = 1.5
+    unit_cost = 8.0
+    init_cost = 60.0
+    wait_cost = 0.5
+    delay_cost = 1.5
 
-    indSize = 25
-    popSize = 80
-    cxPb = 0.85
-    mutPb = 0.01
-    NGen = 100
+    ind_size = 25
+    pop_size = 80
+    cx_pb = 0.85
+    mut_pb = 0.01
+    n_gen = 100
 
-    exportCSV = True
+    export_csv = True
 
-    gaVRPTW(
-        instName=instName,
-        unitCost=unitCost,
-        initCost=initCost,
-        waitCost=waitCost,
-        delayCost=delayCost,
-        indSize=indSize,
-        popSize=popSize,
-        cxPb=cxPb,
-        mutPb=mutPb,
-        NGen=NGen,
-        exportCSV=exportCSV
+    run_gavrptw(
+        instance_name=instance_name,
+        unit_cost=unit_cost,
+        init_cost=init_cost,
+        wait_cost=wait_cost,
+        delay_cost=delay_cost,
+        ind_size=ind_size,
+        pop_size=pop_size,
+        cx_pb=cx_pb,
+        mut_pb=mut_pb,
+        n_gen=n_gen,
+        export_csv=export_csv
     )
 
 

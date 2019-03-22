@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)][repository]
-[![Python](https://img.shields.io/badge/python-2.7%2F3.5%2B-blue.svg)][python]
+[![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
 [![Watchers](https://img.shields.io/github/watchers/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
 [![Stargazers](https://img.shields.io/github/stars/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Star)][star]
@@ -68,7 +68,7 @@ Of course, tuning improvements of this algorithm and forks are always welcome.
 ## Installation
 ### Requirements
 - [macOS][macos] (Recommended)
-- [Python 2.7/3.5+][python]
+- [Python 3.6+][python]
 - [Pip][pip]
 - [Virtualenv][virtualenv]
 
@@ -78,7 +78,7 @@ On Unix, Linux, BSD, macOS, and Cygwin:
 ```sh
 git clone https://github.com/iRB-Lab/py-ga-VRPTW.git
 cd py-ga-VRPTW
-virtualenv venv
+virtualenv --python=python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -194,7 +194,7 @@ Below is a description of the format of the JSON file that defines each problem 
 **Remarks:**
 
 1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
-2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<jsonData>['distance_matrix'][1][2]`, where `<jsonData>` denotes the name of a Python `dict` object.
+2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<json_data>['distance_matrix'][1][2]`, where `<json_data>` denotes the name of a Python `dict` object.
 
 #### Use Customized Instance Data
 You can customize your own problem instances.
@@ -210,7 +210,8 @@ Run the `text2json.py` script to convert `*.txt` file to `*.json` file.
 
 ```python
 # -*- coding: utf-8 -*-
-# text2json_customize.py
+
+'''text2json_customize.py'''
 
 from gavrptw.utils import text2json
 
@@ -224,7 +225,7 @@ if __name__ == '__main__':
 ```
 
 ##### GA Set-up
-The `customizeData` flag of the `gaVRPTW()` method should be set to `True`. For further understanding, please refer to the sample codes section at the end of this document.
+The `customize_data` flag of the `run_gavrptw()` method should be set to `True`. For further understanding, please refer to the sample codes section at the end of this document.
 
 ## GA Implementation
 ### Individual (Chromosome)
@@ -266,45 +267,46 @@ decodes `individual` to `route` representation. To show the difference between a
 ```python
 def ind2route(individual, instance):
     route = []
-    vehicleCapacity = instance['vehicle_capacity']
-    deportDueTime =  instance['deport']['due_time']
+    vehicle_capacity = instance['vehicle_capacity']
+    deport_due_time = instance['deport']['due_time']
     # Initialize a sub-route
-    subRoute = []
-    vehicleLoad = 0
-    elapsedTime = 0
-    lastCustomerID = 0
-    for customerID in individual:
+    sub_route = []
+    vehicle_load = 0
+    elapsed_time = 0
+    last_customer_id = 0
+    for customer_id in individual:
         # Update vehicle load
-        demand = instance['customer_%d' % customerID]['demand']
-        updatedVehicleLoad = vehicleLoad + demand
+        demand = instance['customer_{}'.format(customer_id)]['demand']
+        updated_vehicle_load = vehicle_load + demand
         # Update elapsed time
-        serviceTime = instance['customer_%d' % customerID]['service_time']
-        returnTime = instance['distance_matrix'][customerID][0]
-        updatedElapsedTime = elapsedTime + instance['distance_matrix'][lastCustomerID][customerID] + serviceTime + returnTime
+        service_time = instance['customer_{}'.format(customer_id)]['service_time']
+        return_time = instance['distance_matrix'][customer_id][0]
+        updated_elapsed_time = elapsed_time + \
+            instance['distance_matrix'][last_customer_id][customer_id] + service_time + return_time
         # Validate vehicle load and elapsed time
-        if (updatedVehicleLoad <= vehicleCapacity) and (updatedElapsedTime <= deportDueTime):
+        if (updated_vehicle_load <= vehicle_capacity) and (updated_elapsed_time <= deport_due_time):
             # Add to current sub-route
-            subRoute.append(customerID)
-            vehicleLoad = updatedVehicleLoad
-            elapsedTime = updatedElapsedTime - returnTime
+            sub_route.append(customer_id)
+            vehicle_load = updated_vehicle_load
+            elapsed_time = updated_elapsed_time - return_time
         else:
             # Save current sub-route
-            route.append(subRoute)
+            route.append(sub_route)
             # Initialize a new sub-route and add to it
-            subRoute = [customerID]
-            vehicleLoad = demand
-            elapsedTime = instance['distance_matrix'][0][customerID] + serviceTime
+            sub_route = [customer_id]
+            vehicle_load = demand
+            elapsed_time = instance['distance_matrix'][0][customer_id] + service_time
         # Update last customer ID
-        lastCustomerID = customerID
-    if subRoute != []:
+        last_customer_id = customer_id
+    if sub_route != []:
         # Save current sub-route before return if not empty
-        route.append(subRoute)
+        route.append(sub_route)
     return route
 ```
 
 #### Print Route
 ```python
-printRoute(route, merge=False)
+print_route(route, merge=False)
 ```
 
 prints sub-routes information to screen.
@@ -321,27 +323,26 @@ prints sub-routes information to screen.
 **Definition:**
 
 ```python
-def printRoute(route, merge=False):
-    routeStr = '0'
-    subRouteCount = 0
-    for subRoute in route:
-        subRouteCount += 1
-        subRouteStr = '0'
-        for customerID in subRoute:
-            subRouteStr = subRouteStr + ' - ' + str(customerID)
-            routeStr = routeStr + ' - ' + str(customerID)
-        subRouteStr = subRouteStr + ' - 0'
+def print_route(route, merge=False):
+    route_str = '0'
+    sub_route_count = 0
+    for sub_route in route:
+        sub_route_count += 1
+        sub_route_str = '0'
+        for customer_id in sub_route:
+            sub_route_str = sub_route_str + ' - ' + str(customer_id)
+            route_str = route_str + ' - ' + str(customer_id)
+        sub_route_str = sub_route_str + ' - 0'
         if not merge:
-            print('  Vehicle %d\'s route: %s' % (subRouteCount, subRouteStr))
-        routeStr = routeStr + ' - 0'
+            print('  Vehicle {}\'s route: {}'.format(sub_route_count, sub_route_str))
+        route_str = route_str + ' - 0'
     if merge:
-        print(routeStr)
-    return
+        print(route_str)
 ```
 
 ### Evaluation
 ```python
-evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0)
+eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, delay_cost=0)
 ```
 
 takes one individual as argument and returns its fitness as a Python `tuple` object.
@@ -350,10 +351,10 @@ takes one individual as argument and returns its fitness as a Python `tuple` obj
 
 - `individual` - An individual to be evaluated.
 - `instance` - A problem instance `dict` object, which can be loaded from a JSON format file.
-- `unitCost` - The transportation cost of one vehicle for a unit distance.
-- `initCost` - The start-up cost of a vehicle.
-- `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
-- `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
+- `unit_cost` - The transportation cost of one vehicle for a unit distance.
+- `init_cost` - The start-up cost of a vehicle.
+- `wait_cost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
+- `delay_cost` - Cost per unit time if the vehicle arrives later than the due time.
 
 **Returns:**
 
@@ -362,38 +363,42 @@ takes one individual as argument and returns its fitness as a Python `tuple` obj
 **Definition:**
 
 ```python
-def evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0):
-    totalCost = 0
+def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, delay_cost=0):
+    total_cost = 0
     route = ind2route(individual, instance)
-    totalCost = 0
-    for subRoute in route:
-        subRouteTimeCost = 0
-        subRouteDistance = 0
-        elapsedTime = 0
-        lastCustomerID = 0
-        for customerID in subRoute:
+    total_cost = 0
+    for sub_route in route:
+        sub_route_time_cost = 0
+        sub_route_distance = 0
+        elapsed_time = 0
+        last_customer_id = 0
+        for customer_id in sub_route:
             # Calculate section distance
-            distance = instance['distance_matrix'][lastCustomerID][customerID]
+            distance = instance['distance_matrix'][last_customer_id][customer_id]
             # Update sub-route distance
-            subRouteDistance = subRouteDistance + distance
+            sub_route_distance = sub_route_distance + distance
             # Calculate time cost
-            arrivalTime = elapsedTime + distance
-            timeCost = waitCost * max(instance['customer_%d' % customerID]['ready_time'] - arrivalTime, 0) + delayCost * max(arrivalTime - instance['customer_%d' % customerID]['due_time'], 0)
+            arrival_time = elapsed_time + distance
+            time_cost = wait_cost * \
+                max(instance['customer_{}'.format(customer_id)]['ready_time'] - arrival_time, 0) + \
+                delay_cost * \
+                max(arrival_time - instance['customer_{}'.format(customer_id)]['due_time'], 0)
             # Update sub-route time cost
-            subRouteTimeCost = subRouteTimeCost + timeCost
+            sub_route_time_cost = sub_route_time_cost + time_cost
             # Update elapsed time
-            elapsedTime = arrivalTime + instance['customer_%d' % customerID]['service_time']
+            elapsed_time = arrival_time + \
+                instance['customer_{}'.format(customer_id)]['service_time']
             # Update last customer ID
-            lastCustomerID = customerID
+            last_customer_id = customer_id
         # Calculate transport cost
-        subRouteDistance = subRouteDistance + instance['distance_matrix'][lastCustomerID][0]
-        subRouteTranCost = initCost + unitCost * subRouteDistance
+        sub_route_distance = sub_route_distance + instance['distance_matrix'][last_customer_id][0]
+        sub_route_transport_cost = init_cost + unit_cost * sub_route_distance
         # Obtain sub-route cost
-        subRouteCost = subRouteTimeCost + subRouteTranCost
+        sub_route_cost = sub_route_time_cost + sub_route_transport_cost
         # Update total cost
-        totalCost = totalCost + subRouteCost
-    fitness = 1.0 / totalCost
-    return fitness,
+        total_cost = total_cost + sub_route_cost
+    fitness = 1.0 / total_cost
+    return (fitness, )
 ```
 
 ### Selection: Roulette Wheel Selection
@@ -432,7 +437,7 @@ def selRoulette(individuals, k):
 
 ### Crossover: Partially Matched Crossover
 ```python
-cxPartialyMatched(ind1, ind2)
+cx_partialy_matched(ind1, ind2)
 ```
 
 executes a partially matched crossover (PMX) on the input individuals. The two individuals are modified in place. This crossover expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
@@ -449,25 +454,25 @@ executes a partially matched crossover (PMX) on the input individuals. The two i
 **Definition:**
 
 ```python
-def cxPartialyMatched(ind1, ind2):
+def cx_partialy_matched(ind1, ind2):
     size = min(len(ind1), len(ind2))
     cxpoint1, cxpoint2 = sorted(random.sample(range(size), 2))
     temp1 = ind1[cxpoint1:cxpoint2+1] + ind2
     temp2 = ind1[cxpoint1:cxpoint2+1] + ind1
     ind1 = []
-    for x in temp1:
-        if x not in ind1:
-            ind1.append(x)
+    for gene in temp1:
+        if gene not in ind1:
+            ind1.append(gene)
     ind2 = []
-    for x in temp2:
-        if x not in ind2:
-            ind2.append(x)
+    for gene in temp2:
+        if gene not in ind2:
+            ind2.append(gene)
     return ind1, ind2
 ```
 
 ### Mutation: Inverse Operation
 ```python
-mutInverseIndexes(individual)
+mut_inverse_indexes(individual)
 ```
 
 inverses the attributes between two random points of the input individual and return the mutant. This mutation expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
@@ -483,27 +488,27 @@ inverses the attributes between two random points of the input individual and re
 **Definition:**
 
 ```python
-def mutInverseIndexes(individual):
+def mut_inverse_indexes(individual):
     start, stop = sorted(random.sample(range(len(individual)), 2))
     individual = individual[:start] + individual[stop:start-1:-1] + individual[stop+1:]
-    return individual,
+    return (individual, )
 ```
 
 ### Algorithm
 ```python
-gaVRPTW(
-    instName,
-    unitCost,
-    initCost,
-    waitCost,
-    delayCost,
-    indSize,
-    popSize,
-    cxPb,
-    mutPb,
-    NGen,
-    exportCSV=False,
-    customizeData=False
+run_gavrptw(
+    instance_name,
+    unit_cost,
+    init_cost,
+    wait_cost,
+    delay_cost,
+    ind_size,
+    pop_size,
+    cx_pb,
+    mut_pb,
+    n_gen,
+    export_csv=False,
+    customize_data=False
 )
 ```
 
@@ -511,18 +516,18 @@ implements a genetic algorithm-based solution to vehicle routing problem with ti
 
 **Parameters:**
 
-- `instName` - A problem instance name provided in Solomon's VRPTW benchmark problems.
-- `unitCost` - The transportation cost of one vehicle for a unit distance.
-- `initCost` - The start-up cost of a vehicle.
-- `waitCost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
-- `delayCost` - Cost per unit time if the vehicle arrives later than the due time.
-- `indSize` - Size of an individual.
-- `popSize` - Size of a population.
-- `cxPb` - Probability of crossover.
-- `mutPb` - Probability of mutation.
-- `NGen` - Maximum number of generations to terminate evolution.
-- `exportCSV` - If `True`, a CSV format log file will be exported to the `results\` directory.
-- `customizeData` - If `Ture`, customized JSON format problem instance file will be loaded from `data\json_customized\` directory.
+- `instance_name` - A problem instance name provided in Solomon's VRPTW benchmark problems.
+- `unit_cost` - The transportation cost of one vehicle for a unit distance.
+- `init_cost` - The start-up cost of a vehicle.
+- `wait_cost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
+- `delay_cost` - Cost per unit time if the vehicle arrives later than the due time.
+- `ind_size` - Size of an individual.
+- `pop_size` - Size of a population.
+- `cx_pb` - Probability of crossover.
+- `mut_pb` - Probability of mutation.
+- `n_gen` - Maximum number of generations to terminate evolution.
+- `export_csv` - If `True`, a CSV format log file will be exported to the `results\` directory.
+- `customize_data` - If `Ture`, customized JSON format problem instance file will be loaded from `data\json_customized\` directory.
 
 **Returns:**
 
@@ -531,59 +536,69 @@ implements a genetic algorithm-based solution to vehicle routing problem with ti
 **Definition:**
 
 ```python
-def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen, exportCSV=False, customizeData=False):
-    if customizeData:
-        jsonDataDir = os.path.join(BASE_DIR,'data', 'json_customize')
+def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size, pop_size, \
+            cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False):
+    if customize_data:
+        json_data_dir = os.path.join(BASE_DIR, 'data', 'json_customize')
     else:
-        jsonDataDir = os.path.join(BASE_DIR,'data', 'json')
-    jsonFile = os.path.join(jsonDataDir, '%s.json' % instName)
-    with open(jsonFile) as f:
-        instance = load(f)
+        json_data_dir = os.path.join(BASE_DIR, 'data', 'json')
+    json_file = os.path.join(json_data_dir, '{}.json'.format(instance_name))
+    instance = load_instance(json_file=json_file)
+    if instance is None:
+        return
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
     creator.create('Individual', list, fitness=creator.FitnessMax)
     toolbox = base.Toolbox()
     # Attribute generator
-    toolbox.register('indexes', random.sample, range(1, indSize + 1), indSize)
+    toolbox.register('indexes', random.sample, range(1, ind_size + 1), ind_size)
     # Structure initializers
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
     # Operator registering
-    toolbox.register('evaluate', evalVRPTW, instance=instance, unitCost=unitCost, initCost=initCost, waitCost=waitCost, delayCost=delayCost)
+    toolbox.register(
+        'evaluate',
+        eval_vrptw,
+        instance=instance,
+        unit_cost=unit_cost,
+        init_cost=init_cost,
+        wait_cost=wait_cost,
+        delay_cost=delay_cost
+    )
     toolbox.register('select', tools.selRoulette)
-    toolbox.register('mate', cxPartialyMatched)
-    toolbox.register('mutate', mutInverseIndexes)
-    pop = toolbox.population(n=popSize)
+    toolbox.register('mate', cx_partialy_matched)
+    toolbox.register('mutate', mut_inverse_indexes)
+    pop = toolbox.population(n=pop_size)
     # Results holders for exporting results to CSV file
-    csvData = []
+    csv_data = []
     print('Start of evolution')
     # Evaluate the entire population
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
-    print('  Evaluated %d individuals' % len(pop))
+    print('  Evaluated {} individuals'.format(len(pop)))
     # Begin the evolution
-    for g in range(NGen):
-        print('-- Generation %d --' % g)
+    for gen in range(n_gen):
+        print('-- Generation {} --'.format(gen))
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
         offspring = list(map(toolbox.clone, offspring))
         # Apply crossover and mutation on the offspring
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            if random.random() < cxPb:
+            if random.random() < cx_pb:
                 toolbox.mate(child1, child2)
                 del child1.fitness.values
                 del child2.fitness.values
         for mutant in offspring:
-            if random.random() < mutPb:
+            if random.random() < mut_pb:
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
         # Evaluate the individuals with an invalid fitness
-        invalidInd = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = map(toolbox.evaluate, invalidInd)
-        for ind, fit in zip(invalidInd, fitnesses):
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
-        print('  Evaluated %d individuals' % len(invalidInd))
+        print('  Evaluated {} individuals'.format(len(invalid_ind)))
         # The population is entirely replaced by the offspring
         pop[:] = offspring
         # Gather all the fitnesses in one list and print the stats
@@ -592,81 +607,100 @@ def gaVRPTW(instName, unitCost, initCost, waitCost, delayCost, indSize, popSize,
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)
         std = abs(sum2 / length - mean**2)**0.5
-        print('  Min %s' % min(fits))
-        print('  Max %s' % max(fits))
-        print('  Avg %s' % mean)
-        print('  Std %s' % std)
+        print('  Min {}'.format(min(fits)))
+        print('  Max {}'.format(max(fits)))
+        print('  Avg {}'.format(mean))
+        print('  Std {}'.format(std))
         # Write data to holders for exporting results to CSV file
-        if exportCSV:
-            csvRow = {
-                'generation': g,
-                'evaluated_individuals': len(invalidInd),
+        if export_csv:
+            csv_row = {
+                'generation': gen,
+                'evaluated_individuals': len(invalid_ind),
                 'min_fitness': min(fits),
                 'max_fitness': max(fits),
                 'avg_fitness': mean,
                 'std_fitness': std,
             }
-            csvData.append(csvRow)
+            csv_data.append(csv_row)
     print('-- End of (successful) evolution --')
-    bestInd = tools.selBest(pop, 1)[0]
-    print('Best individual: %s' % bestInd))
-    print('Fitness: %s' % bestInd.fitness.values[0])
-    printRoute(ind2route(bestInd, instance))
-    print('Total cost: %s' % (1 / bestInd.fitness.values[0]))
-    if exportCSV:
-        csvFilename = '%s_uC%s_iC%s_wC%s_dC%s_iS%s_pS%s_cP%s_mP%s_nG%s.csv' % (instName, unitCost, initCost, waitCost, delayCost, indSize, popSize, cxPb, mutPb, NGen)
-        csvPathname = os.path.join(BASE_DIR, 'results', csvFilename)
-        print('Write to file: %s' % csvPathname)
-        makeDirsForFile(pathname=csvPathname)
-        if not exist(pathname=csvPathname, overwrite=True):
-            with open(csvPathname, 'w') as f:
-                fieldnames = ['generation', 'evaluated_individuals', 'min_fitness', 'max_fitness', 'avg_fitness', 'std_fitness']
-                writer = DictWriter(f, fieldnames=fieldnames, dialect='excel')
+    best_ind = tools.selBest(pop, 1)[0]
+    print('Best individual: {}'.format(best_ind))
+    print('Fitness: {}'.format(best_ind.fitness.values[0]))
+    print_route(ind2route(best_ind, instance))
+    print('Total cost: {}'.format(1 / best_ind.fitness.values[0]))
+    if export_csv:
+        csv_file_name = '{}_uC{}_iC{}_wC{}_dC{}_iS{}_pS{}_cP{}_mP{}_nG{}.csv'.format(
+            instance_name,
+            unit_cost,
+            init_cost,
+            wait_cost,
+            delay_cost,
+            ind_size,
+            pop_size,
+            cx_pb,
+            mut_pb,
+            n_gen
+        )
+        csv_file = os.path.join(BASE_DIR, 'results', csv_file_name)
+        print('Write to file: {}'.format(csv_file))
+        make_dirs_for_file(path=csv_file)
+        if not exist(path=csv_file, overwrite=True):
+            with io.open(csv_file, 'wt', newline='') as file_object:
+                fieldnames = [
+                    'generation',
+                    'evaluated_individuals',
+                    'min_fitness',
+                    'max_fitness',
+                    'avg_fitness',
+                    'std_fitness',
+                ]
+                writer = DictWriter(file_object, fieldnames=fieldnames, dialect='excel')
                 writer.writeheader()
-                for csvRow in csvData:
-                    writer.writerow(csvRow)
+                for csv_row in csv_data:
+                    writer.writerow(csv_row)
 ```
 
 ### Sample Codes
 #### Instance: R101
 ```python
 # -*- coding: utf-8 -*-
-# sample_R101.py
+
+'''sample_R101.py'''
 
 import random
-from gavrptw.core import gaVRPTW
+from gavrptw.core import run_gavrptw
 
 
 def main():
     random.seed(64)
 
-    instName = 'R101'
+    instance_name = 'R101'
 
-    unitCost = 8.0
-    initCost = 60.0
-    waitCost = 0.5
-    delayCost = 1.5
+    unit_cost = 8.0
+    init_cost = 60.0
+    wait_cost = 0.5
+    delay_cost = 1.5
 
-    indSize = 25
-    popSize = 80
-    cxPb = 0.85
-    mutPb = 0.01
-    NGen = 100
+    ind_size = 25
+    pop_size = 80
+    cx_pb = 0.85
+    mut_pb = 0.01
+    n_gen = 100
 
-    exportCSV = True
+    export_csv = True
 
-    gaVRPTW(
-        instName=instName,
-        unitCost=unitCost,
-        initCost=initCost,
-        waitCost=waitCost,
-        delayCost=delayCost,
-        indSize=indSize,
-        popSize=popSize,
-        cxPb=cxPb,
-        mutPb=mutPb,
-        NGen=NGen,
-        exportCSV=exportCSV
+    run_gavrptw(
+        instance_name=instance_name,
+        unit_cost=unit_cost,
+        init_cost=init_cost,
+        wait_cost=wait_cost,
+        delay_cost=delay_cost,
+        ind_size=ind_size,
+        pop_size=pop_size,
+        cx_pb=cx_pb,
+        mut_pb=mut_pb,
+        n_gen=n_gen,
+        export_csv=export_csv
     )
 
 
@@ -677,42 +711,43 @@ if __name__ == '__main__':
 #### Instance: C204
 ```python
 # -*- coding: utf-8 -*-
-# sample_C204.py
+
+'''sample_C204.py'''
 
 import random
-from gavrptw.core import gaVRPTW
+from gavrptw.core import run_gavrptw
 
 
 def main():
     random.seed(64)
 
-    instName = 'C204'
+    instance_name = 'C204'
 
-    unitCost = 8.0
-    initCost = 100.0
-    waitCost = 1.0
-    delayCost = 1.5
+    unit_cost = 8.0
+    init_cost = 100.0
+    wait_cost = 1.0
+    delay_cost = 1.5
 
-    indSize = 100
-    popSize = 400
-    cxPb = 0.85
-    mutPb = 0.02
-    NGen = 300
+    ind_size = 100
+    pop_size = 400
+    cx_pb = 0.85
+    mut_pb = 0.02
+    n_gen = 300
 
-    exportCSV = True
+    export_csv = True
 
-    gaVRPTW(
-        instName=instName,
-        unitCost=unitCost,
-        initCost=initCost,
-        waitCost=waitCost,
-        delayCost=delayCost,
-        indSize=indSize,
-        popSize=popSize,
-        cxPb=cxPb,
-        mutPb=mutPb,
-        NGen=NGen,
-        exportCSV=exportCSV
+    run_gavrptw(
+        instance_name=instance_name,
+        unit_cost=unit_cost,
+        init_cost=init_cost,
+        wait_cost=wait_cost,
+        delay_cost=delay_cost,
+        ind_size=ind_size,
+        pop_size=pop_size,
+        cx_pb=cx_pb,
+        mut_pb=mut_pb,
+        n_gen=n_gen,
+        export_csv=export_csv
     )
 
 
@@ -723,44 +758,45 @@ if __name__ == '__main__':
 #### Customized Instance
 ```python
 # -*- coding: utf-8 -*-
-# sample_Customized_Data.py
+
+'''sample_customized_data.py'''
 
 import random
-from gavrptw.core import gaVRPTW
+from gavrptw.core import run_gavrptw
 
 
 def main():
     random.seed(64)
 
-    instName = 'Customized_Data'
+    instance_name = 'Customized_Data'
 
-    unitCost = 8.0
-    initCost = 100.0
-    waitCost = 1.0
-    delayCost = 1.5
+    unit_cost = 8.0
+    init_cost = 100.0
+    wait_cost = 1.0
+    delay_cost = 1.5
 
-    indSize = 100
-    popSize = 400
-    cxPb = 0.85
-    mutPb = 0.02
-    NGen = 300
+    ind_size = 100
+    pop_size = 400
+    cx_pb = 0.85
+    mut_pb = 0.02
+    n_gen = 300
 
-    exportCSV = True
-    customizeData = True
+    export_csv = True
+    customize_data = True
 
-    gaVRPTW(
-        instName=instName,
-        unitCost=unitCost,
-        initCost=initCost,
-        waitCost=waitCost,
-        delayCost=delayCost,
-        indSize=indSize,
-        popSize=popSize,
-        cxPb=cxPb,
-        mutPb=mutPb,
-        NGen=NGen,
-        exportCSV=exportCSV,
-        customizeData=customizeData
+    run_gavrptw(
+        instance_name=instance_name,
+        unit_cost=unit_cost,
+        init_cost=init_cost,
+        wait_cost=wait_cost,
+        delay_cost=delay_cost,
+        ind_size=ind_size,
+        pop_size=pop_size,
+        cx_pb=cx_pb,
+        mut_pb=mut_pb,
+        n_gen=n_gen,
+        export_csv=export_csv,
+        customize_data=customize_data
     )
 
 
@@ -769,27 +805,27 @@ if __name__ == '__main__':
 ```
 
 #### View Logs
-The sample codes will print logs on the screen. Meanwhile, a **CSV format** log file will be saved in the `results\` directory after running each sample code, which can be canceled by setting the `exportCSV` flag to `False`, i.e.,
+The sample codes will print logs on the screen. Meanwhile, a **CSV format** log file will be saved in the `results\` directory after running each sample code, which can be canceled by setting the `export_csv` flag to `False`, i.e.,
 
 ```python
 # -*- coding: utf-8 -*-
 # sample_R101.py
 
     ...
-    exportCSV = False
+    export_csv = False
 
-    gaVRPTW(
-        instName=instName,
-        unitCost=unitCost,
-        initCost=initCost,
-        waitCost=waitCost,
-        delayCost=delayCost,
-        indSize=indSize,
-        popSize=popSize,
-        cxPb=cxPb,
-        mutPb=mutPb,
-        NGen=NGen,
-        exportCSV=exportCSV
+    run_gavrptw(
+        instance_name=instance_name,
+        unit_cost=unit_cost,
+        init_cost=init_cost,
+        wait_cost=wait_cost,
+        delay_cost=delay_cost,
+        ind_size=ind_size,
+        pop_size=pop_size,
+        cx_pb=cx_pb,
+        mut_pb=mut_pb,
+        n_gen=n_gen,
+        export_csv=export_csv
     )
     ...
 ```
@@ -807,40 +843,43 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 route = ind2route(individual, instance)
 ```
 ```python
-printRoute(route, merge=False)
+print_route(route, merge=False)
 ```
 ```python
-evalVRPTW(individual, instance, unitCost=1.0, initCost=0, waitCost=0, delayCost=0)
+eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, delay_cost=0)
 ```
 ```python
-ind1, ind2 = cxPartialyMatched(ind1, ind2)
+ind1, ind2 = cx_partialy_matched(ind1, ind2)
 ```
 ```python
-individual, = mutInverseIndexes(individual)
+individual, = mut_inverse_indexes(individual)
 ```
 ```python
-gaVRPTW(
-    instName,
-    unitCost,
-    initCost,
-    waitCost,
-    delayCost,
-    indSize,
-    popSize,
-    cxPb,
-    mutPb,
-    NGen,
-    exportCSV=False,
-    customizeData=False
+run_gavrptw(
+    instance_name,
+    unit_cost,
+    init_cost,
+    wait_cost,
+    delay_cost,
+    ind_size,
+    pop_size,
+    cx_pb,
+    mut_pb,
+    n_gen,
+    export_csv=False,
+    customize_data=False
 )
 ```
 
 ### Module: `gavrptw.utils`
 ```python
-makeDirsForFile(pathname)
+make_dirs_for_file(path)
 ```
 ```python
-exist(pathname, overwrite=False, displayInfo=True)
+exist(path, overwrite=False, display_info=True)
+```
+```python
+load_instance(json_file)
 ```
 ```python
 text2json(customize=False)
@@ -871,7 +910,7 @@ text2json(customize=False)
 ├── text2json_customize.py
 ├── sample_R101.py
 ├── sample_C204.py
-├── sample_Customized_Data.py
+├── sample_customized_data.py
 ├── requirements.txt
 ├── README.md
 ├── LICENSE
