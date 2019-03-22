@@ -1,9 +1,6 @@
-[![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW.svg)][commit]
 [![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
-[![Watchers](https://img.shields.io/github/watchers/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Watch)][watch]
-[![Stargazers](https://img.shields.io/github/stars/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Star)][star]
-[![Forks](https://img.shields.io/github/forks/iRB-Lab/py-ga-VRPTW.svg?style=social&label=Fork)][fork]
+[![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW.svg)][commit]
 
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
@@ -933,11 +930,8 @@ text2json(customize=False)
 [MIT License][license]
 
 [repository]: https://github.com/iRB-Lab/py-ga-VRPTW "iRB-Lab/py-ga-VRPTW"
-[commit]: https://github.com/iRB-Lab/py-ga-VRPTW/commits/master "Last Commit"
 [license]: https://github.com/iRB-Lab/py-ga-VRPTW/blob/master/LICENSE "License"
-[watch]: https://github.com/iRB-Lab/py-ga-VRPTW/watchers "Watchers"
-[star]: https://github.com/iRB-Lab/py-ga-VRPTW/stargazers "Stargazers"
-[fork]: https://github.com/iRB-Lab/py-ga-VRPTW/network "Forks"
+[commit]: https://github.com/iRB-Lab/py-ga-VRPTW/commits/master "Last Commit"
 
 [macos]: https://www.apple.com/macos/ "macOS"
 [python]: https://docs.python.org/ "Python"
