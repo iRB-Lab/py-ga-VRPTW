@@ -214,6 +214,7 @@ from gavrptw.utils import text2json
 
 
 def main():
+    '''main()'''
     text2json(customize=True)
 
 
@@ -669,6 +670,7 @@ from gavrptw.core import run_gavrptw
 
 
 def main():
+    '''main()'''
     random.seed(64)
 
     instance_name = 'R101'
@@ -716,6 +718,7 @@ from gavrptw.core import run_gavrptw
 
 
 def main():
+    '''main()'''
     random.seed(64)
 
     instance_name = 'C204'
@@ -763,6 +766,7 @@ from gavrptw.core import run_gavrptw
 
 
 def main():
+    '''main()'''
     random.seed(64)
 
     instance_name = 'Customized_Data'
