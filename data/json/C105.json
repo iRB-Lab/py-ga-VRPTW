@@ -999,7 +999,7 @@
         "ready_time": 705.0,
         "service_time": 90.0
     },
-    "deport": {
+    "depart": {
         "coordinates": {
             "x": 40.0,
             "y": 50.0

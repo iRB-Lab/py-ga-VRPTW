@@ -148,7 +148,7 @@ Below is a description of the format of the JSON file that defines each problem 
     "instance_name" : "<Instance name>",
     "max_vehicle_number" : K,
     "vehicle_capacity" : Q,
-    "deport" : {
+    "depart" : {
         "coordinates" : {
             "x" : x0,
             "y" : y0
@@ -266,7 +266,7 @@ decodes `individual` to `route` representation. To show the difference between a
 def ind2route(individual, instance):
     route = []
     vehicle_capacity = instance['vehicle_capacity']
-    deport_due_time = instance['deport']['due_time']
+    depart_due_time = instance['depart']['due_time']
     # Initialize a sub-route
     sub_route = []
     vehicle_load = 0
@@ -282,7 +282,7 @@ def ind2route(individual, instance):
         updated_elapsed_time = elapsed_time + \
             instance['distance_matrix'][last_customer_id][customer_id] + service_time + return_time
         # Validate vehicle load and elapsed time
-        if (updated_vehicle_load <= vehicle_capacity) and (updated_elapsed_time <= deport_due_time):
+        if (updated_vehicle_load <= vehicle_capacity) and (updated_elapsed_time <= depart_due_time):
             # Add to current sub-route
             sub_route.append(customer_id)
             vehicle_load = updated_vehicle_load

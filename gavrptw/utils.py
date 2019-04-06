@@ -84,11 +84,11 @@ def text2json(customize=False):
                     json_data['max_vehicle_number'] = int(values[0])
                     json_data['vehicle_capacity'] = float(values[1])
                 elif line_count == 10:
-                    # Custom number = 0, deport
+                    # Custom number = 0, depart
                     # <Custom number>, <X coordinate>, <Y coordinate>,
                     # ... <Demand>, <Ready time>, <Due date>, <Service time>
                     values = line.strip().split()
-                    json_data['deport'] = {
+                    json_data['depart'] = {
                         'coordinates': {
                             'x': float(values[1]),
                             'y': float(values[2]),
@@ -112,7 +112,7 @@ def text2json(customize=False):
                         'due_time': float(values[5]),
                         'service_time': float(values[6]),
                     }
-        customers = ['deport'] + ['customer_{}'.format(x) for x in range(1, 101)]
+        customers = ['depart'] + ['customer_{}'.format(x) for x in range(1, 101)]
         json_data['distance_matrix'] = [[calculate_distance(json_data[customer1], json_data[customer2]) \
             for customer1 in customers] for customer2 in customers]
         json_file_name = '{}.json'.format(json_data['instance_name'])
