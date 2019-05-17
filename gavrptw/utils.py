@@ -62,12 +62,8 @@ def calculate_distance(customer1, customer2):
 
 def text2json(customize=False):
     '''gavrptw.uitls.text2json(customize=False)'''
-    if customize:
-        text_data_dir = os.path.join(BASE_DIR, 'data', 'text_customize')
-        json_data_dir = os.path.join(BASE_DIR, 'data', 'json_customize')
-    else:
-        text_data_dir = os.path.join(BASE_DIR, 'data', 'text')
-        json_data_dir = os.path.join(BASE_DIR, 'data', 'json')
+    text_data_dir = os.path.join(BASE_DIR, 'data', 'text_customize' if customize else 'text')
+    json_data_dir = os.path.join(BASE_DIR, 'data', 'json_customize' if customize else 'json')
     for text_file in map(lambda text_filename: os.path.join(text_data_dir, text_filename), \
         fnmatch.filter(os.listdir(text_data_dir), '*.txt')):
         json_data = {}
