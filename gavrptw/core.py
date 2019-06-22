@@ -59,12 +59,12 @@ def print_route(route, merge=False):
         sub_route_count += 1
         sub_route_str = '0'
         for customer_id in sub_route:
-            sub_route_str = sub_route_str + ' - ' + str(customer_id)
-            route_str = route_str + ' - ' + str(customer_id)
-        sub_route_str = sub_route_str + ' - 0'
+            sub_route_str = '{} - {}'.format(sub_route_str, customer_id)
+            route_str = '{} - {}'.format(route_str, customer_id)
+        sub_route_str = '{} - 0'.format(sub_route_str)
         if not merge:
             print('  Vehicle {}\'s route: {}'.format(sub_route_count, sub_route_str))
-        route_str = route_str + ' - 0'
+        route_str = '{} - 0'.format(route_str)
     if merge:
         print(route_str)
 
