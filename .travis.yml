@@ -1,0 +1,18 @@
+language: python
+
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.8-dev"
+  - "nightly"
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - python text2json.py
+  - python sample_R101.py
+  - python sample_C204.py
+  - python text2json_customize.py
+  - python sample_customized_data.py

@@ -35,14 +35,14 @@ def exist(path, overwrite=False, display_info=True):
     if os.path.exists(path):
         if overwrite:
             if display_info:
-                print('{}: {} exists. Overwrite.'.format(guess_path_type(path), path))
+                print(f'{guess_path_type(path)}: {path} exists. Overwrite.')
             os.remove(path)
             return False
         if display_info:
-            print('{}: {} exists.'.format(guess_path_type(path), path))
+            print(f'{guess_path_type(path)}: {path} exists.')
         return True
     if display_info:
-        print('{}: {} does not exist.'.format(guess_path_type(path), path))
+        print(f'{guess_path_type(path)}: {path} does not exist.')
     return False
 
 
@@ -98,7 +98,7 @@ def text2json(customize=False):
                     # <Custom number>, <X coordinate>, <Y coordinate>,
                     # ... <Demand>, <Ready time>, <Due date>, <Service time>
                     values = line.strip().split()
-                    json_data['customer_{}'.format(values[0])] = {
+                    json_data[f'customer_{values[0]}'] = {
                         'coordinates': {
                             'x': float(values[1]),
                             'y': float(values[2]),
@@ -108,12 +108,12 @@ def text2json(customize=False):
                         'due_time': float(values[5]),
                         'service_time': float(values[6]),
                     }
-        customers = ['depart'] + ['customer_{}'.format(x) for x in range(1, 101)]
-        json_data['distance_matrix'] = [[calculate_distance(json_data[customer1], json_data[customer2]) \
-            for customer1 in customers] for customer2 in customers]
-        json_file_name = '{}.json'.format(json_data['instance_name'])
+        customers = ['depart'] + [f'customer_{x}' for x in range(1, 101)]
+        json_data['distance_matrix'] = [[calculate_distance(json_data[customer1], \
+            json_data[customer2]) for customer1 in customers] for customer2 in customers]
+        json_file_name = f"{json_data['instance_name']}.json"
         json_file = os.path.join(json_data_dir, json_file_name)
-        print('Write to file: {}'.format(json_file))
+        print(f'Write to file: {json_file}')
         make_dirs_for_file(path=json_file)
         with io.open(json_file, 'wt', newline='') as file_object:
             dump(json_data, file_object, sort_keys=True, indent=4, separators=(',', ': '))

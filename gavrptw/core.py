@@ -23,10 +23,10 @@ def ind2route(individual, instance):
     last_customer_id = 0
     for customer_id in individual:
         # Update vehicle load
-        demand = instance['customer_{}'.format(customer_id)]['demand']
+        demand = instance[f'customer_{customer_id}']['demand']
         updated_vehicle_load = vehicle_load + demand
         # Update elapsed time
-        service_time = instance['customer_{}'.format(customer_id)]['service_time']
+        service_time = instance[f'customer_{customer_id}']['service_time']
         return_time = instance['distance_matrix'][customer_id][0]
         updated_elapsed_time = elapsed_time + \
             instance['distance_matrix'][last_customer_id][customer_id] + service_time + return_time
@@ -59,12 +59,12 @@ def print_route(route, merge=False):
         sub_route_count += 1
         sub_route_str = '0'
         for customer_id in sub_route:
-            sub_route_str = '{} - {}'.format(sub_route_str, customer_id)
-            route_str = '{} - {}'.format(route_str, customer_id)
-        sub_route_str = '{} - 0'.format(sub_route_str)
+            sub_route_str = f'{sub_route_str} - {customer_id}'
+            route_str = f'{route_str} - {customer_id}'
+        sub_route_str = f'{sub_route_str} - 0'
         if not merge:
-            print('  Vehicle {}\'s route: {}'.format(sub_route_count, sub_route_str))
-        route_str = '{} - 0'.format(route_str)
+            print(f'  Vehicle {sub_route_count}\'s route: {sub_route_str}')
+        route_str = f'{route_str} - 0'
     if merge:
         print(route_str)
 
@@ -88,14 +88,14 @@ def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, de
             # Calculate time cost
             arrival_time = elapsed_time + distance
             time_cost = wait_cost * \
-                max(instance['customer_{}'.format(customer_id)]['ready_time'] - arrival_time, 0) + \
+                max(instance[f'customer_{customer_id}']['ready_time'] - arrival_time, 0) + \
                 delay_cost * \
-                max(arrival_time - instance['customer_{}'.format(customer_id)]['due_time'], 0)
+                max(arrival_time - instance[f'customer_{customer_id}']['due_time'], 0)
             # Update sub-route time cost
             sub_route_time_cost = sub_route_time_cost + time_cost
             # Update elapsed time
             elapsed_time = arrival_time + \
-                instance['customer_{}'.format(customer_id)]['service_time']
+                instance[f'customer_{customer_id}']['service_time']
             # Update last customer ID
             last_customer_id = customer_id
         # Calculate transport cost
@@ -141,7 +141,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
         json_data_dir = os.path.join(BASE_DIR, 'data', 'json_customize')
     else:
         json_data_dir = os.path.join(BASE_DIR, 'data', 'json')
-    json_file = os.path.join(json_data_dir, '{}.json'.format(instance_name))
+    json_file = os.path.join(json_data_dir, f'{instance_name}.json')
     instance = load_instance(json_file=json_file)
     if instance is None:
         return
@@ -174,10 +174,10 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
-    print('  Evaluated {} individuals'.format(len(pop)))
+    print(f'  Evaluated {len(pop)} individuals')
     # Begin the evolution
     for gen in range(n_gen):
-        print('-- Generation {} --'.format(gen))
+        print(f'-- Generation {gen} --')
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
@@ -197,7 +197,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
         fitnesses = map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
-        print('  Evaluated {} individuals'.format(len(invalid_ind)))
+        print(f'  Evaluated {len(invalid_ind)} individuals')
         # The population is entirely replaced by the offspring
         pop[:] = offspring
         # Gather all the fitnesses in one list and print the stats
@@ -206,10 +206,10 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
         mean = sum(fits) / length
         sum2 = sum(x*x for x in fits)
         std = abs(sum2 / length - mean**2)**0.5
-        print('  Min {}'.format(min(fits)))
-        print('  Max {}'.format(max(fits)))
-        print('  Avg {}'.format(mean))
-        print('  Std {}'.format(std))
+        print(f'  Min {min(fits)}')
+        print(f'  Max {max(fits)}')
+        print(f'  Avg {mean}')
+        print(f'  Std {std}')
         # Write data to holders for exporting results to CSV file
         if export_csv:
             csv_row = {
@@ -223,25 +223,15 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
             csv_data.append(csv_row)
     print('-- End of (successful) evolution --')
     best_ind = tools.selBest(pop, 1)[0]
-    print('Best individual: {}'.format(best_ind))
-    print('Fitness: {}'.format(best_ind.fitness.values[0]))
+    print(f'Best individual: {best_ind}')
+    print(f'Fitness: {best_ind.fitness.values[0]}')
     print_route(ind2route(best_ind, instance))
-    print('Total cost: {}'.format(1 / best_ind.fitness.values[0]))
+    print(f'Total cost: {1 / best_ind.fitness.values[0]}')
     if export_csv:
-        csv_file_name = '{}_uC{}_iC{}_wC{}_dC{}_iS{}_pS{}_cP{}_mP{}_nG{}.csv'.format(
-            instance_name,
-            unit_cost,
-            init_cost,
-            wait_cost,
-            delay_cost,
-            ind_size,
-            pop_size,
-            cx_pb,
-            mut_pb,
-            n_gen
-        )
+        csv_file_name = f'{instance_name}_uC{unit_cost}_iC{init_cost}_wC{wait_cost}' \
+            f'_dC{delay_cost}_iS{ind_size}_pS{pop_size}_cP{cx_pb}_mP{mut_pb}_nG{n_gen}.csv'
         csv_file = os.path.join(BASE_DIR, 'results', csv_file_name)
-        print('Write to file: {}'.format(csv_file))
+        print(f'Write to file: {csv_file}')
         make_dirs_for_file(path=csv_file)
         if not exist(path=csv_file, overwrite=True):
             with io.open(csv_file, 'wt', newline='') as file_object:
