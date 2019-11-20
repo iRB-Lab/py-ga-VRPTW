@@ -201,26 +201,13 @@ You can customize your own problem instances.
 The customized problem instance data file should be either **text file format** or **JSON format**, exactly the same as the above given examples.
 
 ##### Directory Set-up
-Customized `*.txt` files should be put under the `data\text_customize\` directory and customized `*.json` files should be put under the `data\json_customize\` directory.
+Customized `*.txt` files should be put under the `data\text_customize\` directory, and customized `*.json` files should be put under the `data\json_customize\` directory.
 
 ##### Convert `*.txt` to `*.json`
-Run the `text2json.py` script to convert `*.txt` file to `*.json` file.
+Run the `text2json_customize.py` script to convert `*.txt` file containing customized problem instance data to `*.json` file.
 
-```python
-# -*- coding: utf-8 -*-
-
-'''text2json_customize.py'''
-
-from gavrptw.utils import text2json
-
-
-def main():
-    '''main()'''
-    text2json(customize=True)
-
-
-if __name__ == '__main__':
-    main()
+```sh
+python text2json_customize.py
 ```
 
 ##### GA Set-up
@@ -495,20 +482,8 @@ def mut_inverse_indexes(individual):
 
 ### Algorithm
 ```python
-run_gavrptw(
-    instance_name,
-    unit_cost,
-    init_cost,
-    wait_cost,
-    delay_cost,
-    ind_size,
-    pop_size,
-    cx_pb,
-    mut_pb,
-    n_gen,
-    export_csv=False,
-    customize_data=False
-)
+run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size, pop_size, \
+    cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False)
 ```
 
 implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
@@ -536,7 +511,7 @@ implements a genetic algorithm-based solution to vehicle routing problem with ti
 
 ```python
 def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size, pop_size, \
-            cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False):
+    cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False):
     if customize_data:
         json_data_dir = os.path.join(BASE_DIR, 'data', 'json_customize')
     else:
@@ -554,15 +529,8 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
     # Operator registering
-    toolbox.register(
-        'evaluate',
-        eval_vrptw,
-        instance=instance,
-        unit_cost=unit_cost,
-        init_cost=init_cost,
-        wait_cost=wait_cost,
-        delay_cost=delay_cost
-    )
+    toolbox.register('evaluate', eval_vrptw, instance=instance, unit_cost=unit_cost, \
+        init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', cx_partialy_matched)
     toolbox.register('mutate', mut_inverse_indexes)
@@ -679,19 +647,10 @@ def main():
 
     export_csv = True
 
-    run_gavrptw(
-        instance_name=instance_name,
-        unit_cost=unit_cost,
-        init_cost=init_cost,
-        wait_cost=wait_cost,
-        delay_cost=delay_cost,
-        ind_size=ind_size,
-        pop_size=pop_size,
-        cx_pb=cx_pb,
-        mut_pb=mut_pb,
-        n_gen=n_gen,
-        export_csv=export_csv
-    )
+    run_gavrptw(instance_name=instance_name, \
+        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
+        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
+        export_csv=export_csv)
 
 
 if __name__ == '__main__':
@@ -727,19 +686,10 @@ def main():
 
     export_csv = True
 
-    run_gavrptw(
-        instance_name=instance_name,
-        unit_cost=unit_cost,
-        init_cost=init_cost,
-        wait_cost=wait_cost,
-        delay_cost=delay_cost,
-        ind_size=ind_size,
-        pop_size=pop_size,
-        cx_pb=cx_pb,
-        mut_pb=mut_pb,
-        n_gen=n_gen,
-        export_csv=export_csv
-    )
+    run_gavrptw(instance_name=instance_name, \
+        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
+        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
+        export_csv=export_csv)
 
 
 if __name__ == '__main__':
@@ -776,20 +726,10 @@ def main():
     export_csv = True
     customize_data = True
 
-    run_gavrptw(
-        instance_name=instance_name,
-        unit_cost=unit_cost,
-        init_cost=init_cost,
-        wait_cost=wait_cost,
-        delay_cost=delay_cost,
-        ind_size=ind_size,
-        pop_size=pop_size,
-        cx_pb=cx_pb,
-        mut_pb=mut_pb,
-        n_gen=n_gen,
-        export_csv=export_csv,
-        customize_data=customize_data
-    )
+    run_gavrptw(instance_name=instance_name, \
+        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
+        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
+        export_csv=export_csv, customize_data=customize_data)
 
 
 if __name__ == '__main__':
@@ -806,19 +746,10 @@ The sample codes will print logs on the screen. Meanwhile, a **CSV format** log 
     ...
     export_csv = False
 
-    run_gavrptw(
-        instance_name=instance_name,
-        unit_cost=unit_cost,
-        init_cost=init_cost,
-        wait_cost=wait_cost,
-        delay_cost=delay_cost,
-        ind_size=ind_size,
-        pop_size=pop_size,
-        cx_pb=cx_pb,
-        mut_pb=mut_pb,
-        n_gen=n_gen,
-        export_csv=export_csv
-    )
+    run_gavrptw(instance_name=instance_name, \
+        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
+        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
+        export_csv=export_csv)
     ...
 ```
 
@@ -847,20 +778,8 @@ ind1, ind2 = cx_partialy_matched(ind1, ind2)
 individual, = mut_inverse_indexes(individual)
 ```
 ```python
-run_gavrptw(
-    instance_name,
-    unit_cost,
-    init_cost,
-    wait_cost,
-    delay_cost,
-    ind_size,
-    pop_size,
-    cx_pb,
-    mut_pb,
-    n_gen,
-    export_csv=False,
-    customize_data=False
-)
+run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size, pop_size, \
+    cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False)
 ```
 
 ### Module: `gavrptw.utils`

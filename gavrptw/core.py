@@ -70,8 +70,8 @@ def print_route(route, merge=False):
 
 
 def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, delay_cost=0):
-    '''gavrptw.core.eval_vrptw(individual, instance,
-                                unit_cost=1.0, init_cost=0, wait_cost=0, delay_cost=0)'''
+    '''gavrptw.core.eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0,
+        delay_cost=0)'''
     total_cost = 0
     route = ind2route(individual, instance)
     total_cost = 0
@@ -134,9 +134,9 @@ def mut_inverse_indexes(individual):
 
 
 def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size, pop_size, \
-            cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False):
+    cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False):
     '''gavrptw.core.run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost,
-                ind_size, pop_size, cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False)'''
+        ind_size, pop_size, cx_pb, mut_pb, n_gen, export_csv=False, customize_data=False)'''
     if customize_data:
         json_data_dir = os.path.join(BASE_DIR, 'data', 'json_customize')
     else:
@@ -154,15 +154,8 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
     # Operator registering
-    toolbox.register(
-        'evaluate',
-        eval_vrptw,
-        instance=instance,
-        unit_cost=unit_cost,
-        init_cost=init_cost,
-        wait_cost=wait_cost,
-        delay_cost=delay_cost
-    )
+    toolbox.register('evaluate', eval_vrptw, instance=instance, unit_cost=unit_cost, \
+        init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', cx_partialy_matched)
     toolbox.register('mutate', mut_inverse_indexes)
