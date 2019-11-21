@@ -65,7 +65,6 @@ Of course, tuning improvements of this algorithm and forks are always welcome.
 
 ## Installation
 ### Requirements
-- [macOS][macos] (Recommended)
 - [Python 3.6+][python]
 - [Pip][pip]
 - [Virtualenv][virtualenv]
@@ -848,7 +847,6 @@ text2json(customize=False)
 [commit]: https://github.com/iRB-Lab/py-ga-VRPTW/commits/master "Last Commit"
 [travis-ci]: https://travis-ci.org/iRB-Lab/py-ga-VRPTW "Travis CI"
 
-[macos]: https://www.apple.com/macos/ "macOS"
 [python]: https://docs.python.org/ "Python"
 [pip]: https://pypi.python.org/pypi/pip "Pip"
 [virtualenv]: https://virtualenv.pypa.io/en/stable/ "Virtualenv"
