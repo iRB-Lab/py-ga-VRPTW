@@ -26,10 +26,10 @@ def main():
     export_csv = True
     customize_data = True
 
-    run_gavrptw(instance_name=instance_name, \
-        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
-        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
-        export_csv=export_csv, customize_data=customize_data)
+    run_gavrptw(instance_name=instance_name, unit_cost=unit_cost, init_cost=init_cost, \
+        wait_cost=wait_cost, delay_cost=delay_cost, ind_size=ind_size, pop_size=pop_size, \
+        cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, export_csv=export_csv, \
+        customize_data=customize_data)
 
 
 if __name__ == '__main__':

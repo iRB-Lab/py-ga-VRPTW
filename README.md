@@ -364,15 +364,13 @@ def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, de
             sub_route_distance = sub_route_distance + distance
             # Calculate time cost
             arrival_time = elapsed_time + distance
-            time_cost = wait_cost * \
-                max(instance[f'customer_{customer_id}']['ready_time'] - arrival_time, 0) + \
-                delay_cost * \
-                max(arrival_time - instance[f'customer_{customer_id}']['due_time'], 0)
+            time_cost = wait_cost * max(instance[f'customer_{customer_id}']['ready_time'] - \
+                arrival_time, 0) + delay_cost * max(arrival_time - \
+                instance[f'customer_{customer_id}']['due_time'], 0)
             # Update sub-route time cost
             sub_route_time_cost = sub_route_time_cost + time_cost
             # Update elapsed time
-            elapsed_time = arrival_time + \
-                instance[f'customer_{customer_id}']['service_time']
+            elapsed_time = arrival_time + instance[f'customer_{customer_id}']['service_time']
             # Update last customer ID
             last_customer_id = customer_id
         # Calculate transport cost
@@ -519,7 +517,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     instance = load_instance(json_file=json_file)
     if instance is None:
         return
-    creator.create('FitnessMax', base.Fitness, weights=(1.0,))
+    creator.create('FitnessMax', base.Fitness, weights=(1.0, ))
     creator.create('Individual', list, fitness=creator.FitnessMax)
     toolbox = base.Toolbox()
     # Attribute generator
@@ -571,7 +569,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
         fits = [ind.fitness.values[0] for ind in pop]
         length = len(pop)
         mean = sum(fits) / length
-        sum2 = sum(x*x for x in fits)
+        sum2 = sum([x**2 for x in fits])
         std = abs(sum2 / length - mean**2)**0.5
         print(f'  Min {min(fits)}')
         print(f'  Max {max(fits)}')
@@ -646,10 +644,9 @@ def main():
 
     export_csv = True
 
-    run_gavrptw(instance_name=instance_name, \
-        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
-        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
-        export_csv=export_csv)
+    run_gavrptw(instance_name=instance_name, unit_cost=unit_cost, init_cost=init_cost, \
+        wait_cost=wait_cost, delay_cost=delay_cost, ind_size=ind_size, pop_size=pop_size, \
+        cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, export_csv=export_csv)
 
 
 if __name__ == '__main__':
@@ -685,10 +682,9 @@ def main():
 
     export_csv = True
 
-    run_gavrptw(instance_name=instance_name, \
-        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
-        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
-        export_csv=export_csv)
+    run_gavrptw(instance_name=instance_name, unit_cost=unit_cost, init_cost=init_cost, \
+        wait_cost=wait_cost, delay_cost=delay_cost, ind_size=ind_size, pop_size=pop_size, \
+        cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, export_csv=export_csv)
 
 
 if __name__ == '__main__':
@@ -725,10 +721,10 @@ def main():
     export_csv = True
     customize_data = True
 
-    run_gavrptw(instance_name=instance_name, \
-        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
-        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
-        export_csv=export_csv, customize_data=customize_data)
+    run_gavrptw(instance_name=instance_name, unit_cost=unit_cost, init_cost=init_cost, \
+        wait_cost=wait_cost, delay_cost=delay_cost, ind_size=ind_size, pop_size=pop_size, \
+        cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, export_csv=export_csv, \
+        customize_data=customize_data)
 
 
 if __name__ == '__main__':
@@ -745,10 +741,9 @@ The sample codes will print logs on the screen. Meanwhile, a **CSV format** log 
     ...
     export_csv = False
 
-    run_gavrptw(instance_name=instance_name, \
-        unit_cost=unit_cost, init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost, \
-        ind_size=ind_size, pop_size=pop_size, cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, \
-        export_csv=export_csv)
+    run_gavrptw(instance_name=instance_name, unit_cost=unit_cost, init_cost=init_cost, \
+        wait_cost=wait_cost, delay_cost=delay_cost, ind_size=ind_size, pop_size=pop_size, \
+        cx_pb=cx_pb, mut_pb=mut_pb, n_gen=n_gen, export_csv=export_csv)
     ...
 ```
 

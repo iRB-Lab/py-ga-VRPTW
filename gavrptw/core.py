@@ -87,15 +87,13 @@ def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, de
             sub_route_distance = sub_route_distance + distance
             # Calculate time cost
             arrival_time = elapsed_time + distance
-            time_cost = wait_cost * \
-                max(instance[f'customer_{customer_id}']['ready_time'] - arrival_time, 0) + \
-                delay_cost * \
-                max(arrival_time - instance[f'customer_{customer_id}']['due_time'], 0)
+            time_cost = wait_cost * max(instance[f'customer_{customer_id}']['ready_time'] - \
+                arrival_time, 0) + delay_cost * max(arrival_time - \
+                instance[f'customer_{customer_id}']['due_time'], 0)
             # Update sub-route time cost
             sub_route_time_cost = sub_route_time_cost + time_cost
             # Update elapsed time
-            elapsed_time = arrival_time + \
-                instance[f'customer_{customer_id}']['service_time']
+            elapsed_time = arrival_time + instance[f'customer_{customer_id}']['service_time']
             # Update last customer ID
             last_customer_id = customer_id
         # Calculate transport cost
@@ -145,7 +143,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     instance = load_instance(json_file=json_file)
     if instance is None:
         return
-    creator.create('FitnessMax', base.Fitness, weights=(1.0,))
+    creator.create('FitnessMax', base.Fitness, weights=(1.0, ))
     creator.create('Individual', list, fitness=creator.FitnessMax)
     toolbox = base.Toolbox()
     # Attribute generator
@@ -197,7 +195,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
         fits = [ind.fitness.values[0] for ind in pop]
         length = len(pop)
         mean = sum(fits) / length
-        sum2 = sum(x*x for x in fits)
+        sum2 = sum([x**2 for x in fits])
         std = abs(sum2 / length - mean**2)**0.5
         print(f'  Min {min(fits)}')
         print(f'  Max {max(fits)}')
