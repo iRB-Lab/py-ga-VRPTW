@@ -21,7 +21,7 @@ Therefore, I should say, **to be precise, the performances of the given examples
 
 Of course, tuning improvements of this algorithm and forks are always welcome.
 
-#### Some Existing (Outstanding) Forks:
+#### Some Outstanding Forks:
 - [paulliwali/**py-ga-VRPTW**](https://github.com/paulliwali/py-ga-VRPTW)
 
 ## Contents
