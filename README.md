@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/iRB-Lab/py-ga-VRPTW.svg)][travis-ci]
-[![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue.svg)][python]
+[![Python](https://img.shields.io/badge/python-3.9-blue.svg)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
 [![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW.svg)][commit]
 
@@ -65,7 +65,7 @@ Of course, tuning improvements of this algorithm and forks are always welcome.
 
 ## Installation
 ### Requirements
-- [Python 3.6 | 3.7 | 3.8][python]
+- [Python 3.9][python]
 - [Pip][pip]
 - [Virtualenv][virtualenv]
 
