@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/iRB-Lab/py-ga-VRPTW.svg)][travis-ci]
+[![Build Status](https://app.travis-ci.com/iRB-Lab/py-ga-VRPTW.svg)][travis-ci]
 [![Python](https://img.shields.io/badge/python-3.9-blue.svg)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
 [![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW.svg)][commit]
@@ -841,7 +841,7 @@ text2json(customize=False)
 [repository]: https://github.com/iRB-Lab/py-ga-VRPTW "iRB-Lab/py-ga-VRPTW"
 [license]: https://github.com/iRB-Lab/py-ga-VRPTW/blob/master/LICENSE "License"
 [commit]: https://github.com/iRB-Lab/py-ga-VRPTW/commits/master "Last Commit"
-[travis-ci]: https://travis-ci.org/iRB-Lab/py-ga-VRPTW "Travis CI"
+[travis-ci]: https://app.travis-ci.com/github/iRB-Lab/py-ga-VRPTW "Travis CI"
 
 [python]: https://docs.python.org/ "Python"
 [pip]: https://pypi.python.org/pypi/pip "Pip"
