@@ -109,25 +109,26 @@ def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, de
 
 def cx_partialy_matched(ind1, ind2):
     '''gavrptw.core.cx_partialy_matched(ind1, ind2)'''
-    size = min(len(ind1), len(ind2))
-    cxpoint1, cxpoint2 = sorted(random.sample(range(size), 2))
-    temp1 = ind1[cxpoint1:cxpoint2+1] + ind2
-    temp2 = ind1[cxpoint1:cxpoint2+1] + ind1
-    ind1 = []
-    for gene in temp1:
-        if gene not in ind1:
-            ind1.append(gene)
-    ind2 = []
-    for gene in temp2:
-        if gene not in ind2:
-            ind2.append(gene)
+    cxpoint1, cxpoint2 = sorted(random.sample(range(min(len(ind1), len(ind2))), 2))
+    part1 = ind2[cxpoint1:cxpoint2+1]
+    part2 = ind1[cxpoint1:cxpoint2+1]
+    unipart1 = [gene for gene in part1 if gene not in part2]
+    unipart2 = [gene for gene in part2 if gene not in part1]
+    rule1to2 = dict(zip(unipart1, unipart2))
+    rule2to1 = dict(zip(unipart2, unipart1))
+    ind1 = [gene if gene not in part2 else rule2to1[gene] for gene in ind1[:cxpoint1]] + part2 + \
+        [gene if gene not in part2 else rule2to1[gene] for gene in ind1[cxpoint2+1:]]
+    ind2 = [gene if gene not in part1 else rule1to2[gene] for gene in ind2[:cxpoint1]] + part1 + \
+        [gene if gene not in part1 else rule1to2[gene] for gene in ind2[cxpoint2+1:]]
     return ind1, ind2
 
 
 def mut_inverse_indexes(individual):
     '''gavrptw.core.mut_inverse_indexes(individual)'''
     start, stop = sorted(random.sample(range(len(individual)), 2))
-    individual = individual[:start] + individual[stop:start-1:-1] + individual[stop+1:]
+    temp = individual[start:stop+1]
+    temp.reverse()
+    individual[start:stop+1] = temp
     return (individual, )
 
 
