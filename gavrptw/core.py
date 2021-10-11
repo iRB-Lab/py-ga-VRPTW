@@ -107,8 +107,8 @@ def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, de
     return (fitness, )
 
 
-def cx_partialy_matched(ind1, ind2):
-    '''gavrptw.core.cx_partialy_matched(ind1, ind2)'''
+def cx_partially_matched(ind1, ind2):
+    '''gavrptw.core.cx_partially_matched(ind1, ind2)'''
     cxpoint1, cxpoint2 = sorted(random.sample(range(min(len(ind1), len(ind2))), 2))
     part1 = ind2[cxpoint1:cxpoint2+1]
     part2 = ind1[cxpoint1:cxpoint2+1]
@@ -158,7 +158,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
     toolbox.register('evaluate', eval_vrptw, instance=instance, unit_cost=unit_cost, \
         init_cost=init_cost, wait_cost=wait_cost, delay_cost=delay_cost)
     toolbox.register('select', tools.selRoulette)
-    toolbox.register('mate', cx_partialy_matched)
+    toolbox.register('mate', cx_partially_matched)
     toolbox.register('mutate', mut_inverse_indexes)
     pop = toolbox.population(n=pop_size)
     # Results holders for exporting results to CSV file
