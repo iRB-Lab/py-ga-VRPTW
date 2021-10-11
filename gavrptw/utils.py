@@ -49,7 +49,7 @@ def exist(path, overwrite=False, display_info=True):
 def load_instance(json_file):
     '''gavrptw.uitls.load_instance(json_file)'''
     if exist(path=json_file, overwrite=False, display_info=True):
-        with io.open(json_file, 'rt', newline='') as file_object:
+        with io.open(json_file, 'rt', encoding='utf-8', newline='') as file_object:
             return load(file_object)
     return None
 
@@ -84,7 +84,7 @@ def text2json(customize=False):
     for text_file in map(lambda text_filename: os.path.join(text_data_dir, text_filename), \
         fnmatch.filter(os.listdir(text_data_dir), '*.txt')):
         json_data = {}
-        with io.open(text_file, 'rt', newline='') as file_object:
+        with io.open(text_file, 'rt', encoding='utf-8', newline='') as file_object:
             for line_count, line in enumerate(file_object, start=1):
                 if line_count in [2, 3, 4, 6, 7, 8, 9]:
                     pass
@@ -132,5 +132,5 @@ def text2json(customize=False):
         json_file = os.path.join(json_data_dir, json_file_name)
         print(f'Write to file: {json_file}')
         make_dirs_for_file(path=json_file)
-        with io.open(json_file, 'wt', newline='') as file_object:
+        with io.open(json_file, 'wt', encoding='utf-8', newline='') as file_object:
             dump(json_data, file_object, sort_keys=True, indent=4, separators=(',', ': '))

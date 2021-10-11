@@ -228,7 +228,7 @@ def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_
         print(f'Write to file: {csv_file}')
         make_dirs_for_file(path=csv_file)
         if not exist(path=csv_file, overwrite=True):
-            with io.open(csv_file, 'wt', newline='') as file_object:
+            with io.open(csv_file, 'wt', encoding='utf-8', newline='') as file_object:
                 fieldnames = [
                     'generation',
                     'evaluated_individuals',
