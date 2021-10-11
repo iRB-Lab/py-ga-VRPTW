@@ -54,6 +54,23 @@ def load_instance(json_file):
     return None
 
 
+def merge_rules(rules):
+    '''gavrptw.uitls.merge_rules(rules)'''
+    is_fully_merged = True
+    for round1 in rules:
+        if round1[0] == round1[1]:
+            rules.remove(round1)
+            is_fully_merged = False
+        else:
+            for round2 in rules:
+                if round2[0] == round1[1]:
+                    rules.append((round1[0], round2[1]))
+                    rules.remove(round1)
+                    rules.remove(round2)
+                    is_fully_merged = False
+    return rules, is_fully_merged
+
+
 def calculate_distance(customer1, customer2):
     '''gavrptw.uitls.calculate_distance(customer1, customer2)'''
     return ((customer1['coordinates']['x'] - customer2['coordinates']['x'])**2 + \

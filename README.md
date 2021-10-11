@@ -441,10 +441,12 @@ def cx_partialy_matched(ind1, ind2):
     cxpoint1, cxpoint2 = sorted(random.sample(range(min(len(ind1), len(ind2))), 2))
     part1 = ind2[cxpoint1:cxpoint2+1]
     part2 = ind1[cxpoint1:cxpoint2+1]
-    unipart1 = [gene for gene in part1 if gene not in part2]
-    unipart2 = [gene for gene in part2 if gene not in part1]
-    rule1to2 = dict(zip(unipart1, unipart2))
-    rule2to1 = dict(zip(unipart2, unipart1))
+    rule1to2 = list(zip(part1, part2))
+    is_fully_merged = False
+    while not is_fully_merged:
+        rule1to2, is_fully_merged = merge_rules(rules=rule1to2)
+    rule2to1 = {rule[1]: rule[0] for rule in rule1to2}
+    rule1to2 = dict(rule1to2)
     ind1 = [gene if gene not in part2 else rule2to1[gene] for gene in ind1[:cxpoint1]] + part2 + \
         [gene if gene not in part2 else rule2to1[gene] for gene in ind1[cxpoint2+1:]]
     ind2 = [gene if gene not in part1 else rule1to2[gene] for gene in ind2[:cxpoint1]] + part1 + \
@@ -782,10 +784,19 @@ run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size
 make_dirs_for_file(path)
 ```
 ```python
+guess_path_type(path)
+```
+```python
 exist(path, overwrite=False, display_info=True)
 ```
 ```python
 load_instance(json_file)
+```
+```python
+merge_rules(rules)
+```
+```python
+calculate_distance(customer1, customer2)
 ```
 ```python
 text2json(customize=False)
