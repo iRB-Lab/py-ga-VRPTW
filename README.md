@@ -1,7 +1,7 @@
-[![Build Status](https://app.travis-ci.com/iRB-Lab/py-ga-VRPTW.svg)][travis-ci]
-[![Python](https://img.shields.io/badge/python-3.9-blue.svg)][python]
-[![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW.svg)][license]
-[![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW.svg)][commit]
+[![Build Status](https://app.travis-ci.com/iRB-Lab/py-ga-VRPTW)][travis-ci]
+[![Python](https://img.shields.io/badge/python-3.10-blue)][python]
+[![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW)][license]
+[![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW)][commit]
 
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
