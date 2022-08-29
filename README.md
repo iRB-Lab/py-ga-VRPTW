@@ -1,5 +1,5 @@
-[![Build Status](https://img.shields.io/travis/com/iRB-Lab/py-ga-VRPTW?logo=travis)][travis-ci]
-[![Python](https://img.shields.io/badge/python-3.10-blue?logo=python&logoColor=white)][python]
+[![Build Status](https://img.shields.io/travis/com/iRB-Lab/py-ga-VRPTW?logo=travisci)][travis-ci]
+[![Python](https://img.shields.io/badge/python-3.10-blue?logo=python)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW)][license]
 [![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW?logo=github)][commit]
 
