@@ -1,28 +1,32 @@
 [![Build Status](https://img.shields.io/travis/com/iRB-Lab/py-ga-VRPTW?logo=travisci)][travis-ci]
-[![Python](https://img.shields.io/badge/python-3.10-blue?logo=python)][python]
+[![Python](https://img.shields.io/badge/python-3.12-blue?logo=python)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW)][license]
 [![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW?logo=github)][commit]
 
 # py-ga-VRPTW
 A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing Problem with Time Windows (VRPTW)
 
-## Important Notes
-### Project Origin (Backstory)
-This project is originated from a university course project.
-
-In 2016, a friend of mine, majoring in logistic engineering, came to me to discuss his course work project. He wanted to solve VRPTW using genetic algorithm, which I happened to know. The discussion went well and my friend got what he needed.
-
-After that, I implemented the approach in Python. The first version of the this project came out that night.
-
-### Performance Issue (Frequently Asked)
-I wrote this project on the spur of that moment. However, after running a few tests with several combinations of parameters and set-ups, I realized that implementing the idea is one thing, and tuning the algorithm to yield a converged result is another thing. The latter would definitely require much more effort.
-
-Therefore, I should say, **to be precise, the performances of the given examples are poor.**
-
-Of course, tuning improvements of this algorithm and forks are always welcome.
-
-#### Some Outstanding Forks:
-- [paulliwali/**py-ga-VRPTW**](https://github.com/paulliwali/py-ga-VRPTW)
+> [!IMPORTANT]
+>
+> ### Project Origin (Backstory)
+>
+> This project is originated from a university course project.
+>
+> In 2016, a friend of mine, majoring in logistic engineering, came to me to discuss his course work project. He wanted to solve VRPTW using genetic algorithm, which I happened to know. The discussion went well and my friend got what he needed.
+>
+> After that, I implemented the approach in Python. The first version of the this project came out that night.
+>
+> ### Performance Issue (Frequently Asked)
+>
+> I wrote this project on the spur of that moment. However, after running a few tests with several combinations of parameters and set-ups, I realized that implementing the idea is one thing, and tuning the algorithm to yield a converged result is another thing. The latter would definitely require much more effort.
+>
+> Therefore, I should say, **to be precise, the performances of the given examples are very poor.**
+>
+> Of course, tuning improvements of this algorithm and forks are always welcome.
+>
+> #### Some Outstanding Forks:
+>
+> - [paulliwali/**py-ga-VRPTW**](https://github.com/paulliwali/py-ga-VRPTW)
 
 ## Contents
 - [Installation](#installation)
@@ -65,9 +69,8 @@ Of course, tuning improvements of this algorithm and forks are always welcome.
 
 ## Installation
 ### Requirements
-- [Python 3.9][python]
+- [Python 3.12][python]
 - [Pip][pip]
-- [Virtualenv][virtualenv]
 
 ### Installing with Virtualenv
 On Unix, Linux, BSD, macOS, and Cygwin:
@@ -75,7 +78,7 @@ On Unix, Linux, BSD, macOS, and Cygwin:
 ```sh
 git clone https://github.com/iRB-Lab/py-ga-VRPTW.git
 cd py-ga-VRPTW
-virtualenv --python=python3 venv
+python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -90,18 +93,19 @@ See [sample codes](#sample-codes).
 |Short Scheduling Horizon|R1-type|C1-type|RC1-type|
 |Long Scheduling Horizon|R2-type|C2-type|RC2-type|
 
-**Remarks:**
-
-1. Solomon generated six sets of problems. Their design highlights several factors that affect the behavior of routing and scheduling algorithms. They are:
-    - geographical data;
-    - the number of customers serviced by a vehicle;
-    - percent of time-constrained customers; and
-    - tightness and positioning of the time windows.
-2. The geographical data are randomly generated in problem sets R1 and R2, clustered in problem sets C1 and C2, and a mix of random and clustered structures in problem sets by RC1 and RC2.
-3. Problem sets R1, C1 and RC1 have a short scheduling horizon and allow only a few customers per route (approximately 5 to 10). In contrast, the sets R2, C2 and RC2 have a long scheduling horizon permitting many customers (more than 30) to be serviced by the same vehicle.
-3. The customer coordinates are identical for all problems within one type (i.e., R, C and RC).
-4. The problems differ with respect to the width of the time windows. Some have very tight time windows, while others have time windows which are hardly constraining. In terms of time window density, that is, the percentage of customers with time windows, I created problems with 25, 50, 75 and 100% time windows.
-4. The larger problems are 100 customer euclidean problems where travel times equal the corresponding distances. For each such problem, smaller problems have been created by considering only the first 25 or 50 customers.
+> [!NOTE]
+>
+> 1. Solomon generated six sets of problems. Their design highlights several factors that affect the behavior of routing and scheduling algorithms. They are:
+>    - geographical data;
+>    - the number of customers serviced by a vehicle;
+>    - percent of time-constrained customers; and
+>    - tightness and positioning of the time windows.
+>
+> 2. The geographical data are randomly generated in problem sets R1 and R2, clustered in problem sets C1 and C2, and a mix of random and clustered structures in problem sets by RC1 and RC2.
+> 3. Problem sets R1, C1 and RC1 have a short scheduling horizon and allow only a few customers per route (approximately 5 to 10). In contrast, the sets R2, C2 and RC2 have a long scheduling horizon permitting many customers (more than 30) to be serviced by the same vehicle.
+> 4. The customer coordinates are identical for all problems within one type (i.e., R, C and RC).
+> 5. The problems differ with respect to the width of the time windows. Some have very tight time windows, while others have time windows which are hardly constraining. In terms of time window density, that is, the percentage of customers with time windows, I created problems with 25, 50, 75 and 100% time windows.
+> 6. The larger problems are 100 customer euclidean problems where travel times equal the corresponding distances. For each such problem, smaller problems have been created by considering only the first 25 or 50 customers.
 
 ### Instance Definitions
 See [Solomon's website][solomon].
@@ -127,16 +131,16 @@ CUST NO.  XCOORD.   YCOORD.    DEMAND   READY TIME  DUE DATE   SERVICE TIME
   100     x100      y100       q100       e100        l100          s100
 ```
 
-**Remarks:**
-
-1. All constants are integers.
-2. `CUST NO.` 0 denotes the depot, where all vehicles must start and finish.
-3. `K` is the maximum number of vehicles.
-4. `Q` the capacity of each vehicle.
-5. `READY TIME` is the earliest time at which service may start at the given customer/depot.
-6. `DUE DATE` is the latest time at which service may start at the given customer/depot.
-7. The value of time is equal to the value of distance.
-8. As a backup, you can download a zip-file with the 100 customers instance definitions<sup>[2][100-customers]</sup> [here][100-customers-zip].
+> [!NOTE]
+>
+> 1. All constants are integers.
+> 2. `CUST NO.` 0 denotes the depot, where all vehicles must start and finish.
+> 3. `K` is the maximum number of vehicles.
+> 4. `Q` the capacity of each vehicle.
+> 5. `READY TIME` is the earliest time at which service may start at the given customer/depot.
+> 6. `DUE DATE` is the latest time at which service may start at the given customer/depot.
+> 7. The value of time is equal to the value of distance.
+> 8. As a backup, you can download a zip-file with the 100 customers instance definitions<sup>[2][100-customers]</sup> [here][100-customers-zip].
 
 #### JSON Format
 For the further convenience, a Python script named `text2json.py` is written to convert problem instances from the **text file format** to **JSON format** and stored under the `data/json/` directory. Like the text files, each JSON file is named with respect to its corresponding instance name, e.g.: the JSON file corresponding to problem instance **C101** is `C101.json`, and locates at `data/json/C101.json`.
@@ -188,10 +192,10 @@ Below is a description of the format of the JSON file that defines each problem 
 }
 ```
 
-**Remarks:**
-
-1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
-2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<json_data>['distance_matrix'][1][2]`, where `<json_data>` denotes the name of a Python `dict` object.
+> [!NOTE]
+>
+> 1. `dist1_1` denotes the distance between Customer 1 and Customer 1, which should be 0, obviously.
+> 2. To obtain the distance value between Customer 1 and Customer 2 in Python can be done by using `<json_data>['distance_matrix'][1][2]`, where `<json_data>` denotes the name of a Python `dict` object.
 
 #### Use Customized Instance Data
 You can customize your own problem instances.
@@ -238,16 +242,16 @@ decodes `individual` to `route` representation. To show the difference between a
 [[5, 3, 2], [7, 1, 6, 9], [8, 4]]
 ```
 
-**Parameters:**
+##### Parameters
 
 - `individual` – An individual to be decoded.
 - `instance` – A problem instance `dict` object, which can be loaded from a JSON format file.
 
-**Returns:**
+##### Returns
 
 - A list of decoded sub-routes corresponding to the input individual.
 
-**Definition:**
+##### Definition
 
 ```python
 def ind2route(individual, instance):
@@ -296,16 +300,16 @@ print_route(route, merge=False)
 
 prints sub-routes information to screen.
 
-**Parameters:**
+##### Parameters
 
 - `route` – A `route` decoded by `ind2route(individual, instance)`.
 - `merge` – If `Ture`, detailed sub-routes are displayed in a single line.
 
-**Returns:**
+##### Returns
 
 - None
 
-**Definition:**
+##### Definition
 
 ```python
 def print_route(route, merge=False):
@@ -332,7 +336,7 @@ eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, delay_
 
 takes one individual as argument and returns its fitness as a Python `tuple` object.
 
-**Parameters:**
+##### Parameters
 
 - `individual` - An individual to be evaluated.
 - `instance` - A problem instance `dict` object, which can be loaded from a JSON format file.
@@ -341,11 +345,11 @@ takes one individual as argument and returns its fitness as a Python `tuple` obj
 - `wait_cost` - Cost per unit time if the vehicle arrives early than the customer's ready time.
 - `delay_cost` - Cost per unit time if the vehicle arrives later than the due time.
 
-**Returns:**
+##### Returns
 
 - A tuple of one fitness value of the evaluated individual.
 
-**Definition:**
+##### Definition
 
 ```python
 def eval_vrptw(individual, instance, unit_cost=1.0, init_cost=0, wait_cost=0, delay_cost=0):
@@ -391,16 +395,16 @@ deap.tools.selRoulette(individuals, k)
 
 selects `k` individuals from the input individuals using `k` spins of a roulette. The selection is made by looking only at the first objective of each individual. The list returned contains references to the input individuals.
 
-**Parameters:**
+##### Parameters
 
 - `individuals` – A list of individuals to select from.
 - `k` – The number of individuals to select.
 
-**Returns:**
+##### Returns
 
 - A list of selected individuals.
 
-**Definition:**
+##### Definition
 
 ```python
 def selRoulette(individuals, k):
@@ -425,16 +429,16 @@ cx_partially_matched(ind1, ind2)
 
 executes a partially matched crossover (PMX) on the input individuals. The two individuals are modified in place. This crossover expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
 
-**Parameters:**
+##### Parameters
 
 - `ind1` – The first individual participating in the crossover.
 - `ind2` – The second individual participating in the crossover.
 
-**Returns:**
+##### Returns
 
 - A tuple of two individuals.
 
-**Definition:**
+##### Definition
 
 ```python
 def cx_partially_matched(ind1, ind2):
@@ -461,15 +465,15 @@ mut_inverse_indexes(individual)
 
 inverses the attributes between two random points of the input individual and return the mutant. This mutation expects sequence individuals of indexes, the result for any other type of individuals is unpredictable.
 
-**Parameters:**
+##### Parameters
 
 - `individual` – Individual to be mutated.
 
-**Returns:**
+##### Returns
 
 - A tuple of one individual.
 
-**Definition:**
+##### Definition
 
 ```python
 def mut_inverse_indexes(individual):
@@ -488,7 +492,7 @@ run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size
 
 implements a genetic algorithm-based solution to vehicle routing problem with time windows (VRPTW).
 
-**Parameters:**
+##### Parameters
 
 - `instance_name` - A problem instance name provided in Solomon's VRPTW benchmark problems.
 - `unit_cost` - The transportation cost of one vehicle for a unit distance.
@@ -503,11 +507,11 @@ implements a genetic algorithm-based solution to vehicle routing problem with ti
 - `export_csv` - If `True`, a CSV format log file will be exported to the `results\` directory.
 - `customize_data` - If `Ture`, customized JSON format problem instance file will be loaded from `data\json_customized\` directory.
 
-**Returns:**
+##### Returns
 
 - None
 
-**Definition:**
+##### Definition
 
 ```python
 def run_gavrptw(instance_name, unit_cost, init_cost, wait_cost, delay_cost, ind_size, pop_size, \
