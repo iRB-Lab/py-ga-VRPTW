@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/travis/com/iRB-Lab/py-ga-VRPTW?logo=travisci)][travis-ci]
-[![Python](https://img.shields.io/badge/python-3.12-blue?logo=python)][python]
+[![Python](https://img.shields.io/badge/python-3.13-blue?logo=python)][python]
 [![License](https://img.shields.io/github/license/iRB-Lab/py-ga-VRPTW)][license]
 [![Last Commit](https://img.shields.io/github/last-commit/iRB-Lab/py-ga-VRPTW?logo=github)][commit]
 
@@ -69,10 +69,10 @@ A Python Implementation of a Genetic Algorithm-based Solution to Vehicle Routing
 
 ## Installation
 ### Requirements
-- [Python 3.12][python]
+- [Python 3.13][python]
 - [Pip][pip]
 
-### Installing with Virtualenv
+### Installing with `venv` module
 On Unix, Linux, BSD, macOS, and Cygwin:
 
 ```sh
